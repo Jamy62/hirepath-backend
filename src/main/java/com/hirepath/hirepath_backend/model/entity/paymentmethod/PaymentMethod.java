@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "payment_method")
+@Table(name = "payment_methods")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,16 +19,16 @@ public class PaymentMethod {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Long id;
 
-    @Column(name = "method_name")
-    private String methodName;
+    @Column(name = "name")
+    private String name;
 
-    @Column(name = "details")
-    private String details;
+    @Column(name = "description")
+    private String description;
 
-    @Column(name = "is_active")
-    private Boolean isActive;
+    @Column(name = "guid")
+    private String guid;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
@@ -37,11 +37,11 @@ public class PaymentMethod {
     private ZonedDateTime createdAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Long createdBy;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 }

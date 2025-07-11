@@ -7,7 +7,7 @@ import lombok.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "job_industry")
+@Table(name = "industries")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,18 +24,24 @@ public class Industry {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "guid")
     private String guid;
+
+    @Column(name = "is_deleted")
+    private String isDeleted;
 
     @Column(name = "created_at")
     private ZonedDateTime createdAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Long createdBy;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 }

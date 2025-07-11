@@ -1,6 +1,10 @@
 package com.hirepath.hirepath_backend.model.entity.companyuser;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.hirepath.hirepath_backend.model.entity.company.Company;
+import com.hirepath.hirepath_backend.model.entity.plan.Plan;
+import com.hirepath.hirepath_backend.model.entity.role.Role;
+import com.hirepath.hirepath_backend.model.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,10 +23,22 @@ public class CompanyUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Long id;
 
-    @Column(name = "position")
-    private String position;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private Company company;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
+    private Role role;
+
+    @Column(name = "guid")
+    private String guid;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
@@ -31,11 +47,11 @@ public class CompanyUser {
     private ZonedDateTime createdAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Long createdBy;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 }

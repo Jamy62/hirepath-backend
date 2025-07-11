@@ -19,7 +19,7 @@ public class Plan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Long id;
 
     @Column(name = "name")
     private String name;
@@ -30,11 +30,17 @@ public class Plan {
     @Column(name = "price")
     private Double price;
 
+    @Column(name = "duration")
+    private String duration;
+
     @Column(name = "duration_days")
     private Integer durationDays;
 
-    @Column(name = "is_active")
-    private Boolean isActive;
+    @Column(name = "features")
+    private String features;
+
+    @Column(name = "guid")
+    private String guid;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
@@ -43,11 +49,11 @@ public class Plan {
     private ZonedDateTime createdAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Long createdBy;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 }

@@ -1,4 +1,4 @@
-package com.hirepath.hirepath_backend.model.entity.reference;
+package com.hirepath.hirepath_backend.model.entity.rolepermissiontype;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -7,34 +7,28 @@ import lombok.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "`references`") // Escaped due to SQL reserved word
+@Table(name = "role_permission_types")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Reference {
+public class RolePermissionType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Long id;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "position")
-    private String position;
+    @Column(name = "description")
+    private String Description;
 
-    @Column(name = "company")
-    private String company;
-
-    @Column(name = "email")
-    private String email;
-
-    @Column(name = "phone")
-    private String phone;
+    @Column(name = "guid")
+    private String guid;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
@@ -43,11 +37,11 @@ public class Reference {
     private ZonedDateTime createdAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Long createdBy;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 }

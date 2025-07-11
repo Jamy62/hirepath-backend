@@ -1,41 +1,51 @@
-package com.hirepath.hirepath_backend.model.entity.verification;
+package com.hirepath.hirepath_backend.model.entity.companyuserposition;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
 import jakarta.persistence.*;
 import lombok.*;
 
+import javax.swing.text.Position;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "verification")
+@Table(name = "company_user_position")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Verification {
+public class CompanyUserPosition {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_user_id")
+    private CompanyUser companyUser;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "position")
+    private Position position;
 
     @Column(name = "guid")
     private String guid;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
     @Column(name = "created_at")
     private ZonedDateTime createdAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Long createdBy;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 }

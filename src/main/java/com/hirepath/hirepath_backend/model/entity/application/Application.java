@@ -2,6 +2,7 @@ package com.hirepath.hirepath_backend.model.entity.application;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hirepath.hirepath_backend.model.entity.job.Job;
+import com.hirepath.hirepath_backend.model.entity.resume.Resume;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,31 +22,7 @@ public class Application {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
-
-    @Column(name = "application_date")
-    private ZonedDateTime applicationDate;
-
-    @Column(name = "status")
-    private String status;
-
-    @Column(name = "cover_letter")
-    private String coverLetter;
-
-    @Column(name = "guid")
-    private String guid;
-
-    @Column(name = "created_at")
-    private ZonedDateTime createdAt;
-
-    @Column(name = "created_by")
-    private Integer createdBy;
-
-    @Column(name = "updated_at")
-    private ZonedDateTime updatedAt;
-
-    @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -54,4 +31,39 @@ public class Application {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_id")
     private Job job;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "resume_id")
+    private Resume resume;
+
+    @Column(name = "application_date")
+    private ZonedDateTime applicationDate;
+
+    @Column(name = "cover_letter")
+    private String coverLetter;
+
+    @Column(name = "file_path")
+    private String filePath;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "guid")
+    private String guid;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
+    @Column(name = "created_at")
+    private ZonedDateTime createdAt;
+
+    @Column(name = "created_by")
+    private Long createdBy;
+
+    @Column(name = "updated_at")
+    private ZonedDateTime updatedAt;
+
+    @Column(name = "updated_by")
+    private Long updatedBy;
+
 }

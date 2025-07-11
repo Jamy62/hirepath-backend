@@ -8,7 +8,7 @@ import lombok.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "preferred_industry")
+@Table(name = "preferred_industries")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,7 +20,7 @@ public class PreferredIndustry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -33,15 +33,18 @@ public class PreferredIndustry {
     @Column(name = "guid")
     private String guid;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @Column(name = "created_at")
     private ZonedDateTime createdAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Long createdBy;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 }

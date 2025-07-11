@@ -1,6 +1,7 @@
 package com.hirepath.hirepath_backend.model.entity.role;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.hirepath.hirepath_backend.model.entity.rolepermissiontype.RolePermissionType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,7 +20,11 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_permission_type_id")
+    private RolePermissionType rolePermissionType;
 
     @Column(name = "name")
     private String name;
@@ -34,11 +39,11 @@ public class Role {
     private ZonedDateTime createdAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Long createdBy;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 }

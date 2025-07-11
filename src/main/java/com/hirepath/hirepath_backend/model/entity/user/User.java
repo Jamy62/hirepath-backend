@@ -8,7 +8,7 @@ import lombok.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -50,11 +50,8 @@ public class User {
     @Column(name = "is_blocked")
     private Boolean isBlocked;
 
-    @Column(name = "last_login")
-    private ZonedDateTime lastLogin;
-
-    @Column(name = "verified_at")
-    private ZonedDateTime verifiedAt;
+    @Column(name = "last_login_at")
+    private ZonedDateTime lastLoginAt;
 
     @Column(name = "guid")
     private String guid;
@@ -66,11 +63,11 @@ public class User {
     private ZonedDateTime createdAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Long createdBy;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 }

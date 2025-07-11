@@ -22,44 +22,69 @@ public class Company {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "name")
     private String name;
 
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "phone")
+    private String phone;
+
+
+    // verification details
+    @Column(name = "verification_status")
+    private String verification_status;
+
+    @Column(name = "legal_business_name")
+    private String legal_business_name;
+
+    @Column(name = "public_name")
+    private String publicName;
+
     @Column(name = "website")
     private String website;
 
-    @Column(name = "contact_email")
-    private String contactEmail;
+    @Column(name = "industry")
+    private String industry;
 
-    @Column(name = "contact_phone")
-    private String contactPhone;
+    @Column(name = "founded_date")
+    private ZonedDateTime foundedDate;
+
+    @Column(name = "company_size")
+    private String companySize;
+
+    @Column(name = "business_type")
+    private String businessType;
+
+    @Column(name = "verified_at")
+    private ZonedDateTime verified_at;
+
+    @Column(name = "verified_by")
+    private Long verifiedBy;
+
 
     @Column(name = "guid")
     private String guid;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 
     @Column(name = "created_at")
     private ZonedDateTime createdAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Long createdBy;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "location_id")
-    private Location location;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "verification_id")
-    private Verification verification;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_plan_id")
-    private CompanyPlan companyPlan;
 }

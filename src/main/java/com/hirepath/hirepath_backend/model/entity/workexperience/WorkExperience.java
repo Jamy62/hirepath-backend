@@ -1,13 +1,14 @@
 package com.hirepath.hirepath_backend.model.entity.workexperience;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.hirepath.hirepath_backend.model.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "work_experience")
+@Table(name = "work_experiences")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,10 +20,14 @@ public class WorkExperience {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Long id;
 
-    @Column(name = "company")
-    private String company;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Column(name = "company_name")
+    private String company_name;
 
     @Column(name = "position")
     private String position;
@@ -36,6 +41,9 @@ public class WorkExperience {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "guid")
+    private String guid;
+
     @Column(name = "is_deleted")
     private Boolean isDeleted;
 
@@ -43,11 +51,11 @@ public class WorkExperience {
     private ZonedDateTime createdAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Long createdBy;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 }

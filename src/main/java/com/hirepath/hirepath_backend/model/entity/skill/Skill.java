@@ -1,13 +1,14 @@
 package com.hirepath.hirepath_backend.model.entity.skill;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.hirepath.hirepath_backend.model.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "skill")
+@Table(name = "skills")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,13 +20,20 @@ public class Skill {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "proficiency_level")
-    private String proficiencyLevel;
+    @Column(name = "proficiency")
+    private String proficiency;
+
+    @Column(name = "guid")
+    private String guid;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;
@@ -34,11 +42,11 @@ public class Skill {
     private ZonedDateTime createdAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Long createdBy;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 }

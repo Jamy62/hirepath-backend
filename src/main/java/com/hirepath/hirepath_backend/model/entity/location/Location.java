@@ -1,7 +1,9 @@
 package com.hirepath.hirepath_backend.model.entity.location;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.entity.township.Township;
+import com.hirepath.hirepath_backend.model.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,10 +22,20 @@ public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id")
+    private Company company;
 
     @Column(name = "name")
     private String name;
+
+    @Column(name = "address")
+    private String address;
+
+    @Column(name = "photo")
+    private String photo;
 
     @Column(name = "guid")
     private String guid;
@@ -32,15 +44,12 @@ public class Location {
     private ZonedDateTime createdAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Long createdBy;
 
     @Column(name = "updated_at")
     private ZonedDateTime updatedAt;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Long updatedBy;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "township_id")
-    private Township township;
 }

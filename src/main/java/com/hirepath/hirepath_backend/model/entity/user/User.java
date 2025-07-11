@@ -22,6 +22,10 @@ public class User {
     @Column(name = "id")
     private int id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "default_language_id")
+    private DefaultLanguage defaultLanguageId;
+
     @Column(name = "name")
     private String name;
 
@@ -69,9 +73,4 @@ public class User {
 
     @Column(name = "updated_by")
     private Integer updatedBy;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "default_language_id")
-    private DefaultLanguage defaultLanguageId;
-
 }

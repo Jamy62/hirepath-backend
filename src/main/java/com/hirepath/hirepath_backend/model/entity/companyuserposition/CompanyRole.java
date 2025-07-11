@@ -1,4 +1,4 @@
-package com.hirepath.hirepath_backend.model.entity.companyrole;
+package com.hirepath.hirepath_backend.model.entity.companyuserposition;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;

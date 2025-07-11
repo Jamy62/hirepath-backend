@@ -32,10 +32,10 @@ public class CompanyPlan {
     private Plan plan;
 
     @Column(name = "start_date")
-    private String startDate;
+    private ZonedDateTime startDate;
 
     @Column(name = "end_date")
-    private String endDate;
+    private ZonedDateTime endDate;
 
     @Column(name = "is_active")
     private String isActive;

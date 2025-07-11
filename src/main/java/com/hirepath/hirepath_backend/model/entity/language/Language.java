@@ -22,12 +22,11 @@ public class Language {
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
     @Column(name = "name")
     private String name;
+
+    @Column(name = "code")
+    private String code;
 
     @Column(name = "guid")
     private String guid;

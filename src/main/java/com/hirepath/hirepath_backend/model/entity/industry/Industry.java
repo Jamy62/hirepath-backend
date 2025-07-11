@@ -19,19 +19,19 @@ public class Industry {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private Integer id;
+    private Long id;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "guid")
     private String guid;
 
     @Column(name = "is_deleted")
-    private String isDeleted;
+    private Boolean isDeleted;
 
     @Column(name = "created_at")
     private ZonedDateTime createdAt;

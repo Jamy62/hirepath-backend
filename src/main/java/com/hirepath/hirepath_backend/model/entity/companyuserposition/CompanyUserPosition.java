@@ -28,7 +28,7 @@ public class CompanyUserPosition {
     private CompanyUser companyUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "position")
+    @JoinColumn(name = "position_id")
     private Position position;
 
     @Column(name = "guid")

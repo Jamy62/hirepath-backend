@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.model.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.hirepath.hirepath_backend.model.entity.defaultlanguage.DefaultLanguage;
+import com.hirepath.hirepath_backend.model.entity.preferredlanguage.PreferredLanguage;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,11 +20,11 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "default_language_id")
-    private DefaultLanguage defaultLanguageId;
+    @JoinColumn(name = "preferred_language_id")
+    private PreferredLanguage preferredLanguage;
 
     @Column(name = "name")
     private String name;

@@ -38,7 +38,7 @@ public class WorkExperience {
     @Column(name = "end_date")
     private ZonedDateTime endDate;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "guid")

@@ -1,8 +1,6 @@
 package com.hirepath.hirepath_backend.model.entity.permission;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.hirepath.hirepath_backend.model.entity.jobfunction.JobFunction;
-import com.hirepath.hirepath_backend.model.entity.rolepermissiontype.RolePermissionType;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.ZonedDateTime;
@@ -17,19 +15,23 @@ import java.time.ZonedDateTime;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Permission {
 
+    public enum PermissionType {
+        SYSTEM, PAGE
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_permission_type_id")
-    private RolePermissionType rolePermissionType;
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    private PermissionType type;
 
     @Column(name = "name")
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "guid")

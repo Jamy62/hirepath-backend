@@ -8,7 +8,7 @@ import lombok.*;
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "preferred_industries")
+@Table(name = "user_industry")
 @Getter
 @Setter
 @NoArgsConstructor

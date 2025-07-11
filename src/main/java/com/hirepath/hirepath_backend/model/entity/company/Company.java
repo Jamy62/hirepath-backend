@@ -27,7 +27,13 @@ public class Company {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "description")
+    @Column(name = "logo")
+    private String logo;
+
+    @Column(name = "banner")
+    private String banner;
+
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "email")
@@ -39,10 +45,10 @@ public class Company {
 
     // verification details
     @Column(name = "verification_status")
-    private String verification_status;
+    private String verificationStatus;
 
     @Column(name = "legal_business_name")
-    private String legal_business_name;
+    private String legalBusinessName;
 
     @Column(name = "public_name")
     private String publicName;

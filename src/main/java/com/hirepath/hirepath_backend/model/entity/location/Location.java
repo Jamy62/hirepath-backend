@@ -40,6 +40,9 @@ public class Location {
     @Column(name = "guid")
     private String guid;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @Column(name = "created_at")
     private ZonedDateTime createdAt;
 

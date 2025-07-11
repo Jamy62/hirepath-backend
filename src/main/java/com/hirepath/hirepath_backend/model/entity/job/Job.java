@@ -61,17 +61,20 @@ public class Job {
     @Column(name = "title")
     private String title;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "requirements")
+    @Column(name = "requirements", columnDefinition = "TEXT")
     private String requirements;
 
-    @Column(name = "benefits")
+    @Column(name = "benefits", columnDefinition = "TEXT")
     private String benefits;
 
-    @Column(name = "salary_range")
-    private String salaryRange;
+    @Column(name = "min_salary")
+    private Double minSalary;
+
+    @Column(name = "max_salary")
+    private Double maxSalary;
 
     @Column(name = "posted_date")
     private ZonedDateTime postedDate;

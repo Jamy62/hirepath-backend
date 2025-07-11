@@ -1,21 +1,20 @@
-package com.hirepath.hirepath_backend.model.entity.defaultlanguage;
+package com.hirepath.hirepath_backend.model.entity.preferredlanguage;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "default_languages")
+@Table(name = "preferred_languages")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class DefaultLanguage {
+public class PreferredLanguage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

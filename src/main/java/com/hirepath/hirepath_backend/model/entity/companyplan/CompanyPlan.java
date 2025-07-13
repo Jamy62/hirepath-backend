@@ -38,7 +38,7 @@ public class CompanyPlan {
     private ZonedDateTime endDate;
 
     @Column(name = "is_active")
-    private String isActive;
+    private Boolean isActive;
 
     @Column(name = "guid")
     private String guid;

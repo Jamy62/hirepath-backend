@@ -27,7 +27,7 @@ public class WorkExperience {
     private User user;
 
     @Column(name = "company_name")
-    private String company_name;
+    private String companyName;
 
     @Column(name = "position")
     private String position;

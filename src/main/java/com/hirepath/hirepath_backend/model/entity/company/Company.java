@@ -1,9 +1,6 @@
 package com.hirepath.hirepath_backend.model.entity.company;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.hirepath.hirepath_backend.model.entity.companyplan.CompanyPlan;
-import com.hirepath.hirepath_backend.model.entity.location.Location;
-import com.hirepath.hirepath_backend.model.entity.verification.Verification;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,6 +15,10 @@ import java.time.ZonedDateTime;
 @Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Company {
+
+    public enum VerificationStatus {
+        PENDING, TRUE, FALSE
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,7 +46,7 @@ public class Company {
 
     // verification details
     @Column(name = "verification_status")
-    private String verificationStatus;
+    private VerificationStatus verificationStatus;
 
     @Column(name = "legal_business_name")
     private String legalBusinessName;

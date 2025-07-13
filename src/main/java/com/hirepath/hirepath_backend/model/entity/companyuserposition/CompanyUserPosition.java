@@ -2,10 +2,10 @@ package com.hirepath.hirepath_backend.model.entity.companyuserposition;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
+import com.hirepath.hirepath_backend.model.entity.position.Position;
 import jakarta.persistence.*;
 import lombok.*;
 
-import javax.swing.text.Position;
 import java.time.ZonedDateTime;
 
 @Entity

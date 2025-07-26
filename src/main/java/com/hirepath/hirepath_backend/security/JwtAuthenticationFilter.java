@@ -26,6 +26,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
         throws ServletException, IOException {
+        if (request.getRequestURI().startsWith("/v1/auth/login") || request.getRequestURI().startsWith("/v1/auth/register")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String header = request.getHeader("Authorization");
         String email = null;
         String jwt = null;
@@ -49,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
 
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
-                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                auth.setDetails(Map.of("companyRoles", companyRoles));
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }

@@ -14,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -23,12 +25,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(request -> {
+                    var config = new org.springframework.web.cors.CorsConfiguration();
+                    config.setAllowedOrigins(List.of("http://localhost:3000"));
+                    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+                    config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+                    return config;
+                }))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/jobs/search", "/api/applications/**").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers("/api/jobs/**").hasAnyRole("PAGE_ADMIN", "RECRUITER")
+                        .requestMatchers("/v1/auth/**").permitAll()
+                        .requestMatchers("/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/v1/jobs/search", "/v1/applications/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/v1/jobs/**").hasAnyRole("COMPANY_ADMIN", "RECRUITER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore((jwtAuthenticationFilter), UsernamePasswordAuthenticationFilter.class);

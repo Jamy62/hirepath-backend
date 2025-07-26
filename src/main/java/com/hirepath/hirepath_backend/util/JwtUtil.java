@@ -2,6 +2,7 @@ package com.hirepath.hirepath_backend.util;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -9,8 +10,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+@Component
 public class JwtUtil {
-    private String SECRET_KEY = "test";
+    private String SECRET_KEY = "hirepath-secret-jamy-hirepath-secret-jamy-hirepath-secret-jamy";
     private long EXPIRATION_TIME = 60 * 60 * 1000;
     private SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes((StandardCharsets.UTF_8)));
 
@@ -30,12 +32,17 @@ public class JwtUtil {
     }
 
     public String extractEmail(String token) {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+        try {
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .getSubject();
+        }
+        catch (Exception e) {
+            throw new IllegalArgumentException("Invalid JWT token: " + e.getMessage());
+        }
     }
 
     public String extractSystemRole(String token) {
@@ -48,12 +55,17 @@ public class JwtUtil {
     }
 
     public Map extractCompanyRoles(String token) {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .get("companyRoles", Map.class);
+        try {
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .get("companyRoles", Map.class);
+        }
+        catch (Exception e) {
+            return new HashMap<>();
+        }
     }
 
     public boolean isTokenValid(String token, String email) {

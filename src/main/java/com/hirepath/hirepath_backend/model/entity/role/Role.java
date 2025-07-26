@@ -17,7 +17,7 @@ import java.time.ZonedDateTime;
 public class Role {
 
     public enum RoleType {
-        SYSTEM, PAGE
+        SYSTEM, COMPANY
     }
 
     @Id

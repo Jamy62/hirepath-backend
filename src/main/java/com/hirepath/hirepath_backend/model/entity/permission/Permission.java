@@ -16,7 +16,7 @@ import java.time.ZonedDateTime;
 public class Permission {
 
     public enum PermissionType {
-        SYSTEM, PAGE
+        SYSTEM, COMPANY
     }
 
     @Id

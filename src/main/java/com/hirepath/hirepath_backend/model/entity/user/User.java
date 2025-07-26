@@ -2,6 +2,7 @@ package com.hirepath.hirepath_backend.model.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hirepath.hirepath_backend.model.entity.preferredlanguage.PreferredLanguage;
+import com.hirepath.hirepath_backend.model.entity.role.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,6 +26,10 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "preferred_language_id")
     private PreferredLanguage preferredLanguage;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     @Column(name = "name")
     private String name;

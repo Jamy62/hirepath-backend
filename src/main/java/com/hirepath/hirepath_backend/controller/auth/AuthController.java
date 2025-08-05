@@ -8,6 +8,7 @@ import com.hirepath.hirepath_backend.service.auth.AuthService;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,10 +26,22 @@ import java.security.Principal;
 public class AuthController {
     private final AuthService authService;
 
+    @PostMapping("/register")
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
+        authService.register(request.getEmail(), request.getPassword(), request.getName());
+        return ResponseEntity.ok("User registered successfully");
+    }
+
     @PostMapping("/login")
     public ResponseEntity<ResponseFormat> login(@RequestBody LoginRequest request) {
         ResponseFormat responseFormat = authService.login(request.getEmail(), request.getPassword());
         return ResponseEntity.ok(responseFormat);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(Principal principal ) {
+        authService.logout(principal.getName());
+        return ResponseEntity.ok("Logout successful");
     }
 
     @PostMapping("/company-access")
@@ -37,12 +50,6 @@ public class AuthController {
                                                         Principal principal) {
         ResponseFormat responseFormat = authService.companyAccess(request.getCompanyGuid(), principal.getName());
         return ResponseEntity.ok(responseFormat);
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        authService.register(request.getEmail(), request.getPassword(), request.getName());
-        return ResponseEntity.ok("User registered successfully");
     }
 
 }

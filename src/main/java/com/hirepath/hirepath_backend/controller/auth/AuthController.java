@@ -7,6 +7,7 @@ import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.auth.AuthService;
 import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
 import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
@@ -27,9 +28,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        authService.register(request.getEmail(), request.getPassword(), request.getName());
-        return ResponseEntity.ok("User registered successfully");
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+        ResponseFormat responseFormat = authService.register(request.getEmail(), request.getPassword(), request.getName());
+        return ResponseEntity.ok(responseFormat);
     }
 
     @PostMapping("/login")

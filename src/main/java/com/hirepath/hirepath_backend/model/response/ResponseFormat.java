@@ -33,4 +33,12 @@ public class ResponseFormat {
         response.setData(Optional.ofNullable(object));
         return response;
     }
+
+    public static ResponseFormat createFailResponse(Object object, String message) {
+        ResponseFormat response = new ResponseFormat();
+        response.setSuccess(false);
+        response.setTimestamp(Optional.of(ZonedDateTime.now()));
+        response.setMessage(Optional.ofNullable(message));
+        return response;
+    }
 }

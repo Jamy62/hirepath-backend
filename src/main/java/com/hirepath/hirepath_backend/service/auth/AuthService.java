@@ -5,7 +5,7 @@ import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import java.security.Principal;
 
 public interface AuthService {
-    void register(String email, String password, String name);
+    ResponseFormat register(String email, String password, String name);
     ResponseFormat login(String email, String password);
     void logout(String email);
     ResponseFormat companyAccess(String companyGuid, String email);

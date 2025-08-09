@@ -18,6 +18,7 @@ import jakarta.transaction.SystemException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Response;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,8 +40,13 @@ public class AuthServiceImpl implements AuthService {
     private final CompanyRepository companyRepository;
     private final CompanyUserRepository companyUserRepository;
 
-    public void register(String email, String password, String name) {
+    public ResponseFormat register(String email, String password, String name) {
         try {
+            Optional<User> existingUser = userRepository.findByEmail(email);
+            if (existingUser.isPresent()) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This email already has an account");
+            }
+
             Role role = roleRepository.findByName(VariableConstant.USER)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found"));
             User user = User.builder()
@@ -55,6 +61,8 @@ public class AuthServiceImpl implements AuthService {
                     .build();
 
             userRepository.save(user);
+
+            return ResponseFormat.createSuccessResponse(user.getName(), "Registered successfully");
         }
         catch (Exception e) {
             throw e;

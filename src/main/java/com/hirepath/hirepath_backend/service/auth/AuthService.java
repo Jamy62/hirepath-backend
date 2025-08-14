@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.service.auth;
 
+import com.hirepath.hirepath_backend.model.request.RegisterRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 
 import java.security.Principal;

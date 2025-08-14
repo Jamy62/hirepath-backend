@@ -6,6 +6,7 @@ import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.CompanySwitchRequest;
+import com.hirepath.hirepath_backend.model.request.RegisterRequest;
 import com.hirepath.hirepath_backend.model.response.LoginResponse;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.company.CompanyRepository;

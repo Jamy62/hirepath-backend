@@ -41,35 +41,6 @@ public class AuthServiceImpl implements AuthService {
     private final CompanyRepository companyRepository;
     private final CompanyUserRepository companyUserRepository;
 
-    public ResponseFormat register(String email, String password, String name) {
-        try {
-            Optional<User> existingUser = userRepository.findByEmail(email);
-            if (existingUser.isPresent()) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This email already has an account");
-            }
-
-            Role role = roleRepository.findByName(VariableConstant.USER)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found"));
-            User user = User.builder()
-                    .role(role)
-                    .email(email)
-                    .password(passwordEncoder.encode(password))
-                    .name(name)
-                    .isActive(true)
-                    .isDeleted(false)
-                    .guid(UUID.randomUUID().toString())
-                    .createdAt(ZonedDateTime.now())
-                    .build();
-
-            userRepository.save(user);
-
-            return ResponseFormat.createSuccessResponse(user.getName(), "Registered successfully");
-        }
-        catch (Exception e) {
-            throw e;
-        }
-    }
-
     public ResponseFormat login(String email, String password) {
         try {
             User user = userRepository.findByEmail(email)

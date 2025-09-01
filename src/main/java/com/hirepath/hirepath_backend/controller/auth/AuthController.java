@@ -27,12 +27,6 @@ import java.security.Principal;
 public class AuthController {
     private final AuthService authService;
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        ResponseFormat responseFormat = authService.register(request.getEmail(), request.getPassword(), request.getName());
-        return ResponseEntity.ok(responseFormat);
-    }
-
     @PostMapping("/login")
     public ResponseEntity<ResponseFormat> login(@RequestBody LoginRequest request) {
         ResponseFormat responseFormat = authService.login(request.getEmail(), request.getPassword());

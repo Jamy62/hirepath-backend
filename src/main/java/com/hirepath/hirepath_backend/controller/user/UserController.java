@@ -2,7 +2,6 @@ package com.hirepath.hirepath_backend.controller.user;
 
 import com.hirepath.hirepath_backend.model.request.RegisterRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
-import com.hirepath.hirepath_backend.service.auth.AuthService;
 import com.hirepath.hirepath_backend.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -15,16 +14,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(name = "/v1/user")
 public class UserController {
     private final UserService userService;
-    private final
 
     @PostMapping("/admin/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<?> adminRegister(@Valid @RequestBody RegisterRequest request) {
         ResponseFormat responseFormat = userService.adminRegister(request);
         return ResponseEntity.ok(responseFormat);
     }
 
     @PostMapping("/user/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<?> userRegister(@Valid @RequestBody RegisterRequest request) {
         ResponseFormat responseFormat = userService.userRegister(request);
         return ResponseEntity.ok(responseFormat);
     }

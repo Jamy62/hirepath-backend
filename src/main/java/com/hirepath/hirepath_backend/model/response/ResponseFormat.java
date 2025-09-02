@@ -3,16 +3,15 @@ package com.hirepath.hirepath_backend.model.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ResponseFormat {
     @Getter @Setter
     @JsonProperty("success") private Boolean success;

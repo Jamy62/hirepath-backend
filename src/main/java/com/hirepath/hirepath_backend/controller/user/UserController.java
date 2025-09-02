@@ -1,6 +1,7 @@
 package com.hirepath.hirepath_backend.controller.user;
 
 import com.hirepath.hirepath_backend.model.request.RegisterRequest;
+import com.hirepath.hirepath_backend.model.request.UserUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.user.UserService;
 import jakarta.validation.Valid;
@@ -9,31 +10,49 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(name = "/v1/user")
+@RequestMapping("/v1/user")
 public class UserController {
     private final UserService userService;
 
-    @PostMapping("/admin/register")
+    @PostMapping("/register/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<?> adminRegister(@Valid @RequestBody RegisterRequest request) {
-        ResponseFormat responseFormat = userService.adminRegister(request);
+    public ResponseEntity<ResponseFormat> adminRegister(@Valid @RequestBody RegisterRequest request) {
+        ResponseFormat responseFormat = userService.register(request, "admin");
         return ResponseEntity.ok(responseFormat);
     }
 
-    @PostMapping("/user/register")
-    public ResponseEntity<?> userRegister(@Valid @RequestBody RegisterRequest request) {
-        ResponseFormat responseFormat = userService.userRegister(request);
+    @PostMapping("/register")
+    public ResponseEntity<ResponseFormat> userRegister(@Valid @RequestBody RegisterRequest request) {
+        ResponseFormat responseFormat = userService.register(request, "user");
         return ResponseEntity.ok(responseFormat);
     }
 
     @GetMapping("/list")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<?> userList(
+    public ResponseEntity<ResponseFormat> userList(
+            @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
+            @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
             @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
-        ResponseFormat responseFormat = userService.userList(first, max);
+        ResponseFormat responseFormat = userService.userList(searchName, orderBy, first, max);
+        return ResponseEntity.ok(responseFormat);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<ResponseFormat> userUpdate(@Valid @RequestBody UserUpdateRequest request, Principal principal) {
+        ResponseFormat responseFormat = userService.userUpdate(request, principal.getName());
+        return ResponseEntity.ok(responseFormat);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<ResponseFormat> userDelete(
+            @RequestParam(value = "userGuid") String userGuid,
+            Principal principal) {
+        ResponseFormat responseFormat = userService.userDelete(userGuid, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 }

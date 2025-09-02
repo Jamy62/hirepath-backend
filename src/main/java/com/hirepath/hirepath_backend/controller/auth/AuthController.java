@@ -2,18 +2,11 @@ package com.hirepath.hirepath_backend.controller.auth;
 
 import com.hirepath.hirepath_backend.model.request.CompanySwitchRequest;
 import com.hirepath.hirepath_backend.model.request.LoginRequest;
-import com.hirepath.hirepath_backend.model.request.RegisterRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.auth.AuthService;
-import io.jsonwebtoken.Jwt;
-import io.jsonwebtoken.Jwts;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
-import org.springframework.boot.autoconfigure.security.oauth2.resource.OAuth2ResourceServerProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -6,12 +6,12 @@ import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 
 public interface PlanService {
 
-    ResponseFormat createPlan(PlanCreateRequest request, String adminEmail);
+    ResponseFormat planCreate(PlanCreateRequest request, String adminEmail);
 
-    ResponseFormat listPlans(String searchName, String orderBy, int first, int max);
+    ResponseFormat planList(String searchName, String orderBy, int first, int max);
 
-    ResponseFormat updatePlan(PlanUpdateRequest request, String adminEmail);
+    ResponseFormat planUpdate(PlanUpdateRequest request, String adminEmail);
 
-    ResponseFormat deletePlan(String planGuid, String adminEmail);
+    ResponseFormat planDelete(String planGuid, String adminEmail);
 }
 

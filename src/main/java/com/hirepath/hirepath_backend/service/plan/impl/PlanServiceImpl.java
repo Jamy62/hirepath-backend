@@ -31,7 +31,7 @@ public class PlanServiceImpl implements PlanService {
     private final UserRepository userRepository;
 
     @Override
-    public ResponseFormat createPlan(PlanCreateRequest request, String adminEmail) {
+    public ResponseFormat planCreate(PlanCreateRequest request, String adminEmail) {
         User admin = userRepository.findByEmail(adminEmail)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
@@ -54,7 +54,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public ResponseFormat listPlans(String searchName, String orderBy, int first, int max) {
+    public ResponseFormat planList(String searchName, String orderBy, int first, int max) {
         if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
             List<PlanListProjection> planListProjection = planRepository.findAllPlansAdminPanel(searchName, orderBy, first, max);
 
@@ -79,7 +79,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public ResponseFormat updatePlan(PlanUpdateRequest request, String email) {
+    public ResponseFormat planUpdate(PlanUpdateRequest request, String email) {
         User admin = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
@@ -114,7 +114,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public ResponseFormat deletePlan(String planGuid, String adminEmail) {
+    public ResponseFormat planDelete(String planGuid, String adminEmail) {
         User admin = userRepository.findByEmail(adminEmail)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 

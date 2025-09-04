@@ -22,7 +22,7 @@ public class PlanController {
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> createPlan(@Valid @RequestBody PlanCreateRequest request, Principal principal) {
-        ResponseFormat responseFormat = planService.createPlan(request, principal.getName());
+        ResponseFormat responseFormat = planService.planCreate(request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
@@ -33,14 +33,14 @@ public class PlanController {
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
             @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
-        ResponseFormat responseFormat = planService.listPlans(searchName, orderBy, first, max);
+        ResponseFormat responseFormat = planService.planList(searchName, orderBy, first, max);
         return ResponseEntity.ok(responseFormat);
     }
 
     @PutMapping("/update/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> updatePlan(@Valid @RequestBody PlanUpdateRequest request, Principal principal) {
-        ResponseFormat responseFormat = planService.updatePlan(request, principal.getName());
+        ResponseFormat responseFormat = planService.planUpdate(request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
@@ -49,7 +49,7 @@ public class PlanController {
     public ResponseEntity<ResponseFormat> deletePlan(
             @RequestParam(value = "planGuid") String planGuid,
             Principal principal) {
-        ResponseFormat responseFormat = planService.deletePlan(planGuid, principal.getName());
+        ResponseFormat responseFormat = planService.planDelete(planGuid, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 }

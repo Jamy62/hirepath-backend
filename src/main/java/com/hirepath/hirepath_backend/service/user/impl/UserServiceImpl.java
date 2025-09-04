@@ -82,9 +82,9 @@ public class UserServiceImpl implements UserService {
                                 .isActive(p.getIsActive())
                                 .isBlocked(p.getIsBlocked())
                                 .guid(p.getGuid())
-                                .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().atZone(ZoneId.systemDefault()) : null)
-                                .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().atZone(ZoneId.systemDefault()) : null)
-                                .lastLoginAt(p.getLastLoginAt() != null ? p.getLastLoginAt().atZone(ZoneId.systemDefault()) : null)
+                                .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .lastLoginAt(p.getLastLoginAt() != null ? p.getLastLoginAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
 

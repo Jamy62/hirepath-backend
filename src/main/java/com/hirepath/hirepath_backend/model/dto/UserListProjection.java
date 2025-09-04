@@ -1,7 +1,6 @@
 package com.hirepath.hirepath_backend.model.dto;
 
-import java.time.LocalDateTime;
-
+import java.sql.Timestamp;
 
 public interface UserListProjection {
     String getName();
@@ -13,7 +12,7 @@ public interface UserListProjection {
     Boolean getIsActive();
     Boolean getIsBlocked();
     String getGuid();
-    LocalDateTime getCreatedAt();
-    LocalDateTime getUpdatedAt();
-    LocalDateTime getLastLoginAt();
+    Timestamp getCreatedAt();
+    Timestamp getUpdatedAt();
+    Timestamp getLastLoginAt();
 }

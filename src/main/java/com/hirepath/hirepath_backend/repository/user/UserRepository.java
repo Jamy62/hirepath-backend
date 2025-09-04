@@ -27,18 +27,22 @@ public interface UserRepository extends CrudRepository<User, Long> {
                 r.name AS roleName,
                 u.is_active AS isActive,
                 u.is_blocked AS isBlocked,
-                u.is_deleted AS isDeleted,
                 u.guid AS guid,
                 u.created_at AS createdAt,
                 u.updated_at AS updatedAt,
                 u.last_login_at AS lastLoginAt
             FROM users u
             JOIN roles r on u.role_id = r.id
-            WHERE u.is_deleted = 0
-            AND (:searchName IS NULL OR LOWER(u.name) LIKE LOWER(CONCAT('%', COALESCE(:searchName, ''), '%')))
+            WHERE (LOWER(u.name) LIKE LOWER(CONCAT('%', COALESCE(:searchName, ''), '%')) OR :searchName IS NULL)
+            AND u.is_deleted = 0
+            ORDER BY
+            CASE WHEN :orderBy = 'ASC' THEN u.created_at END ASC,
+            CASE WHEN :orderBy = 'DESC' THEN u.created_at END DESC
+            LIMIT :max OFFSET :first
             """, nativeQuery = true)
     List<UserListProjection> findAllUsersAdminPanal(
             @Param("searchName") String searchName,
             @Param("orderBy") String orderBy,
-            Pageable pageable);
+            @Param("first") int first,
+            @Param("max") int max);
 }

@@ -1,7 +1,6 @@
 package com.hirepath.hirepath_backend.model.dto;
 
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 
 public interface UserListProjection {
@@ -13,7 +12,6 @@ public interface UserListProjection {
     String getRoleName();
     Boolean getIsActive();
     Boolean getIsBlocked();
-    Boolean getIsDeleted();
     String getGuid();
     LocalDateTime getCreatedAt();
     LocalDateTime getUpdatedAt();

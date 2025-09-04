@@ -13,8 +13,6 @@ import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -71,8 +69,7 @@ public class UserServiceImpl implements UserService {
             }
 
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
-                Pageable pageable = PageRequest.of(first, max);
-                List<UserListProjection> userListProjection = userRepository.findAllUsersAdminPanal(searchName, orderBy, pageable);
+                List<UserListProjection> userListProjection = userRepository.findAllUsersAdminPanal(searchName, orderBy, first, max);
 
                 List<UserListDTO> users = userListProjection.stream()
                         .map(p -> UserListDTO.builder()
@@ -84,7 +81,6 @@ public class UserServiceImpl implements UserService {
                                 .roleName(p.getRoleName())
                                 .isActive(p.getIsActive())
                                 .isBlocked(p.getIsBlocked())
-                                .isDeleted(p.getIsDeleted())
                                 .guid(p.getGuid())
                                 .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().atZone(ZoneId.systemDefault()) : null)
                                 .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().atZone(ZoneId.systemDefault()) : null)
@@ -109,23 +105,20 @@ public class UserServiceImpl implements UserService {
             User updatedBy = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin user not found"));
 
-            if (!request.getName().isBlank()) {
+            if (request.getName() != null && !request.getName().isBlank()) {
                 user.setName(request.getName());
             }
-            else if (!request.getFullName().isBlank()) {
+            if (request.getFullName() != null && !request.getFullName().isBlank()) {
                 user.setFullName(request.getFullName());
             }
-            else if (!request.getEmail().isBlank()) {
+            if (request.getEmail() != null && !request.getEmail().isBlank()) {
                 user.setEmail(request.getEmail());
             }
-            else if (!request.getMobile().isBlank()) {
+            if (request.getMobile() != null && !request.getMobile().isBlank()) {
                 user.setMobile(request.getMobile());
             }
-            else if (!request.getProfile().isBlank()) {
+            if (request.getProfile() != null && !request.getProfile().isBlank()) {
                 user.setProfile(request.getProfile());
-            }
-            else if (!request.getGuid().isBlank()) {
-                user.setGuid(request.getGuid());
             }
 
             user.setUpdatedAt(ZonedDateTime.now());

@@ -22,7 +22,6 @@ public class UserUpdateRequest {
     private Boolean isActive;
     private Boolean isBlocked;
     private Boolean isDeleted;
-    private String guid;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
     private ZonedDateTime lastLoginAt;

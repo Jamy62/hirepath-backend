@@ -21,6 +21,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.nio.file.AccessDeniedException;
 import java.util.Arrays;
@@ -48,6 +49,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoHandlerFoundException.class)
     public ResponseEntity<ResponseFormat> handleNoHandlerFoundException(NoHandlerFoundException ex, WebRequest request) {
         log.warn("No handler found for user: {} at {} - {}",
+                getCurrentUser(), getRequestUri(request), ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ResponseFormat.createFailResponse(null, "API not found"));
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ResponseFormat> handleNoResourceFoundException(NoResourceFoundException ex, WebRequest request) {
+        log.warn("No resource found for user: {} at {} - {}",
                 getCurrentUser(), getRequestUri(request), ex.getMessage());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)

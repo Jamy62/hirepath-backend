@@ -45,6 +45,7 @@ public class Company {
 
 
     // verification details
+    @Enumerated(EnumType.STRING)
     @Column(name = "verification_status")
     private VerificationStatus verificationStatus;
 

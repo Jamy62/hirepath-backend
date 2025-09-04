@@ -31,7 +31,7 @@ public class UserController {
         return ResponseEntity.ok(responseFormat);
     }
 
-    @GetMapping("/list")
+    @GetMapping("/list/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> userList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
@@ -42,13 +42,15 @@ public class UserController {
         return ResponseEntity.ok(responseFormat);
     }
 
-    @PutMapping("/update")
+    @PutMapping("/update/admin")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> userUpdate(@Valid @RequestBody UserUpdateRequest request, Principal principal) {
         ResponseFormat responseFormat = userService.userUpdate(request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/delete/admin")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> userDelete(
             @RequestParam(value = "userGuid") String userGuid,
             Principal principal) {

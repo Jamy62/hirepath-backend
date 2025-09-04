@@ -39,7 +39,8 @@ public class PlanServiceImpl implements PlanService {
                 .name(request.getName())
                 .description(request.getDescription())
                 .price(request.getPrice())
-                .durationInDays(request.getDurationInDays())
+                .duration(request.getDuration())
+                .durationDays(request.getDurationDays())
                 .features(request.getFeatures())
                 .guid(UUID.randomUUID().toString())
                 .isDeleted(false)
@@ -62,7 +63,8 @@ public class PlanServiceImpl implements PlanService {
                             .name(p.getName())
                             .description(p.getDescription())
                             .price(p.getPrice())
-                            .durationInDays(p.getDurationInDays())
+                            .duration(p.getDuration())
+                            .durationDays(p.getDurationDays())
                             .features(p.getFeatures())
                             .guid(p.getGuid())
                             .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
@@ -90,11 +92,14 @@ public class PlanServiceImpl implements PlanService {
         if (request.getDescription() != null && !request.getDescription().isBlank()) {
             plan.setDescription(request.getDescription());
         }
-        if (request.getPrice() != null) {
+        if (request.getPrice() != null && request.getPrice().signum() >= 0) {
             plan.setPrice(request.getPrice());
         }
-        if (request.getDurationInDays() != null) {
-            plan.setDurationInDays(request.getDurationInDays());
+        if (request.getDuration() != null && !request.getDuration().isBlank()) {
+            plan.setDuration(request.getDuration());
+        }
+        if (request.getDurationDays() != null && request.getDurationDays() > 0) {
+            plan.setDurationDays(request.getDurationDays());
         }
         if (request.getFeatures() != null && !request.getFeatures().isBlank()) {
             plan.setFeatures(request.getFeatures());

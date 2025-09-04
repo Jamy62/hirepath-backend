@@ -10,9 +10,6 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class PlanCreateRequest {
 
     @NotBlank(message = "Plan name must not be blank")
@@ -24,7 +21,10 @@ public class PlanCreateRequest {
     private BigDecimal price;
 
     @NotNull(message = "Duration must not be null")
-    private Integer durationInDays;
+    private String duration;
+
+    @NotNull(message = "DurationDays must not be null")
+    private Integer durationDays;
 
     private String features;
 }

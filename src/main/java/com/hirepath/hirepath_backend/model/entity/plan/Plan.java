@@ -31,8 +31,11 @@ public class Plan {
     @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price;
 
-    @Column(name = "duration_in_days")
-    private Integer durationInDays;
+    @Column(name = "duration")
+    private String duration;
+
+    @Column(name = "duration_days")
+    private Integer durationDays;
 
     @Column(name = "features", columnDefinition = "TEXT")
     private String features;

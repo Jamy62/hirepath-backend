@@ -7,7 +7,8 @@ public interface PlanListProjection {
     String getName();
     String getDescription();
     BigDecimal getPrice();
-    Integer getDurationInDays();
+    String getDuration();
+    Integer getDurationDays();
     String getFeatures();
     String getGuid();
     Timestamp getCreatedAt();

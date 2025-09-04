@@ -12,7 +12,8 @@ public class PlanListDTO {
     private String name;
     private String description;
     private BigDecimal price;
-    private Integer durationInDays;
+    private String duration;
+    private Integer durationDays;
     private String features;
     private String guid;
     private ZonedDateTime createdAt;

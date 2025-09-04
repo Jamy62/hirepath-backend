@@ -20,7 +20,8 @@ public class PlanUpdateRequest {
     private String name;
     private String description;
     private BigDecimal price;
-    private Integer durationInDays;
+    private String duration;
+    private Integer durationDays;
     private String features;
 }
 

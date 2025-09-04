@@ -75,8 +75,8 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public ResponseFormat companyUpdate(CompanyUpdateRequest request, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
+    public ResponseFormat companyUpdate(CompanyUpdateRequest request, String email) {
+        User admin = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
         Company company = companyRepository.findByGuid(request.getCompanyGuid())

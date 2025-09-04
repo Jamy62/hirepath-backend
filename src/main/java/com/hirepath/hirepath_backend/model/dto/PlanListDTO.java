@@ -1,0 +1,21 @@
+package com.hirepath.hirepath_backend.model.dto;
+
+import lombok.Builder;
+import lombok.Data;
+
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
+
+@Data
+@Builder
+public class PlanListDTO {
+    private String name;
+    private String description;
+    private BigDecimal price;
+    private Integer durationInDays;
+    private String features;
+    private String guid;
+    private ZonedDateTime createdAt;
+    private ZonedDateTime updatedAt;
+}
+

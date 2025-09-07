@@ -10,7 +10,7 @@ public interface PaymentMethodService {
 
     ResponseFormat paymentMethodList(String searchName, String orderBy, int first, int max);
 
-    ResponseFormat paymentMethodUpdate(PaymentMethodUpdateRequest request, String email);
+    ResponseFormat paymentMethodUpdate(String paymentMethodGuid, PaymentMethodUpdateRequest request, String email);
 
     ResponseFormat paymentMethodDelete(String paymentMethodGuid, String adminEmail);
 }

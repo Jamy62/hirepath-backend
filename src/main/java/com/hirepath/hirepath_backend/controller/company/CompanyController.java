@@ -35,17 +35,17 @@ public class CompanyController {
         return ResponseEntity.ok(responseFormat);
     }
 
-    @PutMapping("/update/admin")
+    @PutMapping("/update/admin/{companyGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> companyUpdate(@Valid @RequestBody CompanyUpdateRequest request, Principal principal) {
-        ResponseFormat responseFormat = companyService.companyUpdate(request, principal.getName());
+    public ResponseEntity<ResponseFormat> companyUpdate(@PathVariable String companyGuid, @Valid @RequestBody CompanyUpdateRequest request, Principal principal) {
+        ResponseFormat responseFormat = companyService.companyUpdate(companyGuid, request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
-    @DeleteMapping("/delete/admin")
+    @DeleteMapping("/delete/admin/{companyGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> companyDelete(
-            @RequestParam(value = "companyGuid") String companyGuid,
+            @PathVariable(value = "companyGuid") String companyGuid,
             Principal principal) {
         ResponseFormat responseFormat = companyService.companyDelete(companyGuid, principal.getName());
         return ResponseEntity.ok(responseFormat);

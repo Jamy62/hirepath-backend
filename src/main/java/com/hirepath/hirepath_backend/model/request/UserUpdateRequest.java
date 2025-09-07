@@ -10,9 +10,6 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 public class UserUpdateRequest {
-    @NotBlank(message = "User update guid must not be black")
-    private String userGuid;
-
     private String name;
     private String fullName;
     @Email(message = "Email must be a valid email address")

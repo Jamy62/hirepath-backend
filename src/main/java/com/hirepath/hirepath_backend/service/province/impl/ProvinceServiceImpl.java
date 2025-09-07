@@ -1,0 +1,108 @@
+package com.hirepath.hirepath_backend.service.province.impl;
+
+import com.hirepath.hirepath_backend.constant.VariableConstant;
+import com.hirepath.hirepath_backend.model.dto.ProvinceListDTO;
+import com.hirepath.hirepath_backend.model.dto.ProvinceListProjection;
+import com.hirepath.hirepath_backend.model.entity.province.Province;
+import com.hirepath.hirepath_backend.model.entity.user.User;
+import com.hirepath.hirepath_backend.model.request.ProvinceCreateRequest;
+import com.hirepath.hirepath_backend.model.request.ProvinceUpdateRequest;
+import com.hirepath.hirepath_backend.model.response.ResponseFormat;
+import com.hirepath.hirepath_backend.repository.province.ProvinceRepository;
+import com.hirepath.hirepath_backend.repository.user.UserRepository;
+import com.hirepath.hirepath_backend.service.province.ProvinceService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+public class ProvinceServiceImpl implements ProvinceService {
+
+    private final ProvinceRepository provinceRepository;
+    private final UserRepository userRepository;
+
+    @Override
+    public ResponseFormat provinceCreate(ProvinceCreateRequest request, String adminEmail) {
+        User admin = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+
+        Province province = Province.builder()
+                .name(request.getName())
+                .guid(UUID.randomUUID().toString())
+                .isDeleted(false)
+                .createdAt(ZonedDateTime.now())
+                .createdBy(admin.getId())
+                .build();
+
+        provinceRepository.save(province);
+
+        return ResponseFormat.createSuccessResponse(null, "Province created successfully");
+    }
+
+    @Override
+    public ResponseFormat provinceList(String searchName, String orderBy, int first, int max) {
+        if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
+            // This method will need to be created in ProvinceRepository
+            List<ProvinceListProjection> provinceListProjections = provinceRepository.findAllProvincesAdminPanel(searchName, orderBy, first, max);
+
+            List<ProvinceListDTO> provinces = provinceListProjections.stream()
+                    .map(p -> ProvinceListDTO.builder()
+                            .name(p.getName())
+                            .guid(p.getGuid())
+                            .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                            .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                            .build())
+                    .toList();
+
+            return ResponseFormat.createSuccessResponse(provinces, "Province list retrieved successfully");
+        }
+
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
+    }
+
+    @Override
+    public ResponseFormat provinceUpdate(String provinceGuid, ProvinceUpdateRequest request, String email) {
+        User admin = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+
+        Province province = provinceRepository.findByGuid(provinceGuid)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Province not found"));
+
+        if (request.getName() != null && !request.getName().isBlank()) {
+            province.setName(request.getName());
+        }
+
+        province.setUpdatedAt(ZonedDateTime.now());
+        province.setUpdatedBy(admin.getId());
+
+        provinceRepository.save(province);
+
+        return ResponseFormat.createSuccessResponse(null, "Province updated successfully");
+    }
+
+    @Override
+    public ResponseFormat provinceDelete(String provinceGuid, String adminEmail) {
+        User admin = userRepository.findByEmail(adminEmail)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+
+        Province province = provinceRepository.findByGuid(provinceGuid)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Province not found"));
+
+        province.setIsDeleted(true);
+        province.setUpdatedAt(ZonedDateTime.now());
+        province.setUpdatedBy(admin.getId());
+
+        provinceRepository.save(province);
+
+        return ResponseFormat.createSuccessResponse(null, "Province deleted successfully");
+    }
+}

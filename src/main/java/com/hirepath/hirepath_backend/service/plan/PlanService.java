@@ -10,8 +10,7 @@ public interface PlanService {
 
     ResponseFormat planList(String searchName, String orderBy, int first, int max);
 
-    ResponseFormat planUpdate(PlanUpdateRequest request, String adminEmail);
+    ResponseFormat planUpdate(String planGuid, PlanUpdateRequest request, String adminEmail);
 
     ResponseFormat planDelete(String planGuid, String adminEmail);
 }
-

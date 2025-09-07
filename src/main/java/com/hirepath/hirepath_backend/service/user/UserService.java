@@ -7,6 +7,6 @@ import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 public interface UserService {
     ResponseFormat register(RegisterRequest request, String userType);
     ResponseFormat userList(String searchName, String orderBy, int first, int max);
-    ResponseFormat userUpdate(UserUpdateRequest request, String email);
-    ResponseFormat userDelete(String guid, String email);
+    ResponseFormat userUpdate(String userGuid, UserUpdateRequest request, String email);
+    ResponseFormat userDelete(String userGuid, String email);
 }

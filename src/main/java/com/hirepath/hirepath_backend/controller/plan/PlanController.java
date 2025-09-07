@@ -37,20 +37,19 @@ public class PlanController {
         return ResponseEntity.ok(responseFormat);
     }
 
-    @PutMapping("/update/admin")
+    @PutMapping("/update/admin/{planGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> updatePlan(@Valid @RequestBody PlanUpdateRequest request, Principal principal) {
-        ResponseFormat responseFormat = planService.planUpdate(request, principal.getName());
+    public ResponseEntity<ResponseFormat> updatePlan(@PathVariable String planGuid, @Valid @RequestBody PlanUpdateRequest request, Principal principal) {
+        ResponseFormat responseFormat = planService.planUpdate(planGuid, request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
-    @DeleteMapping("/delete/admin")
+    @DeleteMapping("/delete/admin/{planGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> deletePlan(
-            @RequestParam(value = "planGuid") String planGuid,
+            @PathVariable(value = "planGuid") String planGuid,
             Principal principal) {
         ResponseFormat responseFormat = planService.planDelete(planGuid, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 }
-

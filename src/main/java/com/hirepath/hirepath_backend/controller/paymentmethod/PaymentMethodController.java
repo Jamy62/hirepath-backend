@@ -37,17 +37,17 @@ public class PaymentMethodController {
         return ResponseEntity.ok(responseFormat);
     }
 
-    @PutMapping("/update/admin")
+    @PutMapping("/update/admin/{paymentMethodGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> updatePaymentMethod(@Valid @RequestBody PaymentMethodUpdateRequest request, @PathVariable String paymentMethodGuid, Principal principal) {
-        ResponseFormat responseFormat = paymentMethodService.paymentMethodUpdate(request, principal.getName());
+    public ResponseEntity<ResponseFormat> updatePaymentMethod(@PathVariable String paymentMethodGuid, @Valid @RequestBody PaymentMethodUpdateRequest request, Principal principal) {
+        ResponseFormat responseFormat = paymentMethodService.paymentMethodUpdate(paymentMethodGuid, request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
-    @DeleteMapping("/delete/admin")
+    @DeleteMapping("/delete/admin/{paymentMethodGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> deletePaymentMethod(
-            @RequestParam(value = "paymentMethodGuid") String paymentMethodGuid,
+            @PathVariable(value = "paymentMethodGuid") String paymentMethodGuid,
             Principal principal) {
         ResponseFormat responseFormat = paymentMethodService.paymentMethodDelete(paymentMethodGuid, principal.getName());
         return ResponseEntity.ok(responseFormat);

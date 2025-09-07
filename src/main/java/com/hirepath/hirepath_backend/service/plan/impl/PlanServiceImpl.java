@@ -79,11 +79,11 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public ResponseFormat planUpdate(PlanUpdateRequest request, String email) {
+    public ResponseFormat planUpdate(String planGuid, PlanUpdateRequest request, String email) {
         User admin = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Plan plan = planRepository.findByGuid(request.getPlanGuid())
+        Plan plan = planRepository.findByGuid(planGuid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Plan not found"));
 
         if (request.getName() != null && !request.getName().isBlank()) {
@@ -130,4 +130,3 @@ public class PlanServiceImpl implements PlanService {
         return ResponseFormat.createSuccessResponse(null, "Plan deleted successfully");
     }
 }
-

@@ -42,17 +42,18 @@ public class UserController {
         return ResponseEntity.ok(responseFormat);
     }
 
-    @PutMapping("/update/admin")
+    @PutMapping("/update/admin/{userGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> userUpdate(@Valid @RequestBody UserUpdateRequest request, Principal principal) {
-        ResponseFormat responseFormat = userService.userUpdate(request, principal.getName());
+    public ResponseEntity<ResponseFormat> userUpdate(@PathVariable String userGuid,
+                                                     @Valid @RequestBody UserUpdateRequest request, Principal principal) {
+        ResponseFormat responseFormat = userService.userUpdate(userGuid, request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
-    @DeleteMapping("/delete/admin")
+    @DeleteMapping("/delete/admin/{userGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> userDelete(
-            @RequestParam(value = "userGuid") String userGuid,
+            @PathVariable(value = "userGuid") String userGuid,
             Principal principal) {
         ResponseFormat responseFormat = userService.userDelete(userGuid, principal.getName());
         return ResponseEntity.ok(responseFormat);

@@ -1,6 +1,5 @@
 package com.hirepath.hirepath_backend.model.request;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,9 +13,6 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class PlanUpdateRequest {
 
-    @NotBlank(message = "Plan guid must not be blank")
-    private String planGuid;
-
     private String name;
     private String description;
     private BigDecimal price;
@@ -24,4 +20,3 @@ public class PlanUpdateRequest {
     private Integer durationDays;
     private String features;
 }
-

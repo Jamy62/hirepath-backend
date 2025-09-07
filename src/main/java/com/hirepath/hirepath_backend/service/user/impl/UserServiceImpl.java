@@ -98,9 +98,9 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public ResponseFormat userUpdate(UserUpdateRequest request, String email) {
+    public ResponseFormat userUpdate(String userGuid, UserUpdateRequest request, String email) {
         try {
-            User user = userRepository.findByGuid(request.getUserGuid())
+            User user = userRepository.findByGuid(userGuid)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User to update not found"));
             User updatedBy = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin user not found"));

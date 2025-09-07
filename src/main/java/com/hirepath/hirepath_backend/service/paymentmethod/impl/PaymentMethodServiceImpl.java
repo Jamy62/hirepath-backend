@@ -71,11 +71,11 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     }
 
     @Override
-    public ResponseFormat paymentMethodUpdate(PaymentMethodUpdateRequest request, String email) {
+    public ResponseFormat paymentMethodUpdate(String paymentMethodGuid, PaymentMethodUpdateRequest request, String email) {
         User admin = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        PaymentMethod paymentMethod = paymentMethodRepository.findByGuid(request.getPaymentMethodGuid())
+        PaymentMethod paymentMethod = paymentMethodRepository.findByGuid(paymentMethodGuid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment method not found"));
 
         if (request.getName() != null && !request.getName().isBlank()) {

@@ -1,13 +1,11 @@
 package com.hirepath.hirepath_backend.model.request;
 
-import jakarta.validation.constraints.NotBlank;
+import com.hirepath.hirepath_backend.security.AutoNotBlank;
 import lombok.Data;
 
+@AutoNotBlank
 @Data
 public class PaymentMethodCreateRequest {
-
-    @NotBlank(message = "Payment method name must not be blank")
     private String name;
-
     private String description;
 }

@@ -10,8 +10,7 @@ public interface CompanyService {
 
     ResponseFormat companyList(String searchName, String orderBy, int first, int max);
 
-    ResponseFormat companyUpdate(CompanyUpdateRequest request, String adminEmail);
+    ResponseFormat companyUpdate(String companyGuid, CompanyUpdateRequest request, String adminEmail);
 
     ResponseFormat companyDelete(String companyGuid, String adminEmail);
 }
-

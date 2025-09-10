@@ -27,6 +27,7 @@ public interface CompanyRepository extends CrudRepository<Company, Long> {
             FROM companies c
             WHERE (LOWER(c.name) LIKE LOWER(CONCAT('%', COALESCE(:searchName, ''), '%')) OR :searchName IS NULL)
             AND c.is_deleted = 0
+            AND c.verification_status = :verificationStatus
             ORDER BY
             CASE WHEN :orderBy = 'ASC' THEN c.created_at END ASC,
             CASE WHEN :orderBy = 'DESC' THEN c.created_at END DESC
@@ -36,5 +37,6 @@ public interface CompanyRepository extends CrudRepository<Company, Long> {
     List<CompanyListProjection> findAllCompaniesAdminPanel(@Param("searchName") String searchName,
                                                            @Param("orderBy") String orderBy,
                                                            @Param("first") int first,
-                                                           @Param("max") int max);
+                                                           @Param("max") int max,
+                                                           @Param("verificationStatus") Company.VerificationStatus verificationStatus);
 }

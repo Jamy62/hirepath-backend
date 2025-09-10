@@ -32,47 +32,59 @@ public class AuthServiceImpl implements AuthService {
     private final CompanyUserRepository companyUserRepository;
 
     public ResponseFormat login(String email, String password) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
+        try {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
 
-        if (passwordEncoder.matches(password, user.getPassword())) {
-            String token = jwtUtil.generateSystemToken(user);
+            if (passwordEncoder.matches(password, user.getPassword())) {
+                String token = jwtUtil.generateSystemToken(user);
+                LoginResponse loginResponse = LoginResponse.builder()
+                        .token(token)
+                        .build();
+
+                return ResponseFormat.createSuccessResponse(loginResponse, "Login success");
+            }
+
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public void logout(String email) {
+        try {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
+
+            user.setLastLoginAt(ZonedDateTime.now());
+            userRepository.save(user);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public ResponseFormat companyAccess(String companyGuid, String email) {
+        try {
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
+            Company company = companyRepository.findByGuid(companyGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
+            Optional<CompanyUser> companyUser = companyUserRepository.findByUserAndCompanyAndIsDeleted(user, company, false);
+
+            if (companyUser.isEmpty() || companyUser.get().getRole().getType() != Role.RoleType.COMPANY) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You have no role in this company");
+            }
+
+            String companyRole = companyUser.get().getRole().getName();
+            String token = jwtUtil.generateCompanyToken(user, companyGuid, companyRole);
+
             LoginResponse loginResponse = LoginResponse.builder()
                     .token(token)
                     .build();
 
-            return ResponseFormat.createSuccessResponse(loginResponse, "Login success");
+            return ResponseFormat.createSuccessResponse(loginResponse, "Successfully switched to company");
+        } catch (Exception e) {
+            throw e;
         }
-
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
-    }
-
-    public void logout(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
-
-        user.setLastLoginAt(ZonedDateTime.now());
-        userRepository.save(user);
-    }
-
-    public ResponseFormat companyAccess(String companyGuid, String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
-        Company company = companyRepository.findByGuid(companyGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
-        Optional<CompanyUser> companyUser = companyUserRepository.findByUserAndCompanyAndIsDeleted(user, company, false);
-
-        if (companyUser.isEmpty() || companyUser.get().getRole().getType() != Role.RoleType.COMPANY) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You have no role in this company");
-        }
-
-        String companyRole = companyUser.get().getRole().getName();
-        String token = jwtUtil.generateCompanyToken(user, companyGuid, companyRole);
-
-        LoginResponse loginResponse = LoginResponse.builder()
-                .token(token)
-                .build();
-
-        return ResponseFormat.createSuccessResponse(loginResponse, "Successfully switched to company");
     }
 }

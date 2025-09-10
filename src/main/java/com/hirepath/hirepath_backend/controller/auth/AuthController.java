@@ -33,7 +33,7 @@ public class AuthController {
     }
 
     @PostMapping("/company-access")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<ResponseFormat> companyAccess(@RequestBody CompanySwitchRequest request,
                                                         Principal principal) {
         ResponseFormat responseFormat = authService.companyAccess(request.getCompanyGuid(), principal.getName());

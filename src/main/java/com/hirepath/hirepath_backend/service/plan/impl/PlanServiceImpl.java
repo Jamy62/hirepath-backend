@@ -32,101 +32,117 @@ public class PlanServiceImpl implements PlanService {
 
     @Override
     public ResponseFormat planCreate(PlanCreateRequest request, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Plan plan = Plan.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .duration(request.getDuration())
-                .durationDays(request.getDurationDays())
-                .features(request.getFeatures())
-                .guid(UUID.randomUUID().toString())
-                .isDeleted(false)
-                .createdAt(ZonedDateTime.now())
-                .createdBy(admin.getId())
-                .build();
+            Plan plan = Plan.builder()
+                    .name(request.getName())
+                    .description(request.getDescription())
+                    .price(request.getPrice())
+                    .duration(request.getDuration())
+                    .durationDays(request.getDurationDays())
+                    .features(request.getFeatures())
+                    .guid(UUID.randomUUID().toString())
+                    .isDeleted(false)
+                    .createdAt(ZonedDateTime.now())
+                    .createdBy(admin.getId())
+                    .build();
 
-        planRepository.save(plan);
+            planRepository.save(plan);
 
-        return ResponseFormat.createSuccessResponse(null, "Plan created successfully");
+            return ResponseFormat.createSuccessResponse(null, "Plan created successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override
     public ResponseFormat planList(String searchName, String orderBy, int first, int max) {
-        if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
-            List<PlanListProjection> planListProjection = planRepository.findAllPlansAdminPanel(searchName, orderBy, first, max);
+        try {
+            if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
+                List<PlanListProjection> planListProjection = planRepository.findAllPlansAdminPanel(searchName, orderBy, first, max);
 
-            List<PlanListDTO> plans = planListProjection.stream()
-                    .map(p -> PlanListDTO.builder()
-                            .name(p.getName())
-                            .description(p.getDescription())
-                            .price(p.getPrice())
-                            .duration(p.getDuration())
-                            .durationDays(p.getDurationDays())
-                            .features(p.getFeatures())
-                            .guid(p.getGuid())
-                            .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .build())
-                    .toList();
+                List<PlanListDTO> plans = planListProjection.stream()
+                        .map(p -> PlanListDTO.builder()
+                                .name(p.getName())
+                                .description(p.getDescription())
+                                .price(p.getPrice())
+                                .duration(p.getDuration())
+                                .durationDays(p.getDurationDays())
+                                .features(p.getFeatures())
+                                .guid(p.getGuid())
+                                .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .build())
+                        .toList();
 
-            return ResponseFormat.createSuccessResponse(plans, "Plan list retrieved successfully");
+                return ResponseFormat.createSuccessResponse(plans, "Plan list retrieved successfully");
+            }
+
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
+        } catch (Exception e) {
+            throw e;
         }
-
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
     }
 
     @Override
     public ResponseFormat planUpdate(String planGuid, PlanUpdateRequest request, String email) {
-        User admin = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Plan plan = planRepository.findByGuid(planGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Plan not found"));
+            Plan plan = planRepository.findByGuid(planGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Plan not found"));
 
-        if (request.getName() != null && !request.getName().isBlank()) {
-            plan.setName(request.getName());
-        }
-        if (request.getDescription() != null && !request.getDescription().isBlank()) {
-            plan.setDescription(request.getDescription());
-        }
-        if (request.getPrice() != null && request.getPrice().signum() >= 0) {
-            plan.setPrice(request.getPrice());
-        }
-        if (request.getDuration() != null && !request.getDuration().isBlank()) {
-            plan.setDuration(request.getDuration());
-        }
-        if (request.getDurationDays() != null && request.getDurationDays() > 0) {
-            plan.setDurationDays(request.getDurationDays());
-        }
-        if (request.getFeatures() != null && !request.getFeatures().isBlank()) {
-            plan.setFeatures(request.getFeatures());
-        }
+            if (request.getName() != null && !request.getName().isBlank()) {
+                plan.setName(request.getName());
+            }
+            if (request.getDescription() != null && !request.getDescription().isBlank()) {
+                plan.setDescription(request.getDescription());
+            }
+            if (request.getPrice() != null && request.getPrice().signum() >= 0) {
+                plan.setPrice(request.getPrice());
+            }
+            if (request.getDuration() != null && !request.getDuration().isBlank()) {
+                plan.setDuration(request.getDuration());
+            }
+            if (request.getDurationDays() != null && request.getDurationDays() > 0) {
+                plan.setDurationDays(request.getDurationDays());
+            }
+            if (request.getFeatures() != null && !request.getFeatures().isBlank()) {
+                plan.setFeatures(request.getFeatures());
+            }
 
-        plan.setUpdatedAt(ZonedDateTime.now());
-        plan.setUpdatedBy(admin.getId());
+            plan.setUpdatedAt(ZonedDateTime.now());
+            plan.setUpdatedBy(admin.getId());
 
-        planRepository.save(plan);
+            planRepository.save(plan);
 
-        return ResponseFormat.createSuccessResponse(null, "Plan updated successfully");
+            return ResponseFormat.createSuccessResponse(null, "Plan updated successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override
     public ResponseFormat planDelete(String planGuid, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Plan plan = planRepository.findByGuid(planGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Plan not found"));
+            Plan plan = planRepository.findByGuid(planGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Plan not found"));
 
-        plan.setIsDeleted(true);
-        plan.setUpdatedAt(ZonedDateTime.now());
-        plan.setUpdatedBy(admin.getId());
+            plan.setIsDeleted(true);
+            plan.setUpdatedAt(ZonedDateTime.now());
+            plan.setUpdatedBy(admin.getId());
 
-        planRepository.save(plan);
+            planRepository.save(plan);
 
-        return ResponseFormat.createSuccessResponse(null, "Plan deleted successfully");
+            return ResponseFormat.createSuccessResponse(null, "Plan deleted successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }

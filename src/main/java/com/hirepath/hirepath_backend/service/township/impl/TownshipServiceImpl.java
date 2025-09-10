@@ -35,87 +35,102 @@ public class TownshipServiceImpl implements TownshipService {
 
     @Override
     public ResponseFormat townshipCreate(TownshipCreateRequest request, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Province province = provinceRepository.findByGuid(request.getProvinceGuid())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Province not found"));
+            Province province = provinceRepository.findByGuid(request.getProvinceGuid())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Province not found"));
 
-        Township township = Township.builder()
-                .name(request.getName())
-                .province(province)
-                .guid(UUID.randomUUID().toString())
-                .isDeleted(false)
-                .createdAt(ZonedDateTime.now())
-                .createdBy(admin.getId())
-                .build();
+            Township township = Township.builder()
+                    .name(request.getName())
+                    .province(province)
+                    .guid(UUID.randomUUID().toString())
+                    .isDeleted(false)
+                    .createdAt(ZonedDateTime.now())
+                    .createdBy(admin.getId())
+                    .build();
 
-        townshipRepository.save(township);
+            townshipRepository.save(township);
 
-        return ResponseFormat.createSuccessResponse(null, "Township created successfully");
+            return ResponseFormat.createSuccessResponse(null, "Township created successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override
     public ResponseFormat townshipList(String searchName, String orderBy, int first, int max) {
-        if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
-            // This method will need to be created in TownshipRepository
-            List<TownshipListProjection> townshipListProjections = townshipRepository.findAllTownshipsAdminPanel(searchName, orderBy, first, max);
+        try {
+            if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
+                List<TownshipListProjection> townshipListProjections = townshipRepository.findAllTownshipsAdminPanel(searchName, orderBy, first, max);
 
-            List<TownshipListDTO> townships = townshipListProjections.stream()
-                    .map(p -> TownshipListDTO.builder()
-                            .name(p.getName())
-                            .provinceName(p.getProvinceName())
-                            .guid(p.getGuid())
-                            .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .build())
-                    .toList();
+                List<TownshipListDTO> townships = townshipListProjections.stream()
+                        .map(p -> TownshipListDTO.builder()
+                                .name(p.getName())
+                                .provinceName(p.getProvinceName())
+                                .guid(p.getGuid())
+                                .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .build())
+                        .toList();
 
-            return ResponseFormat.createSuccessResponse(townships, "Township list retrieved successfully");
+                return ResponseFormat.createSuccessResponse(townships, "Township list retrieved successfully");
+            }
+
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
+        } catch (Exception e) {
+            throw e;
         }
-
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
     }
 
     @Override
     public ResponseFormat townshipUpdate(String townshipGuid, TownshipUpdateRequest request, String email) {
-        User admin = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Township township = townshipRepository.findByGuid(townshipGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Township not found"));
+            Township township = townshipRepository.findByGuid(townshipGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Township not found"));
 
-        if (request.getName() != null && !request.getName().isBlank()) {
-            township.setName(request.getName());
+            if (request.getName() != null && !request.getName().isBlank()) {
+                township.setName(request.getName());
+            }
+            if (request.getProvinceGuid() != null && !request.getProvinceGuid().isBlank()) {
+                Province province = provinceRepository.findByGuid(request.getProvinceGuid())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Province not found"));
+                township.setProvince(province);
+            }
+
+            township.setUpdatedAt(ZonedDateTime.now());
+            township.setUpdatedBy(admin.getId());
+
+            townshipRepository.save(township);
+
+            return ResponseFormat.createSuccessResponse(null, "Township updated successfully");
+        } catch (Exception e) {
+            throw e;
         }
-        if (request.getProvinceGuid() != null && !request.getProvinceGuid().isBlank()) {
-            Province province = provinceRepository.findByGuid(request.getProvinceGuid())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Province not found"));
-            township.setProvince(province);
-        }
-
-        township.setUpdatedAt(ZonedDateTime.now());
-        township.setUpdatedBy(admin.getId());
-
-        townshipRepository.save(township);
-
-        return ResponseFormat.createSuccessResponse(null, "Township updated successfully");
     }
 
     @Override
     public ResponseFormat townshipDelete(String townshipGuid, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Township township = townshipRepository.findByGuid(townshipGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Township not found"));
+            Township township = townshipRepository.findByGuid(townshipGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Township not found"));
 
-        township.setIsDeleted(true);
-        township.setUpdatedAt(ZonedDateTime.now());
-        township.setUpdatedBy(admin.getId());
+            township.setIsDeleted(true);
+            township.setUpdatedAt(ZonedDateTime.now());
+            township.setUpdatedBy(admin.getId());
 
-        townshipRepository.save(township);
+            townshipRepository.save(township);
 
-        return ResponseFormat.createSuccessResponse(null, "Township deleted successfully");
+            return ResponseFormat.createSuccessResponse(null, "Township deleted successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }

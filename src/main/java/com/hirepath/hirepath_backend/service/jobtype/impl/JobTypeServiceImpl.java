@@ -32,84 +32,97 @@ public class JobTypeServiceImpl implements JobTypeService {
 
     @Override
     public ResponseFormat jobTypeCreate(JobTypeCreateRequest request, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        JobType jobType = JobType.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .guid(UUID.randomUUID().toString())
-                .isDeleted(false)
-                .createdAt(ZonedDateTime.now())
-                .createdBy(admin.getId())
-                .build();
+            JobType jobType = JobType.builder()
+                    .name(request.getName())
+                    .description(request.getDescription())
+                    .guid(UUID.randomUUID().toString())
+                    .isDeleted(false)
+                    .createdAt(ZonedDateTime.now())
+                    .createdBy(admin.getId())
+                    .build();
 
-        jobTypeRepository.save(jobType);
+            jobTypeRepository.save(jobType);
 
-        return ResponseFormat.createSuccessResponse(null, "Job type created successfully");
+            return ResponseFormat.createSuccessResponse(null, "Job type created successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override
     public ResponseFormat jobTypeList(String searchName, String orderBy, int first, int max) {
-        if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
-            // This method will need to be created in JobTypeRepository
-            List<JobTypeListProjection> jobTypeListProjections = jobTypeRepository.findAllJobTypesAdminPanel(searchName, orderBy, first, max);
+        try {
+            if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
+                List<JobTypeListProjection> jobTypeListProjections = jobTypeRepository.findAllJobTypesAdminPanel(searchName, orderBy, first, max);
 
-            List<JobTypeListDTO> jobTypes = jobTypeListProjections.stream()
-                    .map(p -> JobTypeListDTO.builder()
-                            .name(p.getName())
-                            .description(p.getDescription())
-                            .guid(p.getGuid())
-                            .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .build())
-                    .toList();
+                List<JobTypeListDTO> jobTypes = jobTypeListProjections.stream()
+                        .map(p -> JobTypeListDTO.builder()
+                                .name(p.getName())
+                                .description(p.getDescription())
+                                .guid(p.getGuid())
+                                .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .build())
+                        .toList();
 
-            return ResponseFormat.createSuccessResponse(jobTypes, "Job type list retrieved successfully");
+                return ResponseFormat.createSuccessResponse(jobTypes, "Job type list retrieved successfully");
+            }
+
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
+        } catch (Exception e) {
+            throw e;
         }
-
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
     }
 
     @Override
     public ResponseFormat jobTypeUpdate(String jobTypeGuid, JobTypeUpdateRequest request, String email) {
-        User admin = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        // This method will need to be created in JobTypeRepository
-        JobType jobType = jobTypeRepository.findByGuid(jobTypeGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job type not found"));
+            JobType jobType = jobTypeRepository.findByGuid(jobTypeGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job type not found"));
 
-        if (request.getName() != null && !request.getName().isBlank()) {
-            jobType.setName(request.getName());
+            if (request.getName() != null && !request.getName().isBlank()) {
+                jobType.setName(request.getName());
+            }
+            if (request.getDescription() != null && !request.getDescription().isBlank()) {
+                jobType.setDescription(request.getDescription());
+            }
+
+            jobType.setUpdatedAt(ZonedDateTime.now());
+            jobType.setUpdatedBy(admin.getId());
+
+            jobTypeRepository.save(jobType);
+
+            return ResponseFormat.createSuccessResponse(null, "Job type updated successfully");
+        } catch (Exception e) {
+            throw e;
         }
-        if (request.getDescription() != null && !request.getDescription().isBlank()) {
-            jobType.setDescription(request.getDescription());
-        }
-
-        jobType.setUpdatedAt(ZonedDateTime.now());
-        jobType.setUpdatedBy(admin.getId());
-
-        jobTypeRepository.save(jobType);
-
-        return ResponseFormat.createSuccessResponse(null, "Job type updated successfully");
     }
 
     @Override
     public ResponseFormat jobTypeDelete(String jobTypeGuid, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        // This method will need to be created in JobTypeRepository
-        JobType jobType = jobTypeRepository.findByGuid(jobTypeGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job type not found"));
+            JobType jobType = jobTypeRepository.findByGuid(jobTypeGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job type not found"));
 
-        jobType.setIsDeleted(true);
-        jobType.setUpdatedAt(ZonedDateTime.now());
-        jobType.setUpdatedBy(admin.getId());
+            jobType.setIsDeleted(true);
+            jobType.setUpdatedAt(ZonedDateTime.now());
+            jobType.setUpdatedBy(admin.getId());
 
-        jobTypeRepository.save(jobType);
+            jobTypeRepository.save(jobType);
 
-        return ResponseFormat.createSuccessResponse(null, "Job type deleted successfully");
+            return ResponseFormat.createSuccessResponse(null, "Job type deleted successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }

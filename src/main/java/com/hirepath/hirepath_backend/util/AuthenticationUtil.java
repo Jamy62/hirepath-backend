@@ -9,8 +9,7 @@ import java.util.Map;
 public class AuthenticationUtil {
 
     public static void isPageMember(Object authDetail, String companyGuid) {
-        Map<String, String> authDetailMap = (Map<String, String>) authDetail;
-        String authCompanyGuid = authDetail.get("companyGuid");
+        String authCompanyGuid = ((Map<String, String>) authDetail).get("companyGuid");
 
         if (authCompanyGuid == null || !authCompanyGuid.equals(companyGuid)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not belong to this page.");

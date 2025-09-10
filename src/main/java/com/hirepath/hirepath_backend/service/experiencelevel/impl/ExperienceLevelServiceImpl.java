@@ -32,84 +32,97 @@ public class ExperienceLevelServiceImpl implements ExperienceLevelService {
 
     @Override
     public ResponseFormat experienceLevelCreate(ExperienceLevelCreateRequest request, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        ExperienceLevel experienceLevel = ExperienceLevel.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .guid(UUID.randomUUID().toString())
-                .isDeleted(false)
-                .createdAt(ZonedDateTime.now())
-                .createdBy(admin.getId())
-                .build();
+            ExperienceLevel experienceLevel = ExperienceLevel.builder()
+                    .name(request.getName())
+                    .description(request.getDescription())
+                    .guid(UUID.randomUUID().toString())
+                    .isDeleted(false)
+                    .createdAt(ZonedDateTime.now())
+                    .createdBy(admin.getId())
+                    .build();
 
-        experienceLevelRepository.save(experienceLevel);
+            experienceLevelRepository.save(experienceLevel);
 
-        return ResponseFormat.createSuccessResponse(null, "Experience level created successfully");
+            return ResponseFormat.createSuccessResponse(null, "Experience level created successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override
     public ResponseFormat experienceLevelList(String searchName, String orderBy, int first, int max) {
-        if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
-            // This method will need to be created in ExperienceLevelRepository
-            List<ExperienceLevelListProjection> experienceLevelListProjections = experienceLevelRepository.findAllExperienceLevelsAdminPanel(searchName, orderBy, first, max);
+        try {
+            if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
+                List<ExperienceLevelListProjection> experienceLevelListProjections = experienceLevelRepository.findAllExperienceLevelsAdminPanel(searchName, orderBy, first, max);
 
-            List<ExperienceLevelListDTO> experienceLevels = experienceLevelListProjections.stream()
-                    .map(p -> ExperienceLevelListDTO.builder()
-                            .name(p.getName())
-                            .description(p.getDescription())
-                            .guid(p.getGuid())
-                            .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .build())
-                    .toList();
+                List<ExperienceLevelListDTO> experienceLevels = experienceLevelListProjections.stream()
+                        .map(p -> ExperienceLevelListDTO.builder()
+                                .name(p.getName())
+                                .description(p.getDescription())
+                                .guid(p.getGuid())
+                                .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .build())
+                        .toList();
 
-            return ResponseFormat.createSuccessResponse(experienceLevels, "Experience level list retrieved successfully");
+                return ResponseFormat.createSuccessResponse(experienceLevels, "Experience level list retrieved successfully");
+            }
+
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
+        } catch (Exception e) {
+            throw e;
         }
-
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
     }
 
     @Override
     public ResponseFormat experienceLevelUpdate(String experienceLevelGuid, ExperienceLevelUpdateRequest request, String email) {
-        User admin = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        // This method will need to be created in ExperienceLevelRepository
-        ExperienceLevel experienceLevel = experienceLevelRepository.findByGuid(experienceLevelGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Experience level not found"));
+            ExperienceLevel experienceLevel = experienceLevelRepository.findByGuid(experienceLevelGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Experience level not found"));
 
-        if (request.getName() != null && !request.getName().isBlank()) {
-            experienceLevel.setName(request.getName());
+            if (request.getName() != null && !request.getName().isBlank()) {
+                experienceLevel.setName(request.getName());
+            }
+            if (request.getDescription() != null && !request.getDescription().isBlank()) {
+                experienceLevel.setDescription(request.getDescription());
+            }
+
+            experienceLevel.setUpdatedAt(ZonedDateTime.now());
+            experienceLevel.setUpdatedBy(admin.getId());
+
+            experienceLevelRepository.save(experienceLevel);
+
+            return ResponseFormat.createSuccessResponse(null, "Experience level updated successfully");
+        } catch (Exception e) {
+            throw e;
         }
-        if (request.getDescription() != null && !request.getDescription().isBlank()) {
-            experienceLevel.setDescription(request.getDescription());
-        }
-
-        experienceLevel.setUpdatedAt(ZonedDateTime.now());
-        experienceLevel.setUpdatedBy(admin.getId());
-
-        experienceLevelRepository.save(experienceLevel);
-
-        return ResponseFormat.createSuccessResponse(null, "Experience level updated successfully");
     }
 
     @Override
     public ResponseFormat experienceLevelDelete(String experienceLevelGuid, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        // This method will need to be created in ExperienceLevelRepository
-        ExperienceLevel experienceLevel = experienceLevelRepository.findByGuid(experienceLevelGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Experience level not found"));
+            ExperienceLevel experienceLevel = experienceLevelRepository.findByGuid(experienceLevelGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Experience level not found"));
 
-        experienceLevel.setIsDeleted(true);
-        experienceLevel.setUpdatedAt(ZonedDateTime.now());
-        experienceLevel.setUpdatedBy(admin.getId());
+            experienceLevel.setIsDeleted(true);
+            experienceLevel.setUpdatedAt(ZonedDateTime.now());
+            experienceLevel.setUpdatedBy(admin.getId());
 
-        experienceLevelRepository.save(experienceLevel);
+            experienceLevelRepository.save(experienceLevel);
 
-        return ResponseFormat.createSuccessResponse(null, "Experience level deleted successfully");
+            return ResponseFormat.createSuccessResponse(null, "Experience level deleted successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }

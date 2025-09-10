@@ -3,8 +3,7 @@ package com.hirepath.hirepath_backend.model.request.company;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 
-@Getter
-@Setter
+@Data
 public class CompanyUpdateRequest {
     private String name;
     private String logo;

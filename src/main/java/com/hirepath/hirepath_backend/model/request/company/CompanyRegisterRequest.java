@@ -5,8 +5,7 @@ import jakarta.validation.constraints.Email;
 import lombok.*;
 
 @AutoNotBlank
-@Getter
-@Setter
+@Data
 public class CompanyRegisterRequest {
     private String name;
     private String logo;

@@ -32,77 +32,92 @@ public class ProvinceServiceImpl implements ProvinceService {
 
     @Override
     public ResponseFormat provinceCreate(ProvinceCreateRequest request, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Province province = Province.builder()
-                .name(request.getName())
-                .guid(UUID.randomUUID().toString())
-                .isDeleted(false)
-                .createdAt(ZonedDateTime.now())
-                .createdBy(admin.getId())
-                .build();
+            Province province = Province.builder()
+                    .name(request.getName())
+                    .guid(UUID.randomUUID().toString())
+                    .isDeleted(false)
+                    .createdAt(ZonedDateTime.now())
+                    .createdBy(admin.getId())
+                    .build();
 
-        provinceRepository.save(province);
+            provinceRepository.save(province);
 
-        return ResponseFormat.createSuccessResponse(null, "Province created successfully");
+            return ResponseFormat.createSuccessResponse(null, "Province created successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override
     public ResponseFormat provinceList(String searchName, String orderBy, int first, int max) {
-        if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
-            // This method will need to be created in ProvinceRepository
-            List<ProvinceListProjection> provinceListProjections = provinceRepository.findAllProvincesAdminPanel(searchName, orderBy, first, max);
+        try {
+            if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
+                List<ProvinceListProjection> provinceListProjections = provinceRepository.findAllProvincesAdminPanel(searchName, orderBy, first, max);
 
-            List<ProvinceListDTO> provinces = provinceListProjections.stream()
-                    .map(p -> ProvinceListDTO.builder()
-                            .name(p.getName())
-                            .guid(p.getGuid())
-                            .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .build())
-                    .toList();
+                List<ProvinceListDTO> provinces = provinceListProjections.stream()
+                        .map(p -> ProvinceListDTO.builder()
+                                .name(p.getName())
+                                .guid(p.getGuid())
+                                .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .build())
+                        .toList();
 
-            return ResponseFormat.createSuccessResponse(provinces, "Province list retrieved successfully");
+                return ResponseFormat.createSuccessResponse(provinces, "Province list retrieved successfully");
+            }
+
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
+        } catch (Exception e) {
+            throw e;
         }
-
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
     }
 
     @Override
     public ResponseFormat provinceUpdate(String provinceGuid, ProvinceUpdateRequest request, String email) {
-        User admin = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Province province = provinceRepository.findByGuid(provinceGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Province not found"));
+            Province province = provinceRepository.findByGuid(provinceGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Province not found"));
 
-        if (request.getName() != null && !request.getName().isBlank()) {
-            province.setName(request.getName());
+            if (request.getName() != null && !request.getName().isBlank()) {
+                province.setName(request.getName());
+            }
+
+            province.setUpdatedAt(ZonedDateTime.now());
+            province.setUpdatedBy(admin.getId());
+
+            provinceRepository.save(province);
+
+            return ResponseFormat.createSuccessResponse(null, "Province updated successfully");
+        } catch (Exception e) {
+            throw e;
         }
-
-        province.setUpdatedAt(ZonedDateTime.now());
-        province.setUpdatedBy(admin.getId());
-
-        provinceRepository.save(province);
-
-        return ResponseFormat.createSuccessResponse(null, "Province updated successfully");
     }
 
     @Override
     public ResponseFormat provinceDelete(String provinceGuid, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Province province = provinceRepository.findByGuid(provinceGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Province not found"));
+            Province province = provinceRepository.findByGuid(provinceGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Province not found"));
 
-        province.setIsDeleted(true);
-        province.setUpdatedAt(ZonedDateTime.now());
-        province.setUpdatedBy(admin.getId());
+            province.setIsDeleted(true);
+            province.setUpdatedAt(ZonedDateTime.now());
+            province.setUpdatedBy(admin.getId());
 
-        provinceRepository.save(province);
+            provinceRepository.save(province);
 
-        return ResponseFormat.createSuccessResponse(null, "Province deleted successfully");
+            return ResponseFormat.createSuccessResponse(null, "Province deleted successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }

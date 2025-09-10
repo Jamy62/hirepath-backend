@@ -32,81 +32,97 @@ public class IndustryServiceImpl implements IndustryService {
 
     @Override
     public ResponseFormat industryCreate(IndustryCreateRequest request, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Industry industry = Industry.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .guid(UUID.randomUUID().toString())
-                .isDeleted(false)
-                .createdAt(ZonedDateTime.now())
-                .createdBy(admin.getId())
-                .build();
+            Industry industry = Industry.builder()
+                    .name(request.getName())
+                    .description(request.getDescription())
+                    .guid(UUID.randomUUID().toString())
+                    .isDeleted(false)
+                    .createdAt(ZonedDateTime.now())
+                    .createdBy(admin.getId())
+                    .build();
 
-        industryRepository.save(industry);
+            industryRepository.save(industry);
 
-        return ResponseFormat.createSuccessResponse(null, "Industry created successfully");
+            return ResponseFormat.createSuccessResponse(null, "Industry created successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override
     public ResponseFormat industryList(String searchName, String orderBy, int first, int max) {
-        if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
-            List<IndustryListProjection> industryListProjections = industryRepository.findAllIndustriesAdminPanel(searchName, orderBy, first, max);
+        try {
+            if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
+                List<IndustryListProjection> industryListProjections = industryRepository.findAllIndustriesAdminPanel(searchName, orderBy, first, max);
 
-            List<IndustryListDTO> industries = industryListProjections.stream()
-                    .map(p -> IndustryListDTO.builder()
-                            .name(p.getName())
-                            .description(p.getDescription())
-                            .guid(p.getGuid())
-                            .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .build())
-                    .toList();
+                List<IndustryListDTO> industries = industryListProjections.stream()
+                        .map(p -> IndustryListDTO.builder()
+                                .name(p.getName())
+                                .description(p.getDescription())
+                                .guid(p.getGuid())
+                                .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .build())
+                        .toList();
 
-            return ResponseFormat.createSuccessResponse(industries, "Industry list retrieved successfully");
+                return ResponseFormat.createSuccessResponse(industries, "Industry list retrieved successfully");
+            }
+
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
+        } catch (Exception e) {
+            throw e;
         }
-
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
     }
 
     @Override
     public ResponseFormat industryUpdate(String industryGuid, IndustryUpdateRequest request, String email) {
-        User admin = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Industry industry = industryRepository.findByGuid(industryGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Industry not found"));
+            Industry industry = industryRepository.findByGuid(industryGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Industry not found"));
 
-        if (request.getName() != null && !request.getName().isBlank()) {
-            industry.setName(request.getName());
+            if (request.getName() != null && !request.getName().isBlank()) {
+                industry.setName(request.getName());
+            }
+            if (request.getDescription() != null && !request.getDescription().isBlank()) {
+                industry.setDescription(request.getDescription());
+            }
+
+            industry.setUpdatedAt(ZonedDateTime.now());
+            industry.setUpdatedBy(admin.getId());
+
+            industryRepository.save(industry);
+
+            return ResponseFormat.createSuccessResponse(null, "Industry updated successfully");
+        } catch (Exception e) {
+            throw e;
         }
-        if (request.getDescription() != null && !request.getDescription().isBlank()) {
-            industry.setDescription(request.getDescription());
-        }
-
-        industry.setUpdatedAt(ZonedDateTime.now());
-        industry.setUpdatedBy(admin.getId());
-
-        industryRepository.save(industry);
-
-        return ResponseFormat.createSuccessResponse(null, "Industry updated successfully");
     }
 
     @Override
     public ResponseFormat industryDelete(String industryGuid, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Industry industry = industryRepository.findByGuid(industryGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Industry not found"));
+            Industry industry = industryRepository.findByGuid(industryGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Industry not found"));
 
-        industry.setIsDeleted(true);
-        industry.setUpdatedAt(ZonedDateTime.now());
-        industry.setUpdatedBy(admin.getId());
+            industry.setIsDeleted(true);
+            industry.setUpdatedAt(ZonedDateTime.now());
+            industry.setUpdatedBy(admin.getId());
 
-        industryRepository.save(industry);
+            industryRepository.save(industry);
 
-        return ResponseFormat.createSuccessResponse(null, "Industry deleted successfully");
+            return ResponseFormat.createSuccessResponse(null, "Industry deleted successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }

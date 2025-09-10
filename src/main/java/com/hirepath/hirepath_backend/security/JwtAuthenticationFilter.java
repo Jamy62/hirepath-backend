@@ -60,7 +60,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             }
                         }
                         auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
-                    } else if ("COMPANY".equals(tokenType)) {
+                    }
+                    else if ("COMPANY".equals(tokenType)) {
                         String companyRole = jwtUtil.extractCompanyRole(jwt);
                         String companyGuid = jwtUtil.extractCompanyGuid(jwt);
                         if (companyRole != null) {

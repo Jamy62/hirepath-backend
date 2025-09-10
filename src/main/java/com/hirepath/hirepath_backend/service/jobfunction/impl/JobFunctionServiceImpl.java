@@ -32,84 +32,97 @@ public class JobFunctionServiceImpl implements JobFunctionService {
 
     @Override
     public ResponseFormat jobFunctionCreate(JobFunctionCreateRequest request, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        JobFunction jobFunction = JobFunction.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .guid(UUID.randomUUID().toString())
-                .isDeleted(false)
-                .createdAt(ZonedDateTime.now())
-                .createdBy(admin.getId())
-                .build();
+            JobFunction jobFunction = JobFunction.builder()
+                    .name(request.getName())
+                    .description(request.getDescription())
+                    .guid(UUID.randomUUID().toString())
+                    .isDeleted(false)
+                    .createdAt(ZonedDateTime.now())
+                    .createdBy(admin.getId())
+                    .build();
 
-        jobFunctionRepository.save(jobFunction);
+            jobFunctionRepository.save(jobFunction);
 
-        return ResponseFormat.createSuccessResponse(null, "Job function created successfully");
+            return ResponseFormat.createSuccessResponse(null, "Job function created successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override
     public ResponseFormat jobFunctionList(String searchName, String orderBy, int first, int max) {
-        if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
-            // This method will need to be created in JobFunctionRepository
-            List<JobFunctionListProjection> jobFunctionListProjections = jobFunctionRepository.findAllJobFunctionsAdminPanel(searchName, orderBy, first, max);
+        try {
+            if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
+                List<JobFunctionListProjection> jobFunctionListProjections = jobFunctionRepository.findAllJobFunctionsAdminPanel(searchName, orderBy, first, max);
 
-            List<JobFunctionListDTO> jobFunctions = jobFunctionListProjections.stream()
-                    .map(p -> JobFunctionListDTO.builder()
-                            .name(p.getName())
-                            .description(p.getDescription())
-                            .guid(p.getGuid())
-                            .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .build())
-                    .toList();
+                List<JobFunctionListDTO> jobFunctions = jobFunctionListProjections.stream()
+                        .map(p -> JobFunctionListDTO.builder()
+                                .name(p.getName())
+                                .description(p.getDescription())
+                                .guid(p.getGuid())
+                                .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .build())
+                        .toList();
 
-            return ResponseFormat.createSuccessResponse(jobFunctions, "Job function list retrieved successfully");
+                return ResponseFormat.createSuccessResponse(jobFunctions, "Job function list retrieved successfully");
+            }
+
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
+        } catch (Exception e) {
+            throw e;
         }
-
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
     }
 
     @Override
     public ResponseFormat jobFunctionUpdate(String jobFunctionGuid, JobFunctionUpdateRequest request, String email) {
-        User admin = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        // This method will need to be created in JobFunctionRepository
-        JobFunction jobFunction = jobFunctionRepository.findByGuid(jobFunctionGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job function not found"));
+            JobFunction jobFunction = jobFunctionRepository.findByGuid(jobFunctionGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job function not found"));
 
-        if (request.getName() != null && !request.getName().isBlank()) {
-            jobFunction.setName(request.getName());
+            if (request.getName() != null && !request.getName().isBlank()) {
+                jobFunction.setName(request.getName());
+            }
+            if (request.getDescription() != null && !request.getDescription().isBlank()) {
+                jobFunction.setDescription(request.getDescription());
+            }
+
+            jobFunction.setUpdatedAt(ZonedDateTime.now());
+            jobFunction.setUpdatedBy(admin.getId());
+
+            jobFunctionRepository.save(jobFunction);
+
+            return ResponseFormat.createSuccessResponse(null, "Job function updated successfully");
+        } catch (Exception e) {
+            throw e;
         }
-        if (request.getDescription() != null && !request.getDescription().isBlank()) {
-            jobFunction.setDescription(request.getDescription());
-        }
-
-        jobFunction.setUpdatedAt(ZonedDateTime.now());
-        jobFunction.setUpdatedBy(admin.getId());
-
-        jobFunctionRepository.save(jobFunction);
-
-        return ResponseFormat.createSuccessResponse(null, "Job function updated successfully");
     }
 
     @Override
     public ResponseFormat jobFunctionDelete(String jobFunctionGuid, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        // This method will need to be created in JobFunctionRepository
-        JobFunction jobFunction = jobFunctionRepository.findByGuid(jobFunctionGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job function not found"));
+            JobFunction jobFunction = jobFunctionRepository.findByGuid(jobFunctionGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job function not found"));
 
-        jobFunction.setIsDeleted(true);
-        jobFunction.setUpdatedAt(ZonedDateTime.now());
-        jobFunction.setUpdatedBy(admin.getId());
+            jobFunction.setIsDeleted(true);
+            jobFunction.setUpdatedAt(ZonedDateTime.now());
+            jobFunction.setUpdatedBy(admin.getId());
 
-        jobFunctionRepository.save(jobFunction);
+            jobFunctionRepository.save(jobFunction);
 
-        return ResponseFormat.createSuccessResponse(null, "Job function deleted successfully");
+            return ResponseFormat.createSuccessResponse(null, "Job function deleted successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }

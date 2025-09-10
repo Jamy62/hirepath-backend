@@ -32,81 +32,97 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
 
     @Override
     public ResponseFormat paymentMethodCreate(PaymentMethodCreateRequest request, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        PaymentMethod paymentMethod = PaymentMethod.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .guid(UUID.randomUUID().toString())
-                .isDeleted(false)
-                .createdAt(ZonedDateTime.now())
-                .createdBy(admin.getId())
-                .build();
+            PaymentMethod paymentMethod = PaymentMethod.builder()
+                    .name(request.getName())
+                    .description(request.getDescription())
+                    .guid(UUID.randomUUID().toString())
+                    .isDeleted(false)
+                    .createdAt(ZonedDateTime.now())
+                    .createdBy(admin.getId())
+                    .build();
 
-        paymentMethodRepository.save(paymentMethod);
+            paymentMethodRepository.save(paymentMethod);
 
-        return ResponseFormat.createSuccessResponse(null, "Payment method created successfully");
+            return ResponseFormat.createSuccessResponse(null, "Payment method created successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override
     public ResponseFormat paymentMethodList(String searchName, String orderBy, int first, int max) {
-        if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
-            List<PaymentMethodListProjection> paymentMethodListProjections = paymentMethodRepository.findAllPaymentMethodsAdminPanel(searchName, orderBy, first, max);
+        try {
+            if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
+                List<PaymentMethodListProjection> paymentMethodListProjections = paymentMethodRepository.findAllPaymentMethodsAdminPanel(searchName, orderBy, first, max);
 
-            List<PaymentMethodListDTO> paymentMethods = paymentMethodListProjections.stream()
-                    .map(p -> PaymentMethodListDTO.builder()
-                            .name(p.getName())
-                            .description(p.getDescription())
-                            .guid(p.getGuid())
-                            .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .build())
-                    .toList();
+                List<PaymentMethodListDTO> paymentMethods = paymentMethodListProjections.stream()
+                        .map(p -> PaymentMethodListDTO.builder()
+                                .name(p.getName())
+                                .description(p.getDescription())
+                                .guid(p.getGuid())
+                                .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .build())
+                        .toList();
 
-            return ResponseFormat.createSuccessResponse(paymentMethods, "Payment method list retrieved successfully");
+                return ResponseFormat.createSuccessResponse(paymentMethods, "Payment method list retrieved successfully");
+            }
+
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
+        } catch (Exception e) {
+            throw e;
         }
-
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
     }
 
     @Override
     public ResponseFormat paymentMethodUpdate(String paymentMethodGuid, PaymentMethodUpdateRequest request, String email) {
-        User admin = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        PaymentMethod paymentMethod = paymentMethodRepository.findByGuid(paymentMethodGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment method not found"));
+            PaymentMethod paymentMethod = paymentMethodRepository.findByGuid(paymentMethodGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment method not found"));
 
-        if (request.getName() != null && !request.getName().isBlank()) {
-            paymentMethod.setName(request.getName());
+            if (request.getName() != null && !request.getName().isBlank()) {
+                paymentMethod.setName(request.getName());
+            }
+            if (request.getDescription() != null && !request.getDescription().isBlank()) {
+                paymentMethod.setDescription(request.getDescription());
+            }
+
+            paymentMethod.setUpdatedAt(ZonedDateTime.now());
+            paymentMethod.setUpdatedBy(admin.getId());
+
+            paymentMethodRepository.save(paymentMethod);
+
+            return ResponseFormat.createSuccessResponse(null, "Payment method updated successfully");
+        } catch (Exception e) {
+            throw e;
         }
-        if (request.getDescription() != null && !request.getDescription().isBlank()) {
-            paymentMethod.setDescription(request.getDescription());
-        }
-
-        paymentMethod.setUpdatedAt(ZonedDateTime.now());
-        paymentMethod.setUpdatedBy(admin.getId());
-
-        paymentMethodRepository.save(paymentMethod);
-
-        return ResponseFormat.createSuccessResponse(null, "Payment method updated successfully");
     }
 
     @Override
     public ResponseFormat paymentMethodDelete(String paymentMethodGuid, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        PaymentMethod paymentMethod = paymentMethodRepository.findByGuid(paymentMethodGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment method not found"));
+            PaymentMethod paymentMethod = paymentMethodRepository.findByGuid(paymentMethodGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment method not found"));
 
-        paymentMethod.setIsDeleted(true);
-        paymentMethod.setUpdatedAt(ZonedDateTime.now());
-        paymentMethod.setUpdatedBy(admin.getId());
+            paymentMethod.setIsDeleted(true);
+            paymentMethod.setUpdatedAt(ZonedDateTime.now());
+            paymentMethod.setUpdatedBy(admin.getId());
 
-        paymentMethodRepository.save(paymentMethod);
+            paymentMethodRepository.save(paymentMethod);
 
-        return ResponseFormat.createSuccessResponse(null, "Payment method deleted successfully");
+            return ResponseFormat.createSuccessResponse(null, "Payment method deleted successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }

@@ -32,82 +32,97 @@ public class LanguageServiceImpl implements LanguageService {
 
     @Override
     public ResponseFormat languageCreate(LanguageCreateRequest request, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Language language = Language.builder()
-                .name(request.getName())
-                .code(request.getCode())
-                .guid(UUID.randomUUID().toString())
-                .isDeleted(false)
-                .createdAt(ZonedDateTime.now())
-                .createdBy(admin.getId())
-                .build();
+            Language language = Language.builder()
+                    .name(request.getName())
+                    .code(request.getCode())
+                    .guid(UUID.randomUUID().toString())
+                    .isDeleted(false)
+                    .createdAt(ZonedDateTime.now())
+                    .createdBy(admin.getId())
+                    .build();
 
-        languageRepository.save(language);
+            languageRepository.save(language);
 
-        return ResponseFormat.createSuccessResponse(null, "Language created successfully");
+            return ResponseFormat.createSuccessResponse(null, "Language created successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     @Override
     public ResponseFormat languageList(String searchName, String orderBy, int first, int max) {
-        if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
-            // This method will need to be created in LanguageRepository
-            List<LanguageListProjection> languageListProjections = languageRepository.findAllLanguagesAdminPanel(searchName, orderBy, first, max);
+        try {
+            if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
+                List<LanguageListProjection> languageListProjections = languageRepository.findAllLanguagesAdminPanel(searchName, orderBy, first, max);
 
-            List<LanguageListDTO> languages = languageListProjections.stream()
-                    .map(p -> LanguageListDTO.builder()
-                            .name(p.getName())
-                            .code(p.getCode())
-                            .guid(p.getGuid())
-                            .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
-                            .build())
-                    .toList();
+                List<LanguageListDTO> languages = languageListProjections.stream()
+                        .map(p -> LanguageListDTO.builder()
+                                .name(p.getName())
+                                .code(p.getCode())
+                                .guid(p.getGuid())
+                                .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .build())
+                        .toList();
 
-            return ResponseFormat.createSuccessResponse(languages, "Language list retrieved successfully");
+                return ResponseFormat.createSuccessResponse(languages, "Language list retrieved successfully");
+            }
+
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
+        } catch (Exception e) {
+            throw e;
         }
-
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
     }
 
     @Override
     public ResponseFormat languageUpdate(String languageGuid, LanguageUpdateRequest request, String email) {
-        User admin = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Language language = languageRepository.findByGuid(languageGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Language not found"));
+            Language language = languageRepository.findByGuid(languageGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Language not found"));
 
-        if (request.getName() != null && !request.getName().isBlank()) {
-            language.setName(request.getName());
+            if (request.getName() != null && !request.getName().isBlank()) {
+                language.setName(request.getName());
+            }
+            if (request.getCode() != null && !request.getCode().isBlank()) {
+                language.setCode(request.getCode());
+            }
+
+            language.setUpdatedAt(ZonedDateTime.now());
+            language.setUpdatedBy(admin.getId());
+
+            languageRepository.save(language);
+
+            return ResponseFormat.createSuccessResponse(null, "Language updated successfully");
+        } catch (Exception e) {
+            throw e;
         }
-        if (request.getCode() != null && !request.getCode().isBlank()) {
-            language.setCode(request.getCode());
-        }
-
-        language.setUpdatedAt(ZonedDateTime.now());
-        language.setUpdatedBy(admin.getId());
-
-        languageRepository.save(language);
-
-        return ResponseFormat.createSuccessResponse(null, "Language updated successfully");
     }
 
     @Override
     public ResponseFormat languageDelete(String languageGuid, String adminEmail) {
-        User admin = userRepository.findByEmail(adminEmail)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+        try {
+            User admin = userRepository.findByEmail(adminEmail)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-        Language language = languageRepository.findByGuid(languageGuid)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Language not found"));
+            Language language = languageRepository.findByGuid(languageGuid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Language not found"));
 
-        language.setIsDeleted(true);
-        language.setUpdatedAt(ZonedDateTime.now());
-        language.setUpdatedBy(admin.getId());
+            language.setIsDeleted(true);
+            language.setUpdatedAt(ZonedDateTime.now());
+            language.setUpdatedBy(admin.getId());
 
-        languageRepository.save(language);
+            languageRepository.save(language);
 
-        return ResponseFormat.createSuccessResponse(null, "Language deleted successfully");
+            return ResponseFormat.createSuccessResponse(null, "Language deleted successfully");
+        } catch (Exception e) {
+            throw e;
+        }
     }
 }

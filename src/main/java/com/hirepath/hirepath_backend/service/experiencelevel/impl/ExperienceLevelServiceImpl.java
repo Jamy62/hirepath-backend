@@ -1,12 +1,12 @@
 package com.hirepath.hirepath_backend.service.experiencelevel.impl;
 
 import com.hirepath.hirepath_backend.constant.VariableConstant;
-import com.hirepath.hirepath_backend.model.dto.ExperienceLevelListDTO;
-import com.hirepath.hirepath_backend.model.dto.ExperienceLevelListProjection;
+import com.hirepath.hirepath_backend.model.dto.experiencelevel.ExperienceLevelListDTO;
+import com.hirepath.hirepath_backend.model.dto.experiencelevel.ExperienceLevelListProjection;
 import com.hirepath.hirepath_backend.model.entity.experiencelevel.ExperienceLevel;
 import com.hirepath.hirepath_backend.model.entity.user.User;
-import com.hirepath.hirepath_backend.model.request.ExperienceLevelCreateRequest;
-import com.hirepath.hirepath_backend.model.request.ExperienceLevelUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.experiencelevel.ExperienceLevelCreateRequest;
+import com.hirepath.hirepath_backend.model.request.experiencelevel.ExperienceLevelUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.experiencelevel.ExperienceLevelRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;

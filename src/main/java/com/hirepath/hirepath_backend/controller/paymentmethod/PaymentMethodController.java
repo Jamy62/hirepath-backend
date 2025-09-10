@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.controller.paymentmethod;
 
-import com.hirepath.hirepath_backend.model.request.PaymentMethodCreateRequest;
-import com.hirepath.hirepath_backend.model.request.PaymentMethodUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodCreateRequest;
+import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.paymentmethod.PaymentMethodService;
 import jakarta.validation.Valid;

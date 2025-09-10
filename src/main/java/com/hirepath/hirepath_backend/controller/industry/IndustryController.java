@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.controller.industry;
 
-import com.hirepath.hirepath_backend.model.request.IndustryCreateRequest;
-import com.hirepath.hirepath_backend.model.request.IndustryUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.industry.IndustryCreateRequest;
+import com.hirepath.hirepath_backend.model.request.industry.IndustryUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.industry.IndustryService;
 import jakarta.validation.Valid;

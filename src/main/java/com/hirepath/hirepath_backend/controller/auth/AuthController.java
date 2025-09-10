@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.controller.auth;
 
-import com.hirepath.hirepath_backend.model.request.CompanySwitchRequest;
-import com.hirepath.hirepath_backend.model.request.LoginRequest;
+import com.hirepath.hirepath_backend.model.request.companyuser.CompanySwitchRequest;
+import com.hirepath.hirepath_backend.model.request.user.LoginRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;

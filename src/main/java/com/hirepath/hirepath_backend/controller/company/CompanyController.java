@@ -1,13 +1,15 @@
 package com.hirepath.hirepath_backend.controller.company;
 
-import com.hirepath.hirepath_backend.model.request.CompanyRegisterRequest;
-import com.hirepath.hirepath_backend.model.request.CompanyUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.company.CompanyRegisterRequest;
+import com.hirepath.hirepath_backend.model.request.company.CompanyUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.company.CompanyService;
+import com.hirepath.hirepath_backend.util.AuthenticationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -37,7 +39,10 @@ public class CompanyController {
 
     @PutMapping("/update/admin/{companyGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> companyUpdate(@PathVariable String companyGuid, @Valid @RequestBody CompanyUpdateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> companyUpdate(@PathVariable String companyGuid, @Valid @RequestBody CompanyUpdateRequest request,
+                                                        Principal principal,
+                                                        Authentication authentication) {
+        AuthenticationUtil.isPageMember(authentication.getDetails(), companyGuid);
         ResponseFormat responseFormat = companyService.companyUpdate(companyGuid, request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }

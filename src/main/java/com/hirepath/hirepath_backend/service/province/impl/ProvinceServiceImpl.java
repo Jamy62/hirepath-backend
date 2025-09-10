@@ -1,12 +1,12 @@
 package com.hirepath.hirepath_backend.service.province.impl;
 
 import com.hirepath.hirepath_backend.constant.VariableConstant;
-import com.hirepath.hirepath_backend.model.dto.ProvinceListDTO;
-import com.hirepath.hirepath_backend.model.dto.ProvinceListProjection;
+import com.hirepath.hirepath_backend.model.dto.province.ProvinceListDTO;
+import com.hirepath.hirepath_backend.model.dto.province.ProvinceListProjection;
 import com.hirepath.hirepath_backend.model.entity.province.Province;
 import com.hirepath.hirepath_backend.model.entity.user.User;
-import com.hirepath.hirepath_backend.model.request.ProvinceCreateRequest;
-import com.hirepath.hirepath_backend.model.request.ProvinceUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.province.ProvinceCreateRequest;
+import com.hirepath.hirepath_backend.model.request.province.ProvinceUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.province.ProvinceRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;

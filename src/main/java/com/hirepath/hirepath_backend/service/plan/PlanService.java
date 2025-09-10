@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.service.plan;
 
-import com.hirepath.hirepath_backend.model.request.PlanCreateRequest;
-import com.hirepath.hirepath_backend.model.request.PlanUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.plan.PlanCreateRequest;
+import com.hirepath.hirepath_backend.model.request.plan.PlanUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 
 public interface PlanService {

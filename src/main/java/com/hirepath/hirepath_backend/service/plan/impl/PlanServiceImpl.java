@@ -1,12 +1,12 @@
 package com.hirepath.hirepath_backend.service.plan.impl;
 
 import com.hirepath.hirepath_backend.constant.VariableConstant;
-import com.hirepath.hirepath_backend.model.dto.PlanListDTO;
-import com.hirepath.hirepath_backend.model.dto.PlanListProjection;
+import com.hirepath.hirepath_backend.model.dto.plan.PlanListDTO;
+import com.hirepath.hirepath_backend.model.dto.plan.PlanListProjection;
 import com.hirepath.hirepath_backend.model.entity.plan.Plan;
 import com.hirepath.hirepath_backend.model.entity.user.User;
-import com.hirepath.hirepath_backend.model.request.PlanCreateRequest;
-import com.hirepath.hirepath_backend.model.request.PlanUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.plan.PlanCreateRequest;
+import com.hirepath.hirepath_backend.model.request.plan.PlanUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.plan.PlanRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;

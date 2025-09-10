@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.service.language;
 
-import com.hirepath.hirepath_backend.model.request.LanguageCreateRequest;
-import com.hirepath.hirepath_backend.model.request.LanguageUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.language.LanguageCreateRequest;
+import com.hirepath.hirepath_backend.model.request.language.LanguageUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 
 public interface LanguageService {

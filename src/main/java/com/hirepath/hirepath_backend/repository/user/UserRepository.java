@@ -1,9 +1,7 @@
 package com.hirepath.hirepath_backend.repository.user;
 
-import com.hirepath.hirepath_backend.model.dto.UserListDTO;
-import com.hirepath.hirepath_backend.model.dto.UserListProjection;
+import com.hirepath.hirepath_backend.model.dto.user.UserListProjection;
 import com.hirepath.hirepath_backend.model.entity.user.User;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

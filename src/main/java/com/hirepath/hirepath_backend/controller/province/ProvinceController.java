@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.controller.province;
 
-import com.hirepath.hirepath_backend.model.request.ProvinceCreateRequest;
-import com.hirepath.hirepath_backend.model.request.ProvinceUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.province.ProvinceCreateRequest;
+import com.hirepath.hirepath_backend.model.request.province.ProvinceUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.province.ProvinceService;
 import jakarta.validation.Valid;

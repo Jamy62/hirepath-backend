@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.service.company;
 
-import com.hirepath.hirepath_backend.model.request.CompanyRegisterRequest;
-import com.hirepath.hirepath_backend.model.request.CompanyUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.company.CompanyRegisterRequest;
+import com.hirepath.hirepath_backend.model.request.company.CompanyUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 
 public interface CompanyService {

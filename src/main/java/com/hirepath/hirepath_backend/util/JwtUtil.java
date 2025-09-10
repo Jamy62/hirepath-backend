@@ -1,5 +1,7 @@
 package com.hirepath.hirepath_backend.util;
 
+import com.hirepath.hirepath_backend.model.entity.user.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
@@ -12,59 +14,80 @@ import java.util.Map;
 
 @Component
 public class JwtUtil {
-    private String SECRET_KEY = "hirepath-secret-jamy-hirepath-secret-jamy-hirepath-secret-jamy";
-    private long EXPIRATION_TIME = 60 * 60 * 1000;
-    private SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes((StandardCharsets.UTF_8)));
+    private final String SECRET_KEY = "hirepath-secret-jamy-hirepath-secret-jamy-hirepath-secret-jamy";
+    private final long EXPIRATION_TIME = 60 * 60 * 1000;
+    private final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
-    public String generateToken(String email, String systemRole, Map<String, String> companyRoles) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("systemRole", systemRole);
-        if (companyRoles != null && !companyRoles.isEmpty()) {
-            claims.put("companyRoles", companyRoles);
-        }
+    private String generateToken(String subject, Map<String, Object> claims) {
         return Jwts.builder()
                 .claims(claims)
-                .subject(email)
+                .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key, Jwts.SIG.HS256)
                 .compact();
     }
 
-    public String extractEmail(String token) {
-        try {
-            return Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getSubject();
-        }
-        catch (Exception e) {
-            throw new IllegalArgumentException("Invalid JWT token: " + e.getMessage());
-        }
+    public String generateSystemToken(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("tokenType", "SYSTEM");
+        claims.put("systemRole", user.getRole().getName());
+        return generateToken(user.getEmail(), claims);
     }
 
-    public String extractSystemRole(String token) {
+    public String generateCompanyToken(User user, String companyGuid, String companyRole) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("tokenType", "COMPANY");
+        claims.put("companyGuid", companyGuid);
+        claims.put("companyRole", companyRole);
+        return generateToken(user.getEmail(), claims);
+    }
+
+    private Claims getAllClaimsFromToken(String token) {
         return Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
-                .getPayload()
-                .get("systemRole", String.class);
+                .getPayload();
     }
 
-    public Map extractCompanyRoles(String token) {
+    public String extractEmail(String token) {
         try {
-            return Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .get("companyRoles", Map.class);
+            return getAllClaimsFromToken(token).getSubject();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid JWT token: " + e.getMessage());
         }
-        catch (Exception e) {
-            return new HashMap<>();
+    }
+
+    public String extractTokenType(String token) {
+        try {
+            return getAllClaimsFromToken(token).get("tokenType", String.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public String extractSystemRole(String token) {
+        try {
+            return getAllClaimsFromToken(token).get("systemRole", String.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public String extractCompanyRole(String token) {
+        try {
+            return getAllClaimsFromToken(token).get("companyRole", String.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public String extractCompanyGuid(String token) {
+        try {
+            return getAllClaimsFromToken(token).get("companyGuid", String.class);
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -78,12 +101,6 @@ public class JwtUtil {
     }
 
     private boolean isTokenExpired(String token) {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getExpiration()
-                .before(new Date());
+        return getAllClaimsFromToken(token).getExpiration().before(new Date());
     }
 }

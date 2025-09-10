@@ -1,13 +1,13 @@
 package com.hirepath.hirepath_backend.service.township.impl;
 
 import com.hirepath.hirepath_backend.constant.VariableConstant;
-import com.hirepath.hirepath_backend.model.dto.TownshipListDTO;
-import com.hirepath.hirepath_backend.model.dto.TownshipListProjection;
+import com.hirepath.hirepath_backend.model.dto.township.TownshipListDTO;
+import com.hirepath.hirepath_backend.model.dto.township.TownshipListProjection;
 import com.hirepath.hirepath_backend.model.entity.province.Province;
 import com.hirepath.hirepath_backend.model.entity.township.Township;
 import com.hirepath.hirepath_backend.model.entity.user.User;
-import com.hirepath.hirepath_backend.model.request.TownshipCreateRequest;
-import com.hirepath.hirepath_backend.model.request.TownshipUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.township.TownshipCreateRequest;
+import com.hirepath.hirepath_backend.model.request.township.TownshipUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.province.ProvinceRepository;
 import com.hirepath.hirepath_backend.repository.township.TownshipRepository;

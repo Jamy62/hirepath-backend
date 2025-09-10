@@ -1,12 +1,12 @@
 package com.hirepath.hirepath_backend.service.language.impl;
 
 import com.hirepath.hirepath_backend.constant.VariableConstant;
-import com.hirepath.hirepath_backend.model.dto.LanguageListDTO;
-import com.hirepath.hirepath_backend.model.dto.LanguageListProjection;
+import com.hirepath.hirepath_backend.model.dto.language.LanguageListDTO;
+import com.hirepath.hirepath_backend.model.dto.language.LanguageListProjection;
 import com.hirepath.hirepath_backend.model.entity.language.Language;
 import com.hirepath.hirepath_backend.model.entity.user.User;
-import com.hirepath.hirepath_backend.model.request.LanguageCreateRequest;
-import com.hirepath.hirepath_backend.model.request.LanguageUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.language.LanguageCreateRequest;
+import com.hirepath.hirepath_backend.model.request.language.LanguageUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.language.LanguageRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;

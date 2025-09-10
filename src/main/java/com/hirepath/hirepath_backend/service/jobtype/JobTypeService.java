@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.service.jobtype;
 
-import com.hirepath.hirepath_backend.model.request.JobTypeCreateRequest;
-import com.hirepath.hirepath_backend.model.request.JobTypeUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.jobtype.JobTypeCreateRequest;
+import com.hirepath.hirepath_backend.model.request.jobtype.JobTypeUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 
 public interface JobTypeService {

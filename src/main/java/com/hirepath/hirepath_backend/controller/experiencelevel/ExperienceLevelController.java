@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.controller.experiencelevel;
 
-import com.hirepath.hirepath_backend.model.request.ExperienceLevelCreateRequest;
-import com.hirepath.hirepath_backend.model.request.ExperienceLevelUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.experiencelevel.ExperienceLevelCreateRequest;
+import com.hirepath.hirepath_backend.model.request.experiencelevel.ExperienceLevelUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.experiencelevel.ExperienceLevelService;
 import jakarta.validation.Valid;

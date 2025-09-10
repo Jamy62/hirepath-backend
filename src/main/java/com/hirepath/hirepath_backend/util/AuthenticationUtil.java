@@ -1,0 +1,19 @@
+package com.hirepath.hirepath_backend.util;
+
+import com.hirepath.hirepath_backend.model.response.ResponseFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Map;
+
+public class AuthenticationUtil {
+
+    public static void isPageMember(Object authDetail, String companyGuid) {
+        Map<String, String> authDetailMap = (Map<String, String>) authDetail;
+        String authCompanyGuid = authDetail.get("companyGuid");
+
+        if (authCompanyGuid == null || !authCompanyGuid.equals(companyGuid)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not belong to this page.");
+        }
+    }
+}

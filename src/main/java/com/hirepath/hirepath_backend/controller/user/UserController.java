@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.controller.user;
 
-import com.hirepath.hirepath_backend.model.request.RegisterRequest;
-import com.hirepath.hirepath_backend.model.request.UserUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.user.RegisterRequest;
+import com.hirepath.hirepath_backend.model.request.user.UserUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.user.UserService;
 import jakarta.validation.Valid;

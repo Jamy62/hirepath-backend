@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.service.paymentmethod;
 
-import com.hirepath.hirepath_backend.model.request.PaymentMethodCreateRequest;
-import com.hirepath.hirepath_backend.model.request.PaymentMethodUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodCreateRequest;
+import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 
 public interface PaymentMethodService {

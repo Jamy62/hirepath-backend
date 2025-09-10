@@ -1,6 +1,6 @@
 package com.hirepath.hirepath_backend.repository.plan;
 
-import com.hirepath.hirepath_backend.model.dto.PlanListProjection;
+import com.hirepath.hirepath_backend.model.dto.plan.PlanListProjection;
 import com.hirepath.hirepath_backend.model.entity.plan.Plan;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

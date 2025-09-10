@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.service.experiencelevel;
 
-import com.hirepath.hirepath_backend.model.request.ExperienceLevelCreateRequest;
-import com.hirepath.hirepath_backend.model.request.ExperienceLevelUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.experiencelevel.ExperienceLevelCreateRequest;
+import com.hirepath.hirepath_backend.model.request.experiencelevel.ExperienceLevelUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 
 public interface ExperienceLevelService {

@@ -1,6 +1,6 @@
 package com.hirepath.hirepath_backend.repository.experiencelevel;
 
-import com.hirepath.hirepath_backend.model.dto.ExperienceLevelListProjection;
+import com.hirepath.hirepath_backend.model.dto.experiencelevel.ExperienceLevelListProjection;
 import com.hirepath.hirepath_backend.model.entity.experiencelevel.ExperienceLevel;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

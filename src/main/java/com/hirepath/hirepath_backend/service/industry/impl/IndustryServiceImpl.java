@@ -1,12 +1,12 @@
 package com.hirepath.hirepath_backend.service.industry.impl;
 
 import com.hirepath.hirepath_backend.constant.VariableConstant;
-import com.hirepath.hirepath_backend.model.dto.IndustryListDTO;
-import com.hirepath.hirepath_backend.model.dto.IndustryListProjection;
+import com.hirepath.hirepath_backend.model.dto.industry.IndustryListDTO;
+import com.hirepath.hirepath_backend.model.dto.industry.IndustryListProjection;
 import com.hirepath.hirepath_backend.model.entity.industry.Industry;
 import com.hirepath.hirepath_backend.model.entity.user.User;
-import com.hirepath.hirepath_backend.model.request.IndustryCreateRequest;
-import com.hirepath.hirepath_backend.model.request.IndustryUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.industry.IndustryCreateRequest;
+import com.hirepath.hirepath_backend.model.request.industry.IndustryUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.industry.IndustryRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;

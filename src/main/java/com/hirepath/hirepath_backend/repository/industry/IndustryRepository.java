@@ -1,6 +1,6 @@
 package com.hirepath.hirepath_backend.repository.industry;
 
-import com.hirepath.hirepath_backend.model.dto.IndustryListProjection;
+import com.hirepath.hirepath_backend.model.dto.industry.IndustryListProjection;
 import com.hirepath.hirepath_backend.model.entity.industry.Industry;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

@@ -1,6 +1,6 @@
 package com.hirepath.hirepath_backend.repository.language;
 
-import com.hirepath.hirepath_backend.model.dto.LanguageListProjection;
+import com.hirepath.hirepath_backend.model.dto.language.LanguageListProjection;
 import com.hirepath.hirepath_backend.model.entity.language.Language;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

@@ -1,6 +1,6 @@
 package com.hirepath.hirepath_backend.repository.jobfunction;
 
-import com.hirepath.hirepath_backend.model.dto.JobFunctionListProjection;
+import com.hirepath.hirepath_backend.model.dto.jobfunction.JobFunctionListProjection;
 import com.hirepath.hirepath_backend.model.entity.jobfunction.JobFunction;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

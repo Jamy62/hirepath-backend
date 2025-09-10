@@ -1,12 +1,12 @@
 package com.hirepath.hirepath_backend.service.jobtype.impl;
 
 import com.hirepath.hirepath_backend.constant.VariableConstant;
-import com.hirepath.hirepath_backend.model.dto.JobTypeListDTO;
-import com.hirepath.hirepath_backend.model.dto.JobTypeListProjection;
+import com.hirepath.hirepath_backend.model.dto.jobtype.JobTypeListDTO;
+import com.hirepath.hirepath_backend.model.dto.jobtype.JobTypeListProjection;
 import com.hirepath.hirepath_backend.model.entity.jobtype.JobType;
 import com.hirepath.hirepath_backend.model.entity.user.User;
-import com.hirepath.hirepath_backend.model.request.JobTypeCreateRequest;
-import com.hirepath.hirepath_backend.model.request.JobTypeUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.jobtype.JobTypeCreateRequest;
+import com.hirepath.hirepath_backend.model.request.jobtype.JobTypeUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.jobtype.JobTypeRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;

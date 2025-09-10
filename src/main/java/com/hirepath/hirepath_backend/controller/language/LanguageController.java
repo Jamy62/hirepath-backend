@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.controller.language;
 
-import com.hirepath.hirepath_backend.model.request.LanguageCreateRequest;
-import com.hirepath.hirepath_backend.model.request.LanguageUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.language.LanguageCreateRequest;
+import com.hirepath.hirepath_backend.model.request.language.LanguageUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.language.LanguageService;
 import jakarta.validation.Valid;

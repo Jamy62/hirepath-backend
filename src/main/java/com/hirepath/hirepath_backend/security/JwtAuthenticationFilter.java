@@ -28,17 +28,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
+
+        if (request.getRequestURI().equals("/v1/auth/login") || request.getRequestURI().equals("/v1/user/register")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        final String header = request.getHeader("Authorization");
+        String email = null;
+        String jwt = null;
+
         try {
-            if (request.getRequestURI().equals("/v1/auth/login") || request.getRequestURI().equals("/v1/user/register")) {
-                chain.doFilter(request, response);
-                return;
-            }
-
-            String header = request.getHeader("Authorization");
-            String email = null;
-            String jwt = null;
-
             if (header != null && header.startsWith("Bearer ")) {
                 jwt = header.substring(7);
                 email = jwtUtil.extractEmail(jwt);
@@ -46,27 +47,39 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 if (jwtUtil.isTokenValid(jwt, email)) {
-                    String systemRole = jwtUtil.extractSystemRole(jwt);
-                    Map<String, String> companyRoles = jwtUtil.extractCompanyRoles(jwt);
+                    String tokenType = jwtUtil.extractTokenType(jwt);
                     List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                    UsernamePasswordAuthenticationToken auth = null;
 
-                    if (systemRole != null) {
-                        authorities.add(new SimpleGrantedAuthority("ROLE_" + systemRole));
-                    }
-                    if (companyRoles != null) {
-                        companyRoles.values().forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
+                    if ("SYSTEM".equals(tokenType)) {
+                        String systemRole = jwtUtil.extractSystemRole(jwt);
+                        if (systemRole != null) {
+                            authorities.add(new SimpleGrantedAuthority(systemRole));
+                            if ("ADMIN".equals(systemRole)) {
+                                authorities.add(new SimpleGrantedAuthority("USER"));
+                            }
+                        }
+                        auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
+                    } else if ("COMPANY".equals(tokenType)) {
+                        String companyRole = jwtUtil.extractCompanyRole(jwt);
+                        String companyGuid = jwtUtil.extractCompanyGuid(jwt);
+                        if (companyRole != null) {
+                            authorities.add(new SimpleGrantedAuthority(companyRole));
+                        }
+                        auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
+                        if (companyGuid != null) {
+                            auth.setDetails(Map.of("companyGuid", companyGuid));
+                        }
                     }
 
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
-                    if (companyRoles != null && !companyRoles.isEmpty()) {
-                        auth.setDetails(Map.of("companyRoles", companyRoles));
+                    if (auth != null) {
+                        SecurityContextHolder.getContext().setAuthentication(auth);
                     }
-                    SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
-        }
-        catch (JwtException e) {
-            log.error("JWT validation failed for request: {} - {}", request.getRequestURI(), e.getMessage(), e);
+            chain.doFilter(request, response);
+        } catch (JwtException e) {
+            log.error("JWT validation failed for request: {} - {}", request.getRequestURI(), e.getMessage());
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType("application/json");
             response.getWriter().write("{\"success\": false, \"data\": null, \"message\": \"Invalid or expired token\"}");
@@ -76,6 +89,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
             response.getWriter().write("{\"success\": false, \"data\": null, \"message\": \"An unexpected error occurred\"}");
         }
-        chain.doFilter(request, response);
     }
 }

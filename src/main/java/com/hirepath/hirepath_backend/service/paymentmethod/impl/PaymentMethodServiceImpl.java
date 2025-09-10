@@ -1,12 +1,12 @@
 package com.hirepath.hirepath_backend.service.paymentmethod.impl;
 
 import com.hirepath.hirepath_backend.constant.VariableConstant;
-import com.hirepath.hirepath_backend.model.dto.PaymentMethodListDTO;
-import com.hirepath.hirepath_backend.model.dto.PaymentMethodListProjection;
+import com.hirepath.hirepath_backend.model.dto.paymentmethod.PaymentMethodListDTO;
+import com.hirepath.hirepath_backend.model.dto.paymentmethod.PaymentMethodListProjection;
 import com.hirepath.hirepath_backend.model.entity.paymentmethod.PaymentMethod;
 import com.hirepath.hirepath_backend.model.entity.user.User;
-import com.hirepath.hirepath_backend.model.request.PaymentMethodCreateRequest;
-import com.hirepath.hirepath_backend.model.request.PaymentMethodUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodCreateRequest;
+import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.paymentmethod.PaymentMethodRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;

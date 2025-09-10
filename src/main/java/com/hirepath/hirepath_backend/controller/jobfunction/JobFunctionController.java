@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.controller.jobfunction;
 
-import com.hirepath.hirepath_backend.model.request.JobFunctionCreateRequest;
-import com.hirepath.hirepath_backend.model.request.JobFunctionUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.jobfunction.JobFunctionCreateRequest;
+import com.hirepath.hirepath_backend.model.request.jobfunction.JobFunctionUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.jobfunction.JobFunctionService;
 import jakarta.validation.Valid;

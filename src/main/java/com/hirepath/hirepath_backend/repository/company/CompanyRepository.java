@@ -1,8 +1,7 @@
 package com.hirepath.hirepath_backend.repository.company;
 
-import com.hirepath.hirepath_backend.model.dto.CompanyListProjection;
+import com.hirepath.hirepath_backend.model.dto.company.CompanyListProjection;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

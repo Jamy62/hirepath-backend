@@ -1,12 +1,12 @@
 package com.hirepath.hirepath_backend.service.jobfunction.impl;
 
 import com.hirepath.hirepath_backend.constant.VariableConstant;
-import com.hirepath.hirepath_backend.model.dto.JobFunctionListDTO;
-import com.hirepath.hirepath_backend.model.dto.JobFunctionListProjection;
+import com.hirepath.hirepath_backend.model.dto.jobfunction.JobFunctionListDTO;
+import com.hirepath.hirepath_backend.model.dto.jobfunction.JobFunctionListProjection;
 import com.hirepath.hirepath_backend.model.entity.jobfunction.JobFunction;
 import com.hirepath.hirepath_backend.model.entity.user.User;
-import com.hirepath.hirepath_backend.model.request.JobFunctionCreateRequest;
-import com.hirepath.hirepath_backend.model.request.JobFunctionUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.jobfunction.JobFunctionCreateRequest;
+import com.hirepath.hirepath_backend.model.request.jobfunction.JobFunctionUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.jobfunction.JobFunctionRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;

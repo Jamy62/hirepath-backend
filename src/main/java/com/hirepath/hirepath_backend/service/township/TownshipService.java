@@ -1,7 +1,7 @@
 package com.hirepath.hirepath_backend.service.township;
 
-import com.hirepath.hirepath_backend.model.request.TownshipCreateRequest;
-import com.hirepath.hirepath_backend.model.request.TownshipUpdateRequest;
+import com.hirepath.hirepath_backend.model.request.township.TownshipCreateRequest;
+import com.hirepath.hirepath_backend.model.request.township.TownshipUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 
 public interface TownshipService {

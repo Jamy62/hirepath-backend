@@ -1,6 +1,6 @@
 package com.hirepath.hirepath_backend.repository.jobtype;
 
-import com.hirepath.hirepath_backend.model.dto.JobTypeListProjection;
+import com.hirepath.hirepath_backend.model.dto.jobtype.JobTypeListProjection;
 import com.hirepath.hirepath_backend.model.entity.jobtype.JobType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

@@ -1,6 +1,6 @@
 package com.hirepath.hirepath_backend.repository.province;
 
-import com.hirepath.hirepath_backend.model.dto.ProvinceListProjection;
+import com.hirepath.hirepath_backend.model.dto.province.ProvinceListProjection;
 import com.hirepath.hirepath_backend.model.entity.province.Province;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

@@ -1,6 +1,6 @@
 package com.hirepath.hirepath_backend.repository.paymentmethod;
 
-import com.hirepath.hirepath_backend.model.dto.PaymentMethodListProjection;
+import com.hirepath.hirepath_backend.model.dto.paymentmethod.PaymentMethodListProjection;
 import com.hirepath.hirepath_backend.model.entity.paymentmethod.PaymentMethod;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

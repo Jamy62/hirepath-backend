@@ -6,13 +6,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -21,10 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -54,9 +52,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     if ("SYSTEM".equals(tokenType)) {
                         String systemRole = jwtUtil.extractSystemRole(jwt);
                         if (systemRole != null) {
-                            authorities.add(new SimpleGrantedAuthority(systemRole));
+                            authorities.add(new SimpleGrantedAuthority("ROLE_" + systemRole));
                             if ("ADMIN".equals(systemRole)) {
-                                authorities.add(new SimpleGrantedAuthority("USER"));
+                                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
                             }
                         }
                         auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
@@ -65,7 +63,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         String companyRole = jwtUtil.extractCompanyRole(jwt);
                         String companyGuid = jwtUtil.extractCompanyGuid(jwt);
                         if (companyRole != null) {
-                            authorities.add(new SimpleGrantedAuthority(companyRole));
+                            authorities.add(new SimpleGrantedAuthority("ROLE_" + companyRole));
                         }
                         auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
                         if (companyGuid != null) {

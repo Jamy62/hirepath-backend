@@ -1,12 +1,15 @@
 package com.hirepath.hirepath_backend.service.language;
 
 import com.hirepath.hirepath_backend.model.dto.language.LanguageListDTO;
+import com.hirepath.hirepath_backend.model.entity.language.Language;
 import com.hirepath.hirepath_backend.model.request.language.LanguageCreateRequest;
 import com.hirepath.hirepath_backend.model.request.language.LanguageUpdateRequest;
 
 import java.util.List;
 
 public interface LanguageService {
+
+    Language findByGuid(String guid);
 
     void languageCreate(LanguageCreateRequest request, String adminEmail);
 

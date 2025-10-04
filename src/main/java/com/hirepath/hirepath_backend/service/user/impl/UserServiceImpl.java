@@ -41,6 +41,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    public User findByEmail(String email) {
+        try {
+            return userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
     public String register(RegisterRequest request, String userType) {
         try {
             Optional<User> existingUser = userRepository.findByEmail(request.getEmail());

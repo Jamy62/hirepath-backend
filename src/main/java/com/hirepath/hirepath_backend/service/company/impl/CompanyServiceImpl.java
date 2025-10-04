@@ -37,6 +37,16 @@ public class CompanyServiceImpl implements CompanyService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
+    @Override
+    public Company findByGuid(String guid) {
+        try {
+            return companyRepository.findByGuid(guid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found"));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
     public void companyRegister(CompanyRegisterRequest request, String email) {
         try {
             User user = userRepository.findByEmail(email)

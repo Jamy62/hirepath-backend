@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface UserService {
     User findByGuid(String guid);
+    User findByEmail(String email);
     String register(RegisterRequest request, String userType);
     List<UserListDTO> userList(String searchName, String orderBy, int first, int max);
     String userUpdate(String userGuid, UserUpdateRequest request, String email);

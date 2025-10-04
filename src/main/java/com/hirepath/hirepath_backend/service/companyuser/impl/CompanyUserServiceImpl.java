@@ -5,11 +5,12 @@ import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.companyuser.AssignCompanyRoleRequest;
-import com.hirepath.hirepath_backend.repository.company.CompanyRepository;
 import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
 import com.hirepath.hirepath_backend.repository.role.RoleRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
+import com.hirepath.hirepath_backend.service.company.CompanyService;
 import com.hirepath.hirepath_backend.service.companyuser.CompanyUserService;
+import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -23,17 +24,26 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class CompanyUserServiceImpl implements CompanyUserService {
-    private final CompanyRepository companyRepository;
+    private final CompanyService companyService;
+    private final UserService userService;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final CompanyUserRepository companyUserRepository;
 
+    @Override
+    public CompanyUser findByGuid(String guid) {
+        try {
+            return companyUserRepository.findByGuid(guid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company user not found"));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
     public void assignCompanyRole(AssignCompanyRoleRequest request, String email) {
         try {
-            Company company = companyRepository.findByGuid(request.getCompanyGuid())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found"));
-            User user = userRepository.findByGuid(request.getUserGuid())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+            Company company = companyService.findByGuid(request.getCompanyGuid());
+            User user = userService.findByGuid(request.getUserGuid());
             Role role = roleRepository.findByGuid(request.getRoleGuid())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
             User assigner = userRepository.findByEmail(email)

@@ -30,6 +30,16 @@ public class ProvinceServiceImpl implements ProvinceService {
     private final UserRepository userRepository;
 
     @Override
+    public Province findByGuid(String guid) {
+        try {
+            return provinceRepository.findByGuid(guid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Province not found"));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
     public void provinceCreate(ProvinceCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
@@ -77,8 +87,7 @@ public class ProvinceServiceImpl implements ProvinceService {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            Province province = provinceRepository.findByGuid(provinceGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Province not found"));
+            Province province = findByGuid(provinceGuid);
 
             if (request.getName() != null && !request.getName().isBlank()) {
                 province.setName(request.getName());
@@ -99,8 +108,7 @@ public class ProvinceServiceImpl implements ProvinceService {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            Province province = provinceRepository.findByGuid(provinceGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Province not found"));
+            Province province = findByGuid(provinceGuid);
 
             province.setIsDeleted(true);
             province.setUpdatedAt(ZonedDateTime.now());

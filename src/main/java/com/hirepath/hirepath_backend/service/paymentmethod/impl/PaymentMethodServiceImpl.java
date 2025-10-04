@@ -30,6 +30,16 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     private final UserRepository userRepository;
 
     @Override
+    public PaymentMethod findByGuid(String guid) {
+        try {
+            return paymentMethodRepository.findByGuid(guid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment method not found"));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
     public void paymentMethodCreate(PaymentMethodCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
@@ -79,8 +89,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            PaymentMethod paymentMethod = paymentMethodRepository.findByGuid(paymentMethodGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment method not found"));
+            PaymentMethod paymentMethod = findByGuid(paymentMethodGuid);
 
             if (request.getName() != null && !request.getName().isBlank()) {
                 paymentMethod.setName(request.getName());
@@ -104,8 +113,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            PaymentMethod paymentMethod = paymentMethodRepository.findByGuid(paymentMethodGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Payment method not found"));
+            PaymentMethod paymentMethod = findByGuid(paymentMethodGuid);
 
             paymentMethod.setIsDeleted(true);
             paymentMethod.setUpdatedAt(ZonedDateTime.now());

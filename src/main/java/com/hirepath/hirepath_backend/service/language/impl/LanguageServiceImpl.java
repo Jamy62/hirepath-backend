@@ -30,6 +30,16 @@ public class LanguageServiceImpl implements LanguageService {
     private final UserRepository userRepository;
 
     @Override
+    public Language findByGuid(String guid) {
+        try {
+            return languageRepository.findByGuid(guid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Language not found"));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
     public void languageCreate(LanguageCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
@@ -79,8 +89,7 @@ public class LanguageServiceImpl implements LanguageService {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            Language language = languageRepository.findByGuid(languageGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Language not found"));
+            Language language = findByGuid(languageGuid);
 
             if (request.getName() != null && !request.getName().isBlank()) {
                 language.setName(request.getName());
@@ -104,8 +113,7 @@ public class LanguageServiceImpl implements LanguageService {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            Language language = languageRepository.findByGuid(languageGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Language not found"));
+            Language language = findByGuid(languageGuid);
 
             language.setIsDeleted(true);
             language.setUpdatedAt(ZonedDateTime.now());

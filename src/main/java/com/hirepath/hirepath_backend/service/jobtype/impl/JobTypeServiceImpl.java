@@ -30,6 +30,16 @@ public class JobTypeServiceImpl implements JobTypeService {
     private final UserRepository userRepository;
 
     @Override
+    public JobType findByGuid(String guid) {
+        try {
+            return jobTypeRepository.findByGuid(guid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job type not found"));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
     public void jobTypeCreate(JobTypeCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
@@ -79,8 +89,7 @@ public class JobTypeServiceImpl implements JobTypeService {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            JobType jobType = jobTypeRepository.findByGuid(jobTypeGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job type not found"));
+            JobType jobType = findByGuid(jobTypeGuid);
 
             if (request.getName() != null && !request.getName().isBlank()) {
                 jobType.setName(request.getName());
@@ -104,8 +113,7 @@ public class JobTypeServiceImpl implements JobTypeService {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            JobType jobType = jobTypeRepository.findByGuid(jobTypeGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job type not found"));
+            JobType jobType = findByGuid(jobTypeGuid);
 
             jobType.setIsDeleted(true);
             jobType.setUpdatedAt(ZonedDateTime.now());

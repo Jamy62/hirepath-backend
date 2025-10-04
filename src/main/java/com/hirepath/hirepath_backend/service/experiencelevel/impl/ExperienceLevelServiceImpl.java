@@ -30,6 +30,16 @@ public class ExperienceLevelServiceImpl implements ExperienceLevelService {
     private final UserRepository userRepository;
 
     @Override
+    public ExperienceLevel findByGuid(String guid) {
+        try {
+            return experienceLevelRepository.findByGuid(guid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Experience level not found"));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
     public void experienceLevelCreate(ExperienceLevelCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
@@ -79,8 +89,7 @@ public class ExperienceLevelServiceImpl implements ExperienceLevelService {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            ExperienceLevel experienceLevel = experienceLevelRepository.findByGuid(experienceLevelGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Experience level not found"));
+            ExperienceLevel experienceLevel = findByGuid(experienceLevelGuid);
 
             if (request.getName() != null && !request.getName().isBlank()) {
                 experienceLevel.setName(request.getName());
@@ -104,8 +113,7 @@ public class ExperienceLevelServiceImpl implements ExperienceLevelService {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            ExperienceLevel experienceLevel = experienceLevelRepository.findByGuid(experienceLevelGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Experience level not found"));
+            ExperienceLevel experienceLevel = findByGuid(experienceLevelGuid);
 
             experienceLevel.setIsDeleted(true);
             experienceLevel.setUpdatedAt(ZonedDateTime.now());

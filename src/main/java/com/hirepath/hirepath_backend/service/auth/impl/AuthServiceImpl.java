@@ -6,10 +6,10 @@ import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.response.LoginResponse;
-import com.hirepath.hirepath_backend.repository.company.CompanyRepository;
 import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.auth.AuthService;
+import com.hirepath.hirepath_backend.service.company.CompanyService;
 import com.hirepath.hirepath_backend.service.user.UserService;
 import com.hirepath.hirepath_backend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -30,13 +30,12 @@ public class AuthServiceImpl implements AuthService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final CompanyRepository companyRepository;
+    private final CompanyService companyService;
     private final CompanyUserRepository companyUserRepository;
 
     public LoginResponse login(String email, String password) {
         try {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
+            User user = userService.findByEmail(email);
 
             if (passwordEncoder.matches(password, user.getPassword())) {
                 String token = jwtUtil.generateSystemToken(user);
@@ -55,8 +54,7 @@ public class AuthServiceImpl implements AuthService {
 
     public void logout(String email) {
         try {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
+            User user = userService.findByEmail(email);
 
             user.setLastLoginAt(ZonedDateTime.now());
             userRepository.save(user);
@@ -67,10 +65,8 @@ public class AuthServiceImpl implements AuthService {
 
     public LoginResponse companyAccess(String companyGuid, String email) {
         try {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
-            Company company = companyRepository.findByGuid(companyGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
+            User user = userService.findByEmail(email);
+            Company company = companyService.findByGuid(companyGuid);
             Optional<CompanyUser> companyUser = companyUserRepository.findByUserAndCompanyAndIsDeleted(user, company, false);
 
             if (companyUser.isEmpty() || companyUser.get().getRole().getType() != Role.RoleType.COMPANY) {

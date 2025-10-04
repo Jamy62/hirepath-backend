@@ -30,6 +30,16 @@ public class IndustryServiceImpl implements IndustryService {
     private final UserRepository userRepository;
 
     @Override
+    public Industry findByGuid(String guid) {
+        try {
+            return industryRepository.findByGuid(guid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Industry not found"));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
     public void industryCreate(IndustryCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
@@ -79,8 +89,7 @@ public class IndustryServiceImpl implements IndustryService {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            Industry industry = industryRepository.findByGuid(industryGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Industry not found"));
+            Industry industry = findByGuid(industryGuid);
 
             if (request.getName() != null && !request.getName().isBlank()) {
                 industry.setName(request.getName());
@@ -104,8 +113,7 @@ public class IndustryServiceImpl implements IndustryService {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            Industry industry = industryRepository.findByGuid(industryGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Industry not found"));
+            Industry industry = findByGuid(industryGuid);
 
             industry.setIsDeleted(true);
             industry.setUpdatedAt(ZonedDateTime.now());

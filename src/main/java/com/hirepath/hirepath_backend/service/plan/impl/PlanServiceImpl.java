@@ -30,6 +30,16 @@ public class PlanServiceImpl implements PlanService {
     private final UserRepository userRepository;
 
     @Override
+    public Plan findByGuid(String guid) {
+        try {
+            return planRepository.findByGuid(guid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan not found"));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
     public void planCreate(PlanCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
@@ -87,8 +97,7 @@ public class PlanServiceImpl implements PlanService {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            Plan plan = planRepository.findByGuid(planGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Plan not found"));
+            Plan plan = findByGuid(planGuid);
 
             if (request.getName() != null && !request.getName().isBlank()) {
                 plan.setName(request.getName());
@@ -124,8 +133,7 @@ public class PlanServiceImpl implements PlanService {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            Plan plan = planRepository.findByGuid(planGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Plan not found"));
+            Plan plan = findByGuid(planGuid);
 
             plan.setIsDeleted(true);
             plan.setUpdatedAt(ZonedDateTime.now());

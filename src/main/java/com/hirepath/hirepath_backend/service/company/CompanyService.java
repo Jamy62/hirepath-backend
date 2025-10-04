@@ -1,6 +1,7 @@
 package com.hirepath.hirepath_backend.service.company;
 
 import com.hirepath.hirepath_backend.model.dto.company.CompanyListDTO;
+import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.request.company.CompanyRegisterRequest;
 import com.hirepath.hirepath_backend.model.request.company.CompanyUpdateRequest;
 import com.hirepath.hirepath_backend.model.request.company.CompanyVerifyRequest;
@@ -9,6 +10,8 @@ import com.hirepath.hirepath_backend.model.request.company.CompanyVerifyResponse
 import java.util.List;
 
 public interface CompanyService {
+
+    Company findByGuid(String guid);
 
     void companyRegister(CompanyRegisterRequest request, String email);
 

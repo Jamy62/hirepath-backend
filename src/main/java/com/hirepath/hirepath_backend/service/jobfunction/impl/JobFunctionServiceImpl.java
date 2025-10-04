@@ -30,6 +30,16 @@ public class JobFunctionServiceImpl implements JobFunctionService {
     private final UserRepository userRepository;
 
     @Override
+    public JobFunction findByGuid(String guid) {
+        try {
+            return jobFunctionRepository.findByGuid(guid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job function not found"));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
     public void jobFunctionCreate(JobFunctionCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
@@ -79,8 +89,7 @@ public class JobFunctionServiceImpl implements JobFunctionService {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            JobFunction jobFunction = jobFunctionRepository.findByGuid(jobFunctionGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job function not found"));
+            JobFunction jobFunction = findByGuid(jobFunctionGuid);
 
             if (request.getName() != null && !request.getName().isBlank()) {
                 jobFunction.setName(request.getName());
@@ -104,8 +113,7 @@ public class JobFunctionServiceImpl implements JobFunctionService {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
 
-            JobFunction jobFunction = jobFunctionRepository.findByGuid(jobFunctionGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Job function not found"));
+            JobFunction jobFunction = findByGuid(jobFunctionGuid);
 
             jobFunction.setIsDeleted(true);
             jobFunction.setUpdatedAt(ZonedDateTime.now());

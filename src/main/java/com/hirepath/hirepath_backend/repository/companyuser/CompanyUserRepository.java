@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface CompanyUserRepository extends CrudRepository<CompanyUser, Long> {
+    Optional<CompanyUser> findByGuid(String guid);
     Optional<CompanyUser> findByUserAndCompanyAndIsDeleted(User user, Company company, boolean isDeleted);
     Optional<List<CompanyUser>> findByUserAndIsDeleted(User user, boolean isDeleted);
 }

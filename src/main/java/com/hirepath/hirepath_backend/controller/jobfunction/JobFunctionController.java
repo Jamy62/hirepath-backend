@@ -21,14 +21,14 @@ public class JobFunctionController {
 
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> createJobFunction(@Valid @RequestBody JobFunctionCreateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> jobFunctionCreate(@Valid @RequestBody JobFunctionCreateRequest request, Principal principal) {
         ResponseFormat responseFormat = jobFunctionService.jobFunctionCreate(request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @GetMapping("/list/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> listJobFunctions(
+    public ResponseEntity<ResponseFormat> jobFunctionList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
@@ -39,14 +39,14 @@ public class JobFunctionController {
 
     @PutMapping("/update/admin/{jobFunctionGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> updateJobFunction(@PathVariable String jobFunctionGuid, @Valid @RequestBody JobFunctionUpdateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> jobFunctionUpdate(@PathVariable String jobFunctionGuid, @Valid @RequestBody JobFunctionUpdateRequest request, Principal principal) {
         ResponseFormat responseFormat = jobFunctionService.jobFunctionUpdate(jobFunctionGuid, request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @DeleteMapping("/delete/admin/{jobFunctionGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> deleteJobFunction(
+    public ResponseEntity<ResponseFormat> jobFunctionDelete(
             @PathVariable(value = "jobFunctionGuid") String jobFunctionGuid,
             Principal principal) {
         ResponseFormat responseFormat = jobFunctionService.jobFunctionDelete(jobFunctionGuid, principal.getName());

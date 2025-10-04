@@ -21,14 +21,14 @@ public class LanguageController {
 
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> createLanguage(@Valid @RequestBody LanguageCreateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> languageCreate(@Valid @RequestBody LanguageCreateRequest request, Principal principal) {
         ResponseFormat responseFormat = languageService.languageCreate(request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @GetMapping("/list/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> listLanguages(
+    public ResponseEntity<ResponseFormat> languageList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
@@ -39,14 +39,14 @@ public class LanguageController {
 
     @PutMapping("/update/admin/{languageGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> updateLanguage(@PathVariable String languageGuid, @Valid @RequestBody LanguageUpdateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> languageUpdate(@PathVariable String languageGuid, @Valid @RequestBody LanguageUpdateRequest request, Principal principal) {
         ResponseFormat responseFormat = languageService.languageUpdate(languageGuid, request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @DeleteMapping("/delete/admin/{languageGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> deleteLanguage(
+    public ResponseEntity<ResponseFormat> languageDelete(
             @PathVariable(value = "languageGuid") String languageGuid,
             Principal principal) {
         ResponseFormat responseFormat = languageService.languageDelete(languageGuid, principal.getName());

@@ -40,6 +40,7 @@ public class AuthServiceImpl implements AuthService {
                 String token = jwtUtil.generateSystemToken(user);
                 LoginResponse loginResponse = LoginResponse.builder()
                         .token(token)
+                        .guid(user.getGuid())
                         .build();
 
                 return ResponseFormat.createSuccessResponse(loginResponse, "Login success");

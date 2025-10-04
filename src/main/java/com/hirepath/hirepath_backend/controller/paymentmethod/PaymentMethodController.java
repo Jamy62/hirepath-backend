@@ -21,14 +21,14 @@ public class PaymentMethodController {
 
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> createPaymentMethod(@Valid @RequestBody PaymentMethodCreateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> paymentMethodCreate(@Valid @RequestBody PaymentMethodCreateRequest request, Principal principal) {
         ResponseFormat responseFormat = paymentMethodService.paymentMethodCreate(request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @GetMapping("/list/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> listPaymentMethods(
+    public ResponseEntity<ResponseFormat> paymentMethodList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
@@ -39,14 +39,14 @@ public class PaymentMethodController {
 
     @PutMapping("/update/admin/{paymentMethodGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> updatePaymentMethod(@PathVariable String paymentMethodGuid, @Valid @RequestBody PaymentMethodUpdateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> paymentMethodUpdate(@PathVariable String paymentMethodGuid, @Valid @RequestBody PaymentMethodUpdateRequest request, Principal principal) {
         ResponseFormat responseFormat = paymentMethodService.paymentMethodUpdate(paymentMethodGuid, request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @DeleteMapping("/delete/admin/{paymentMethodGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> deletePaymentMethod(
+    public ResponseEntity<ResponseFormat> paymentMethodDelete(
             @PathVariable(value = "paymentMethodGuid") String paymentMethodGuid,
             Principal principal) {
         ResponseFormat responseFormat = paymentMethodService.paymentMethodDelete(paymentMethodGuid, principal.getName());

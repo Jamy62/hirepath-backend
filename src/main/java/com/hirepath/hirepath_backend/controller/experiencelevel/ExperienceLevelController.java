@@ -21,14 +21,14 @@ public class ExperienceLevelController {
 
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> createExperienceLevel(@Valid @RequestBody ExperienceLevelCreateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> experienceLevelCreate(@Valid @RequestBody ExperienceLevelCreateRequest request, Principal principal) {
         ResponseFormat responseFormat = experienceLevelService.experienceLevelCreate(request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @GetMapping("/list/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> listExperienceLevels(
+    public ResponseEntity<ResponseFormat> experienceLevelList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
@@ -39,14 +39,14 @@ public class ExperienceLevelController {
 
     @PutMapping("/update/admin/{experienceLevelGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> updateExperienceLevel(@PathVariable String experienceLevelGuid, @Valid @RequestBody ExperienceLevelUpdateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> experienceLevelUpdate(@PathVariable String experienceLevelGuid, @Valid @RequestBody ExperienceLevelUpdateRequest request, Principal principal) {
         ResponseFormat responseFormat = experienceLevelService.experienceLevelUpdate(experienceLevelGuid, request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @DeleteMapping("/delete/admin/{experienceLevelGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> deleteExperienceLevel(
+    public ResponseEntity<ResponseFormat> experienceLevelDelete(
             @PathVariable(value = "experienceLevelGuid") String experienceLevelGuid,
             Principal principal) {
         ResponseFormat responseFormat = experienceLevelService.experienceLevelDelete(experienceLevelGuid, principal.getName());

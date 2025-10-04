@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -77,16 +78,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
             chain.doFilter(request, response);
-        } catch (JwtException e) {
+        } catch (ResponseStatusException e) {
             log.error("JWT validation failed for request: {} - {}", request.getRequestURI(), e.getMessage());
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setStatus(e.getStatusCode().value());
             response.setContentType("application/json");
-            response.getWriter().write("{\"success\": false, \"data\": null, \"message\": \"Invalid or expired token\"}");
-        } catch (Exception e) {
-            log.error("Unexpected error in JWT filter for request: {} - {}", request.getRequestURI(), e.getMessage(), e);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setContentType("application/json");
-            response.getWriter().write("{\"success\": false, \"data\": null, \"message\": \"An unexpected error occurred\"}");
+            response.getWriter().write(String.format("{\"success\": false, \"data\": null, \"message\": \"%s\"}", e.getReason()));
         }
     }
 }

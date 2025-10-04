@@ -21,14 +21,14 @@ public class PlanController {
 
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> createPlan(@Valid @RequestBody PlanCreateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> planCreate(@Valid @RequestBody PlanCreateRequest request, Principal principal) {
         ResponseFormat responseFormat = planService.planCreate(request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @GetMapping("/list/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> listPlans(
+    public ResponseEntity<ResponseFormat> planList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
@@ -39,14 +39,14 @@ public class PlanController {
 
     @PutMapping("/update/admin/{planGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> updatePlan(@PathVariable String planGuid, @Valid @RequestBody PlanUpdateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> planUpdate(@PathVariable String planGuid, @Valid @RequestBody PlanUpdateRequest request, Principal principal) {
         ResponseFormat responseFormat = planService.planUpdate(planGuid, request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @DeleteMapping("/delete/admin/{planGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> deletePlan(
+    public ResponseEntity<ResponseFormat> planDelete(
             @PathVariable(value = "planGuid") String planGuid,
             Principal principal) {
         ResponseFormat responseFormat = planService.planDelete(planGuid, principal.getName());

@@ -15,6 +15,7 @@ public class UserUpdateRequest {
     private String email;
     private String mobile;
     private String profile;
+    private String roleGuid;
     private Boolean isActive;
     private Boolean isBlocked;
     private Boolean isDeleted;

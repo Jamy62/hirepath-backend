@@ -32,6 +32,14 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
+    public User findByGuid(String guid) {
+        try {
+            return userRepository.findByGuid(guid)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 
     public ResponseFormat register(RegisterRequest request, String userType) {
         try {
@@ -49,6 +57,7 @@ public class UserServiceImpl implements UserService {
                     .name(request.getName())
                     .isActive(true)
                     .isDeleted(false)
+                    .isBlocked(false)
                     .guid(UUID.randomUUID().toString())
                     .createdAt(ZonedDateTime.now())
                     .build();
@@ -100,6 +109,7 @@ public class UserServiceImpl implements UserService {
 
     public ResponseFormat userUpdate(String userGuid, UserUpdateRequest request, String email) {
         try {
+            log.info("User update initiate");
             User user = userRepository.findByGuid(userGuid)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User to update not found"));
             User updatedBy = userRepository.findByEmail(email)
@@ -117,12 +127,21 @@ public class UserServiceImpl implements UserService {
             if (request.getMobile() != null && !request.getMobile().isBlank()) {
                 user.setMobile(request.getMobile());
             }
-            if (request.getProfile() != null && !request.getProfile().isBlank()) {
-                user.setProfile(request.getProfile());
+            if (request.getRoleGuid() != null && !request.getRoleGuid().isBlank()) {
+                Role role = roleRepository.findByGuid(request.getRoleGuid())
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
+                user.setRole(role);
+            }
+            if (request.getIsActive() instanceof Boolean) {
+                user.setIsActive(request.getIsActive());
+            }
+            if (request.getIsBlocked() instanceof Boolean) {
+                user.setIsBlocked(request.getIsBlocked());
             }
 
             user.setUpdatedAt(ZonedDateTime.now());
             user.setUpdatedBy(updatedBy.getId());
+            log.info(String.valueOf(user.getCreatedAt()));
             userRepository.save(user);
 
             return ResponseFormat.createSuccessResponse(user.getGuid(), "User updated successfully");

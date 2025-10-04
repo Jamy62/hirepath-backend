@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.model.dto.language;
 
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 
 public interface LanguageListProjection {
@@ -7,6 +8,6 @@ public interface LanguageListProjection {
     String getCode();
     String getGuid();
     Boolean getIsDeleted();
-    ZonedDateTime getCreatedAt();
-    ZonedDateTime getUpdatedAt();
+    Timestamp getCreatedAt();
+    Timestamp getUpdatedAt();
 }

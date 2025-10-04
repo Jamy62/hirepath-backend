@@ -21,14 +21,14 @@ public class IndustryController {
 
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> createIndustry(@Valid @RequestBody IndustryCreateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> industryCreate(@Valid @RequestBody IndustryCreateRequest request, Principal principal) {
         ResponseFormat responseFormat = industryService.industryCreate(request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @GetMapping("/list/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> listIndustries(
+    public ResponseEntity<ResponseFormat> industryList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
@@ -39,14 +39,14 @@ public class IndustryController {
 
     @PutMapping("/update/admin/{industryGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> updateIndustry(@PathVariable String industryGuid, @Valid @RequestBody IndustryUpdateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> industryUpdate(@PathVariable String industryGuid, @Valid @RequestBody IndustryUpdateRequest request, Principal principal) {
         ResponseFormat responseFormat = industryService.industryUpdate(industryGuid, request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @DeleteMapping("/delete/admin/{industryGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> deleteIndustry(
+    public ResponseEntity<ResponseFormat> industryDelete(
             @PathVariable(value = "industryGuid") String industryGuid,
             Principal principal) {
         ResponseFormat responseFormat = industryService.industryDelete(industryGuid, principal.getName());

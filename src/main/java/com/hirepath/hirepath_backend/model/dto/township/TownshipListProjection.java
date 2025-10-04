@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.model.dto.township;
 
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 
 public interface TownshipListProjection {
@@ -7,6 +8,6 @@ public interface TownshipListProjection {
     String getProvinceName();
     String getGuid();
     Boolean getIsDeleted();
-    ZonedDateTime getCreatedAt();
-    ZonedDateTime getUpdatedAt();
+    Timestamp getCreatedAt();
+    Timestamp getUpdatedAt();
 }

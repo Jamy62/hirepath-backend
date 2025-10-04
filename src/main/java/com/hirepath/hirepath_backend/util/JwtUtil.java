@@ -4,7 +4,10 @@ import com.hirepath.hirepath_backend.model.entity.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.transaction.SystemException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -15,7 +18,7 @@ import java.util.Map;
 @Component
 public class JwtUtil {
     private final String SECRET_KEY = "hirepath-secret-jamy-hirepath-secret-jamy-hirepath-secret-jamy";
-    private final long EXPIRATION_TIME = 60 * 60 * 1000;
+    private final long EXPIRATION_TIME = 60 * 60 * 10000000;
     private final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
     private String generateToken(String subject, Map<String, Object> claims) {
@@ -55,7 +58,7 @@ public class JwtUtil {
         try {
             return getAllClaimsFromToken(token).getSubject();
         } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid JWT token: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid JWT token: " + e.getMessage());
         }
     }
 

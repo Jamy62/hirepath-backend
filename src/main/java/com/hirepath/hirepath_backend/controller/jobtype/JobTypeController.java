@@ -21,14 +21,14 @@ public class JobTypeController {
 
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> createJobType(@Valid @RequestBody JobTypeCreateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> jobTypeCreate(@Valid @RequestBody JobTypeCreateRequest request, Principal principal) {
         ResponseFormat responseFormat = jobTypeService.jobTypeCreate(request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @GetMapping("/list/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> listJobTypes(
+    public ResponseEntity<ResponseFormat> jobTypeList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
@@ -39,14 +39,14 @@ public class JobTypeController {
 
     @PutMapping("/update/admin/{jobTypeGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> updateJobType(@PathVariable String jobTypeGuid, @Valid @RequestBody JobTypeUpdateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> jobTypeUpdate(@PathVariable String jobTypeGuid, @Valid @RequestBody JobTypeUpdateRequest request, Principal principal) {
         ResponseFormat responseFormat = jobTypeService.jobTypeUpdate(jobTypeGuid, request, principal.getName());
         return ResponseEntity.ok(responseFormat);
     }
 
     @DeleteMapping("/delete/admin/{jobTypeGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> deleteJobType(
+    public ResponseEntity<ResponseFormat> jobTypeDelete(
             @PathVariable(value = "jobTypeGuid") String jobTypeGuid,
             Principal principal) {
         ResponseFormat responseFormat = jobTypeService.jobTypeDelete(jobTypeGuid, principal.getName());

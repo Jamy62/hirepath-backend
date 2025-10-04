@@ -1,9 +1,9 @@
 package com.hirepath.hirepath_backend.model.request.township;
 
-import jakarta.validation.constraints.NotBlank;
+import com.hirepath.hirepath_backend.security.AutoNotBlank;
 import lombok.Data;
 
-@NotBlank
+@AutoNotBlank
 @Data
 public class TownshipCreateRequest {
     private String name;

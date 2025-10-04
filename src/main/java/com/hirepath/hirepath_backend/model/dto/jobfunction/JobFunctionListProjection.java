@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.model.dto.jobfunction;
 
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 
 public interface JobFunctionListProjection {
@@ -7,6 +8,6 @@ public interface JobFunctionListProjection {
     String getDescription();
     String getGuid();
     Boolean getIsDeleted();
-    ZonedDateTime getCreatedAt();
-    ZonedDateTime getUpdatedAt();
+    Timestamp getCreatedAt();
+    Timestamp getUpdatedAt();
 }

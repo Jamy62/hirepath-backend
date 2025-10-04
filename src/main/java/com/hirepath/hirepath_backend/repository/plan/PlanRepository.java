@@ -19,7 +19,7 @@ public interface PlanRepository extends CrudRepository<Plan, Long> {
                 p.name as name,
                 p.description as description,
                 p.price as price,
-                p.duration_in_days as durationInDays,
+                p.duration_days as durationDays,
                 p.features as features,
                 p.guid as guid,
                 p.created_at as createdAt,

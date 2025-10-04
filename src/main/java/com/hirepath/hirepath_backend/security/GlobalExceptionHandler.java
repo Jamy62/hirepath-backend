@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -35,6 +36,15 @@ public class GlobalExceptionHandler {
     public GlobalExceptionHandler(Environment environment) {
         this.environment = environment;
         log.info("GlobalExceptionHandler initialized");
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ResponseFormat> MaxUploadSizeExceededException(MaxUploadSizeExceededException ex, WebRequest request) {
+        log.warn("File size limit exceeded: {} at {} - {}",
+                getCurrentUser(), getRequestUri(request), ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(ResponseFormat.createFailResponse(null, "File size limit exceeded"));
     }
 
     @ExceptionHandler(AuthorizationDeniedException.class)

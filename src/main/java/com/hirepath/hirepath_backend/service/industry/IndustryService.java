@@ -1,16 +1,18 @@
 package com.hirepath.hirepath_backend.service.industry;
 
+import com.hirepath.hirepath_backend.model.dto.industry.IndustryListDTO;
 import com.hirepath.hirepath_backend.model.request.industry.IndustryCreateRequest;
 import com.hirepath.hirepath_backend.model.request.industry.IndustryUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
+
+import java.util.List;
 
 public interface IndustryService {
 
-    ResponseFormat industryCreate(IndustryCreateRequest request, String adminEmail);
+    void industryCreate(IndustryCreateRequest request, String adminEmail);
 
-    ResponseFormat industryList(String searchName, String orderBy, int first, int max);
+    List<IndustryListDTO> industryList(String searchName, String orderBy, int first, int max);
 
-    ResponseFormat industryUpdate(String industryGuid, IndustryUpdateRequest request, String email);
+    void industryUpdate(String industryGuid, IndustryUpdateRequest request, String email);
 
-    ResponseFormat industryDelete(String industryGuid, String adminEmail);
+    void industryDelete(String industryGuid, String adminEmail);
 }

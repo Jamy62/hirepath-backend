@@ -1,16 +1,18 @@
 package com.hirepath.hirepath_backend.service.language;
 
+import com.hirepath.hirepath_backend.model.dto.language.LanguageListDTO;
 import com.hirepath.hirepath_backend.model.request.language.LanguageCreateRequest;
 import com.hirepath.hirepath_backend.model.request.language.LanguageUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
+
+import java.util.List;
 
 public interface LanguageService {
 
-    ResponseFormat languageCreate(LanguageCreateRequest request, String adminEmail);
+    void languageCreate(LanguageCreateRequest request, String adminEmail);
 
-    ResponseFormat languageList(String searchName, String orderBy, int first, int max);
+    List<LanguageListDTO> languageList(String searchName, String orderBy, int first, int max);
 
-    ResponseFormat languageUpdate(String languageGuid, LanguageUpdateRequest request, String email);
+    void languageUpdate(String languageGuid, LanguageUpdateRequest request, String email);
 
-    ResponseFormat languageDelete(String languageGuid, String adminEmail);
+    void languageDelete(String languageGuid, String adminEmail);
 }

@@ -1,13 +1,13 @@
 package com.hirepath.hirepath_backend.service.user.impl;
 
 import com.hirepath.hirepath_backend.constant.VariableConstant;
+import com.hirepath.hirepath_backend.model.dto.user.UserDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserListDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserListProjection;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.user.RegisterRequest;
 import com.hirepath.hirepath_backend.model.request.user.UserUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.role.RoleRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.user.UserService;
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public ResponseFormat register(RegisterRequest request, String userType) {
+    public String register(RegisterRequest request, String userType) {
         try {
             Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
             if (existingUser.isPresent()) {
@@ -64,14 +64,14 @@ public class UserServiceImpl implements UserService {
 
             userRepository.save(user);
 
-            return ResponseFormat.createSuccessResponse(user.getName(), "Admin registered successfully");
+            return user.getName();
         }
         catch (Exception e) {
             throw e;
         }
     }
 
-    public ResponseFormat userList(String searchName, String orderBy, int first, int max) {
+    public List<UserListDTO> userList(String searchName, String orderBy, int first, int max) {
         try {
             if (searchName.isBlank()) {
                 searchName = null;
@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
                 List<UserListProjection> userListProjection = userRepository.findAllUsersAdminPanal(searchName, orderBy, first, max);
 
-                List<UserListDTO> users = userListProjection.stream()
+                return userListProjection.stream()
                         .map(p -> UserListDTO.builder()
                                 .name(p.getName())
                                 .fullName(p.getFullName())
@@ -96,8 +96,6 @@ public class UserServiceImpl implements UserService {
                                 .lastLoginAt(p.getLastLoginAt() != null ? p.getLastLoginAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
-
-                return ResponseFormat.createSuccessResponse(users, "User list retrieved successfully");
             }
 
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "please enter either ASC or DESC for orderBy");
@@ -107,7 +105,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public ResponseFormat userUpdate(String userGuid, UserUpdateRequest request, String email) {
+    public String userUpdate(String userGuid, UserUpdateRequest request, String email) {
         try {
             log.info("User update initiate");
             User user = userRepository.findByGuid(userGuid)
@@ -144,14 +142,14 @@ public class UserServiceImpl implements UserService {
             log.info(String.valueOf(user.getCreatedAt()));
             userRepository.save(user);
 
-            return ResponseFormat.createSuccessResponse(user.getGuid(), "User updated successfully");
+            return user.getGuid();
         }
         catch (Exception e) {
             throw e;
         }
     }
 
-    public ResponseFormat userDelete(String guid, String email) {
+    public String userDelete(String guid, String email) {
         try {
             User user = userRepository.findByGuid(guid)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User to update not found"));
@@ -163,7 +161,30 @@ public class UserServiceImpl implements UserService {
             user.setUpdatedBy(deletedBy.getId());
             userRepository.save(user);
 
-            return ResponseFormat.createSuccessResponse(guid, "User deleted successfully");
+            return guid;
+        }
+        catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public UserDetailDTO userDetail(String userGuid) {
+        try {
+            User user = findByGuid(userGuid);
+
+            return UserDetailDTO.builder()
+                    .name(user.getName())
+                    .fullName(user.getFullName())
+                    .email(user.getEmail())
+                    .mobile(user.getMobile())
+                    .profile(user.getProfile())
+                    .role(user.getRole())
+                    .isActive(user.getIsActive())
+                    .isBlocked(user.getIsBlocked())
+                    .guid(user.getGuid())
+                    .createdAt(user.getCreatedAt() != null ? user.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                    .lastLoginAt(user.getLastLoginAt() != null ? user.getLastLoginAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                    .build();
         }
         catch (Exception e) {
             throw e;

@@ -5,7 +5,6 @@ import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.companyuser.AssignCompanyRoleRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.company.CompanyRepository;
 import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
 import com.hirepath.hirepath_backend.repository.role.RoleRepository;
@@ -29,7 +28,7 @@ public class CompanyUserServiceImpl implements CompanyUserService {
     private final RoleRepository roleRepository;
     private final CompanyUserRepository companyUserRepository;
 
-    public ResponseFormat assignCompanyRole(AssignCompanyRoleRequest request, String email) {
+    public void assignCompanyRole(AssignCompanyRoleRequest request, String email) {
         try {
             Company company = companyRepository.findByGuid(request.getCompanyGuid())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found"));
@@ -58,8 +57,6 @@ public class CompanyUserServiceImpl implements CompanyUserService {
                     .createdBy(assigner.getId())
                     .build();
             companyUserRepository.save(companyUser);
-
-            return ResponseFormat.createSuccessResponse(null, "Company role assigned successfully");
         } catch (Exception e) {
             throw e;
         }

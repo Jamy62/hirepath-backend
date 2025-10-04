@@ -1,16 +1,18 @@
 package com.hirepath.hirepath_backend.service.paymentmethod;
 
+import com.hirepath.hirepath_backend.model.dto.paymentmethod.PaymentMethodListDTO;
 import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodCreateRequest;
 import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
+
+import java.util.List;
 
 public interface PaymentMethodService {
 
-    ResponseFormat paymentMethodCreate(PaymentMethodCreateRequest request, String adminEmail);
+    void paymentMethodCreate(PaymentMethodCreateRequest request, String adminEmail);
 
-    ResponseFormat paymentMethodList(String searchName, String orderBy, int first, int max);
+    List<PaymentMethodListDTO> paymentMethodList(String searchName, String orderBy, int first, int max);
 
-    ResponseFormat paymentMethodUpdate(String paymentMethodGuid, PaymentMethodUpdateRequest request, String email);
+    void paymentMethodUpdate(String paymentMethodGuid, PaymentMethodUpdateRequest request, String email);
 
-    ResponseFormat paymentMethodDelete(String paymentMethodGuid, String adminEmail);
+    void paymentMethodDelete(String paymentMethodGuid, String adminEmail);
 }

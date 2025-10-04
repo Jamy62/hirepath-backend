@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.model.response;
 
+import com.hirepath.hirepath_backend.model.dto.user.UserDetailDTO;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,5 +10,5 @@ import lombok.Setter;
 @Setter
 public class LoginResponse {
     private String token;
-    private String guid;
+    private UserDetailDTO user;
 }

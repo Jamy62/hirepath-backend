@@ -1,14 +1,18 @@
 package com.hirepath.hirepath_backend.service.user;
 
+import com.hirepath.hirepath_backend.model.dto.user.UserDetailDTO;
+import com.hirepath.hirepath_backend.model.dto.user.UserListDTO;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.user.RegisterRequest;
 import com.hirepath.hirepath_backend.model.request.user.UserUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
+
+import java.util.List;
 
 public interface UserService {
     User findByGuid(String guid);
-    ResponseFormat register(RegisterRequest request, String userType);
-    ResponseFormat userList(String searchName, String orderBy, int first, int max);
-    ResponseFormat userUpdate(String userGuid, UserUpdateRequest request, String email);
-    ResponseFormat userDelete(String userGuid, String email);
+    String register(RegisterRequest request, String userType);
+    List<UserListDTO> userList(String searchName, String orderBy, int first, int max);
+    String userUpdate(String userGuid, UserUpdateRequest request, String email);
+    String userDelete(String userGuid, String email);
+    UserDetailDTO userDetail(String userGuid);
 }

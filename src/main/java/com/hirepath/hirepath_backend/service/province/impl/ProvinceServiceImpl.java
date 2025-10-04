@@ -7,7 +7,6 @@ import com.hirepath.hirepath_backend.model.entity.province.Province;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.province.ProvinceCreateRequest;
 import com.hirepath.hirepath_backend.model.request.province.ProvinceUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.province.ProvinceRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.province.ProvinceService;
@@ -31,7 +30,7 @@ public class ProvinceServiceImpl implements ProvinceService {
     private final UserRepository userRepository;
 
     @Override
-    public ResponseFormat provinceCreate(ProvinceCreateRequest request, String adminEmail) {
+    public void provinceCreate(ProvinceCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -45,20 +44,18 @@ public class ProvinceServiceImpl implements ProvinceService {
                     .build();
 
             provinceRepository.save(province);
-
-            return ResponseFormat.createSuccessResponse(null, "Province created successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat provinceList(String searchName, String orderBy, int first, int max) {
+    public List<ProvinceListDTO> provinceList(String searchName, String orderBy, int first, int max) {
         try {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
                 List<ProvinceListProjection> provinceListProjections = provinceRepository.findAllProvincesAdminPanel(searchName, orderBy, first, max);
 
-                List<ProvinceListDTO> provinces = provinceListProjections.stream()
+                return provinceListProjections.stream()
                         .map(p -> ProvinceListDTO.builder()
                                 .name(p.getName())
                                 .guid(p.getGuid())
@@ -66,8 +63,6 @@ public class ProvinceServiceImpl implements ProvinceService {
                                 .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
-
-                return ResponseFormat.createSuccessResponse(provinces, "Province list retrieved successfully");
             }
 
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
@@ -77,7 +72,7 @@ public class ProvinceServiceImpl implements ProvinceService {
     }
 
     @Override
-    public ResponseFormat provinceUpdate(String provinceGuid, ProvinceUpdateRequest request, String email) {
+    public void provinceUpdate(String provinceGuid, ProvinceUpdateRequest request, String email) {
         try {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -93,15 +88,13 @@ public class ProvinceServiceImpl implements ProvinceService {
             province.setUpdatedBy(admin.getId());
 
             provinceRepository.save(province);
-
-            return ResponseFormat.createSuccessResponse(null, "Province updated successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat provinceDelete(String provinceGuid, String adminEmail) {
+    public void provinceDelete(String provinceGuid, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -114,8 +107,6 @@ public class ProvinceServiceImpl implements ProvinceService {
             province.setUpdatedBy(admin.getId());
 
             provinceRepository.save(province);
-
-            return ResponseFormat.createSuccessResponse(null, "Province deleted successfully");
         } catch (Exception e) {
             throw e;
         }

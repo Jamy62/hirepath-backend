@@ -7,7 +7,6 @@ import com.hirepath.hirepath_backend.model.entity.language.Language;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.language.LanguageCreateRequest;
 import com.hirepath.hirepath_backend.model.request.language.LanguageUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.language.LanguageRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.language.LanguageService;
@@ -31,7 +30,7 @@ public class LanguageServiceImpl implements LanguageService {
     private final UserRepository userRepository;
 
     @Override
-    public ResponseFormat languageCreate(LanguageCreateRequest request, String adminEmail) {
+    public void languageCreate(LanguageCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -46,20 +45,18 @@ public class LanguageServiceImpl implements LanguageService {
                     .build();
 
             languageRepository.save(language);
-
-            return ResponseFormat.createSuccessResponse(null, "Language created successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat languageList(String searchName, String orderBy, int first, int max) {
+    public List<LanguageListDTO> languageList(String searchName, String orderBy, int first, int max) {
         try {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
                 List<LanguageListProjection> languageListProjections = languageRepository.findAllLanguagesAdminPanel(searchName, orderBy, first, max);
 
-                List<LanguageListDTO> languages = languageListProjections.stream()
+                return languageListProjections.stream()
                         .map(p -> LanguageListDTO.builder()
                                 .name(p.getName())
                                 .code(p.getCode())
@@ -68,8 +65,6 @@ public class LanguageServiceImpl implements LanguageService {
                                 .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
-
-                return ResponseFormat.createSuccessResponse(languages, "Language list retrieved successfully");
             }
 
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
@@ -79,7 +74,7 @@ public class LanguageServiceImpl implements LanguageService {
     }
 
     @Override
-    public ResponseFormat languageUpdate(String languageGuid, LanguageUpdateRequest request, String email) {
+    public void languageUpdate(String languageGuid, LanguageUpdateRequest request, String email) {
         try {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -98,15 +93,13 @@ public class LanguageServiceImpl implements LanguageService {
             language.setUpdatedBy(admin.getId());
 
             languageRepository.save(language);
-
-            return ResponseFormat.createSuccessResponse(null, "Language updated successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat languageDelete(String languageGuid, String adminEmail) {
+    public void languageDelete(String languageGuid, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -119,8 +112,6 @@ public class LanguageServiceImpl implements LanguageService {
             language.setUpdatedBy(admin.getId());
 
             languageRepository.save(language);
-
-            return ResponseFormat.createSuccessResponse(null, "Language deleted successfully");
         } catch (Exception e) {
             throw e;
         }

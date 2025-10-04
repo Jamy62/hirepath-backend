@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.controller.jobfunction;
 
+import com.hirepath.hirepath_backend.model.dto.jobfunction.JobFunctionListDTO;
 import com.hirepath.hirepath_backend.model.request.jobfunction.JobFunctionCreateRequest;
 import com.hirepath.hirepath_backend.model.request.jobfunction.JobFunctionUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
@@ -11,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,8 +24,8 @@ public class JobFunctionController {
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> jobFunctionCreate(@Valid @RequestBody JobFunctionCreateRequest request, Principal principal) {
-        ResponseFormat responseFormat = jobFunctionService.jobFunctionCreate(request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        jobFunctionService.jobFunctionCreate(request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Job function created successfully"));
     }
 
     @GetMapping("/list/admin")
@@ -33,15 +35,15 @@ public class JobFunctionController {
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
             @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
-        ResponseFormat responseFormat = jobFunctionService.jobFunctionList(searchName, orderBy, first, max);
-        return ResponseEntity.ok(responseFormat);
+        List<JobFunctionListDTO> response = jobFunctionService.jobFunctionList(searchName, orderBy, first, max);
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Job function list retrieved successfully"));
     }
 
     @PutMapping("/update/admin/{jobFunctionGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> jobFunctionUpdate(@PathVariable String jobFunctionGuid, @Valid @RequestBody JobFunctionUpdateRequest request, Principal principal) {
-        ResponseFormat responseFormat = jobFunctionService.jobFunctionUpdate(jobFunctionGuid, request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        jobFunctionService.jobFunctionUpdate(jobFunctionGuid, request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Job function updated successfully"));
     }
 
     @DeleteMapping("/delete/admin/{jobFunctionGuid}")
@@ -49,7 +51,7 @@ public class JobFunctionController {
     public ResponseEntity<ResponseFormat> jobFunctionDelete(
             @PathVariable(value = "jobFunctionGuid") String jobFunctionGuid,
             Principal principal) {
-        ResponseFormat responseFormat = jobFunctionService.jobFunctionDelete(jobFunctionGuid, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        jobFunctionService.jobFunctionDelete(jobFunctionGuid, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Job function deleted successfully"));
     }
 }

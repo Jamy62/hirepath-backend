@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.controller.language;
 
+import com.hirepath.hirepath_backend.model.dto.language.LanguageListDTO;
 import com.hirepath.hirepath_backend.model.request.language.LanguageCreateRequest;
 import com.hirepath.hirepath_backend.model.request.language.LanguageUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
@@ -11,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,8 +24,8 @@ public class LanguageController {
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> languageCreate(@Valid @RequestBody LanguageCreateRequest request, Principal principal) {
-        ResponseFormat responseFormat = languageService.languageCreate(request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        languageService.languageCreate(request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Language created successfully"));
     }
 
     @GetMapping("/list/admin")
@@ -33,15 +35,15 @@ public class LanguageController {
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
             @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
-        ResponseFormat responseFormat = languageService.languageList(searchName, orderBy, first, max);
-        return ResponseEntity.ok(responseFormat);
+        List<LanguageListDTO> response = languageService.languageList(searchName, orderBy, first, max);
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Language list retrieved successfully"));
     }
 
     @PutMapping("/update/admin/{languageGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> languageUpdate(@PathVariable String languageGuid, @Valid @RequestBody LanguageUpdateRequest request, Principal principal) {
-        ResponseFormat responseFormat = languageService.languageUpdate(languageGuid, request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        languageService.languageUpdate(languageGuid, request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Language updated successfully"));
     }
 
     @DeleteMapping("/delete/admin/{languageGuid}")
@@ -49,7 +51,7 @@ public class LanguageController {
     public ResponseEntity<ResponseFormat> languageDelete(
             @PathVariable(value = "languageGuid") String languageGuid,
             Principal principal) {
-        ResponseFormat responseFormat = languageService.languageDelete(languageGuid, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        languageService.languageDelete(languageGuid, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Language deleted successfully"));
     }
 }

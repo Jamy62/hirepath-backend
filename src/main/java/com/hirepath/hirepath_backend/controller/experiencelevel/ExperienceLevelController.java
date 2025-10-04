@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.controller.experiencelevel;
 
+import com.hirepath.hirepath_backend.model.dto.experiencelevel.ExperienceLevelListDTO;
 import com.hirepath.hirepath_backend.model.request.experiencelevel.ExperienceLevelCreateRequest;
 import com.hirepath.hirepath_backend.model.request.experiencelevel.ExperienceLevelUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
@@ -11,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,8 +24,8 @@ public class ExperienceLevelController {
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> experienceLevelCreate(@Valid @RequestBody ExperienceLevelCreateRequest request, Principal principal) {
-        ResponseFormat responseFormat = experienceLevelService.experienceLevelCreate(request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        experienceLevelService.experienceLevelCreate(request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Experience level created successfully"));
     }
 
     @GetMapping("/list/admin")
@@ -33,15 +35,15 @@ public class ExperienceLevelController {
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
             @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
-        ResponseFormat responseFormat = experienceLevelService.experienceLevelList(searchName, orderBy, first, max);
-        return ResponseEntity.ok(responseFormat);
+        List<ExperienceLevelListDTO> response = experienceLevelService.experienceLevelList(searchName, orderBy, first, max);
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Experience level list retrieved successfully"));
     }
 
     @PutMapping("/update/admin/{experienceLevelGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> experienceLevelUpdate(@PathVariable String experienceLevelGuid, @Valid @RequestBody ExperienceLevelUpdateRequest request, Principal principal) {
-        ResponseFormat responseFormat = experienceLevelService.experienceLevelUpdate(experienceLevelGuid, request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        experienceLevelService.experienceLevelUpdate(experienceLevelGuid, request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Experience level updated successfully"));
     }
 
     @DeleteMapping("/delete/admin/{experienceLevelGuid}")
@@ -49,7 +51,7 @@ public class ExperienceLevelController {
     public ResponseEntity<ResponseFormat> experienceLevelDelete(
             @PathVariable(value = "experienceLevelGuid") String experienceLevelGuid,
             Principal principal) {
-        ResponseFormat responseFormat = experienceLevelService.experienceLevelDelete(experienceLevelGuid, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        experienceLevelService.experienceLevelDelete(experienceLevelGuid, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Experience level deleted successfully"));
     }
 }

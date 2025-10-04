@@ -7,7 +7,6 @@ import com.hirepath.hirepath_backend.model.entity.jobtype.JobType;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.jobtype.JobTypeCreateRequest;
 import com.hirepath.hirepath_backend.model.request.jobtype.JobTypeUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.jobtype.JobTypeRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.jobtype.JobTypeService;
@@ -31,7 +30,7 @@ public class JobTypeServiceImpl implements JobTypeService {
     private final UserRepository userRepository;
 
     @Override
-    public ResponseFormat jobTypeCreate(JobTypeCreateRequest request, String adminEmail) {
+    public void jobTypeCreate(JobTypeCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -46,20 +45,18 @@ public class JobTypeServiceImpl implements JobTypeService {
                     .build();
 
             jobTypeRepository.save(jobType);
-
-            return ResponseFormat.createSuccessResponse(null, "Job type created successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat jobTypeList(String searchName, String orderBy, int first, int max) {
+    public List<JobTypeListDTO> jobTypeList(String searchName, String orderBy, int first, int max) {
         try {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
                 List<JobTypeListProjection> jobTypeListProjections = jobTypeRepository.findAllJobTypesAdminPanel(searchName, orderBy, first, max);
 
-                List<JobTypeListDTO> jobTypes = jobTypeListProjections.stream()
+                return jobTypeListProjections.stream()
                         .map(p -> JobTypeListDTO.builder()
                                 .name(p.getName())
                                 .description(p.getDescription())
@@ -68,8 +65,6 @@ public class JobTypeServiceImpl implements JobTypeService {
                                 .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
-
-                return ResponseFormat.createSuccessResponse(jobTypes, "Job type list retrieved successfully");
             }
 
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
@@ -79,7 +74,7 @@ public class JobTypeServiceImpl implements JobTypeService {
     }
 
     @Override
-    public ResponseFormat jobTypeUpdate(String jobTypeGuid, JobTypeUpdateRequest request, String email) {
+    public void jobTypeUpdate(String jobTypeGuid, JobTypeUpdateRequest request, String email) {
         try {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -98,15 +93,13 @@ public class JobTypeServiceImpl implements JobTypeService {
             jobType.setUpdatedBy(admin.getId());
 
             jobTypeRepository.save(jobType);
-
-            return ResponseFormat.createSuccessResponse(null, "Job type updated successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat jobTypeDelete(String jobTypeGuid, String adminEmail) {
+    public void jobTypeDelete(String jobTypeGuid, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -119,8 +112,6 @@ public class JobTypeServiceImpl implements JobTypeService {
             jobType.setUpdatedBy(admin.getId());
 
             jobTypeRepository.save(jobType);
-
-            return ResponseFormat.createSuccessResponse(null, "Job type deleted successfully");
         } catch (Exception e) {
             throw e;
         }

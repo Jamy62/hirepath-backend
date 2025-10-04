@@ -7,7 +7,6 @@ import com.hirepath.hirepath_backend.model.entity.paymentmethod.PaymentMethod;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodCreateRequest;
 import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.paymentmethod.PaymentMethodRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.paymentmethod.PaymentMethodService;
@@ -31,7 +30,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     private final UserRepository userRepository;
 
     @Override
-    public ResponseFormat paymentMethodCreate(PaymentMethodCreateRequest request, String adminEmail) {
+    public void paymentMethodCreate(PaymentMethodCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -46,20 +45,18 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
                     .build();
 
             paymentMethodRepository.save(paymentMethod);
-
-            return ResponseFormat.createSuccessResponse(null, "Payment method created successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat paymentMethodList(String searchName, String orderBy, int first, int max) {
+    public List<PaymentMethodListDTO> paymentMethodList(String searchName, String orderBy, int first, int max) {
         try {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
                 List<PaymentMethodListProjection> paymentMethodListProjections = paymentMethodRepository.findAllPaymentMethodsAdminPanel(searchName, orderBy, first, max);
 
-                List<PaymentMethodListDTO> paymentMethods = paymentMethodListProjections.stream()
+                return paymentMethodListProjections.stream()
                         .map(p -> PaymentMethodListDTO.builder()
                                 .name(p.getName())
                                 .description(p.getDescription())
@@ -68,8 +65,6 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
                                 .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
-
-                return ResponseFormat.createSuccessResponse(paymentMethods, "Payment method list retrieved successfully");
             }
 
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
@@ -79,7 +74,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     }
 
     @Override
-    public ResponseFormat paymentMethodUpdate(String paymentMethodGuid, PaymentMethodUpdateRequest request, String email) {
+    public void paymentMethodUpdate(String paymentMethodGuid, PaymentMethodUpdateRequest request, String email) {
         try {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -98,15 +93,13 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
             paymentMethod.setUpdatedBy(admin.getId());
 
             paymentMethodRepository.save(paymentMethod);
-
-            return ResponseFormat.createSuccessResponse(null, "Payment method updated successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat paymentMethodDelete(String paymentMethodGuid, String adminEmail) {
+    public void paymentMethodDelete(String paymentMethodGuid, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -119,8 +112,6 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
             paymentMethod.setUpdatedBy(admin.getId());
 
             paymentMethodRepository.save(paymentMethod);
-
-            return ResponseFormat.createSuccessResponse(null, "Payment method deleted successfully");
         } catch (Exception e) {
             throw e;
         }

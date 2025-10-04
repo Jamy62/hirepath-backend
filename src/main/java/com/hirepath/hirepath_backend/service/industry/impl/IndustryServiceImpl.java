@@ -7,7 +7,6 @@ import com.hirepath.hirepath_backend.model.entity.industry.Industry;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.industry.IndustryCreateRequest;
 import com.hirepath.hirepath_backend.model.request.industry.IndustryUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.industry.IndustryRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.industry.IndustryService;
@@ -31,7 +30,7 @@ public class IndustryServiceImpl implements IndustryService {
     private final UserRepository userRepository;
 
     @Override
-    public ResponseFormat industryCreate(IndustryCreateRequest request, String adminEmail) {
+    public void industryCreate(IndustryCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -46,20 +45,18 @@ public class IndustryServiceImpl implements IndustryService {
                     .build();
 
             industryRepository.save(industry);
-
-            return ResponseFormat.createSuccessResponse(null, "Industry created successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat industryList(String searchName, String orderBy, int first, int max) {
+    public List<IndustryListDTO> industryList(String searchName, String orderBy, int first, int max) {
         try {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
                 List<IndustryListProjection> industryListProjections = industryRepository.findAllIndustriesAdminPanel(searchName, orderBy, first, max);
 
-                List<IndustryListDTO> industries = industryListProjections.stream()
+                return industryListProjections.stream()
                         .map(p -> IndustryListDTO.builder()
                                 .name(p.getName())
                                 .description(p.getDescription())
@@ -68,8 +65,6 @@ public class IndustryServiceImpl implements IndustryService {
                                 .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
-
-                return ResponseFormat.createSuccessResponse(industries, "Industry list retrieved successfully");
             }
 
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
@@ -79,7 +74,7 @@ public class IndustryServiceImpl implements IndustryService {
     }
 
     @Override
-    public ResponseFormat industryUpdate(String industryGuid, IndustryUpdateRequest request, String email) {
+    public void industryUpdate(String industryGuid, IndustryUpdateRequest request, String email) {
         try {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -98,15 +93,13 @@ public class IndustryServiceImpl implements IndustryService {
             industry.setUpdatedBy(admin.getId());
 
             industryRepository.save(industry);
-
-            return ResponseFormat.createSuccessResponse(null, "Industry updated successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat industryDelete(String industryGuid, String adminEmail) {
+    public void industryDelete(String industryGuid, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -119,8 +112,6 @@ public class IndustryServiceImpl implements IndustryService {
             industry.setUpdatedBy(admin.getId());
 
             industryRepository.save(industry);
-
-            return ResponseFormat.createSuccessResponse(null, "Industry deleted successfully");
         } catch (Exception e) {
             throw e;
         }

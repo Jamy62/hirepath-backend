@@ -8,7 +8,6 @@ import com.hirepath.hirepath_backend.model.entity.township.Township;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.township.TownshipCreateRequest;
 import com.hirepath.hirepath_backend.model.request.township.TownshipUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.province.ProvinceRepository;
 import com.hirepath.hirepath_backend.repository.township.TownshipRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
@@ -34,7 +33,7 @@ public class TownshipServiceImpl implements TownshipService {
     private final ProvinceRepository provinceRepository;
 
     @Override
-    public ResponseFormat townshipCreate(TownshipCreateRequest request, String adminEmail) {
+    public void townshipCreate(TownshipCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -52,20 +51,18 @@ public class TownshipServiceImpl implements TownshipService {
                     .build();
 
             townshipRepository.save(township);
-
-            return ResponseFormat.createSuccessResponse(null, "Township created successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat townshipList(String searchName, String orderBy, int first, int max) {
+    public List<TownshipListDTO> townshipList(String searchName, String orderBy, int first, int max) {
         try {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
                 List<TownshipListProjection> townshipListProjections = townshipRepository.findAllTownshipsAdminPanel(searchName, orderBy, first, max);
 
-                List<TownshipListDTO> townships = townshipListProjections.stream()
+                return townshipListProjections.stream()
                         .map(p -> TownshipListDTO.builder()
                                 .name(p.getName())
                                 .provinceName(p.getProvinceName())
@@ -74,8 +71,6 @@ public class TownshipServiceImpl implements TownshipService {
                                 .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
-
-                return ResponseFormat.createSuccessResponse(townships, "Township list retrieved successfully");
             }
 
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
@@ -85,7 +80,7 @@ public class TownshipServiceImpl implements TownshipService {
     }
 
     @Override
-    public ResponseFormat townshipUpdate(String townshipGuid, TownshipUpdateRequest request, String email) {
+    public void townshipUpdate(String townshipGuid, TownshipUpdateRequest request, String email) {
         try {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -106,15 +101,13 @@ public class TownshipServiceImpl implements TownshipService {
             township.setUpdatedBy(admin.getId());
 
             townshipRepository.save(township);
-
-            return ResponseFormat.createSuccessResponse(null, "Township updated successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat townshipDelete(String townshipGuid, String adminEmail) {
+    public void townshipDelete(String townshipGuid, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -127,8 +120,6 @@ public class TownshipServiceImpl implements TownshipService {
             township.setUpdatedBy(admin.getId());
 
             townshipRepository.save(township);
-
-            return ResponseFormat.createSuccessResponse(null, "Township deleted successfully");
         } catch (Exception e) {
             throw e;
         }

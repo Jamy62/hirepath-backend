@@ -1,16 +1,18 @@
 package com.hirepath.hirepath_backend.service.jobtype;
 
+import com.hirepath.hirepath_backend.model.dto.jobtype.JobTypeListDTO;
 import com.hirepath.hirepath_backend.model.request.jobtype.JobTypeCreateRequest;
 import com.hirepath.hirepath_backend.model.request.jobtype.JobTypeUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
+
+import java.util.List;
 
 public interface JobTypeService {
 
-    ResponseFormat jobTypeCreate(JobTypeCreateRequest request, String adminEmail);
+    void jobTypeCreate(JobTypeCreateRequest request, String adminEmail);
 
-    ResponseFormat jobTypeList(String searchName, String orderBy, int first, int max);
+    List<JobTypeListDTO> jobTypeList(String searchName, String orderBy, int first, int max);
 
-    ResponseFormat jobTypeUpdate(String jobTypeGuid, JobTypeUpdateRequest request, String email);
+    void jobTypeUpdate(String jobTypeGuid, JobTypeUpdateRequest request, String email);
 
-    ResponseFormat jobTypeDelete(String jobTypeGuid, String adminEmail);
+    void jobTypeDelete(String jobTypeGuid, String adminEmail);
 }

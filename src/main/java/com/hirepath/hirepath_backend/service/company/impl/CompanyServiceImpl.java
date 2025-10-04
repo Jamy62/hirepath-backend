@@ -11,7 +11,6 @@ import com.hirepath.hirepath_backend.model.request.company.CompanyRegisterReques
 import com.hirepath.hirepath_backend.model.request.company.CompanyUpdateRequest;
 import com.hirepath.hirepath_backend.model.request.company.CompanyVerifyRequest;
 import com.hirepath.hirepath_backend.model.request.company.CompanyVerifyResponseRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.company.CompanyRepository;
 import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
 import com.hirepath.hirepath_backend.repository.role.RoleRepository;
@@ -38,7 +37,7 @@ public class CompanyServiceImpl implements CompanyService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
 
-    public ResponseFormat companyRegister(CompanyRegisterRequest request, String email) {
+    public void companyRegister(CompanyRegisterRequest request, String email) {
         try {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -69,14 +68,12 @@ public class CompanyServiceImpl implements CompanyService {
                     .createdBy(user.getId())
                     .build();
             companyUserRepository.save(companyUser);
-
-            return ResponseFormat.createSuccessResponse(null, "Company registered successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public ResponseFormat companyVerify(String companyGuid, CompanyVerifyRequest request, String email) {
+    public void companyVerify(String companyGuid, CompanyVerifyRequest request, String email) {
         try {
             Company company = companyRepository.findByGuid(companyGuid)
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found"));
@@ -91,15 +88,13 @@ public class CompanyServiceImpl implements CompanyService {
             company.setBusinessType(request.getBusinessType());
 
             companyRepository.save(company);
-
-            return ResponseFormat.createSuccessResponse(null, "Company verification pending");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat verifyResponse(String companyGuid, CompanyVerifyResponseRequest request, String email) {
+    public void verifyResponse(String companyGuid, CompanyVerifyResponseRequest request, String email) {
         try {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -117,25 +112,18 @@ public class CompanyServiceImpl implements CompanyService {
             company.setVerified_at(ZonedDateTime.now());
             company.setVerifiedBy(admin.getId());
             companyRepository.save(company);
-
-            if (request.isResponse()) {
-                return ResponseFormat.createSuccessResponse(null, "Company verified successfully");
-            }
-            else {
-                return ResponseFormat.createSuccessResponse(null, "Company declined successfully");
-            }
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat companyList(String searchName, String orderBy, int first, int max) {
+    public List<CompanyListDTO> companyList(String searchName, String orderBy, int first, int max) {
         try {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
                 List<CompanyListProjection> companyListProjection = companyRepository.findAllCompaniesAdminPanel(searchName, orderBy, first, max, Company.VerificationStatus.TRUE);
 
-                List<CompanyListDTO> companies = companyListProjection.stream()
+                return companyListProjection.stream()
                         .map(p -> CompanyListDTO.builder()
                                 .name(p.getName())
                                 .logo(p.getLogo())
@@ -147,8 +135,6 @@ public class CompanyServiceImpl implements CompanyService {
                                 .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
-
-                return ResponseFormat.createSuccessResponse(companies, "Company list retrieved successfully");
             }
 
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "please enter either ASC or DESC for orderBy");
@@ -158,12 +144,12 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public ResponseFormat companyVerifyList(String searchName, String orderBy, int first, int max) {
+    public List<CompanyListDTO> companyVerifyList(String searchName, String orderBy, int first, int max) {
         try {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
                 List<CompanyListProjection> companyListProjection = companyRepository.findAllCompaniesAdminPanel(searchName, orderBy, first, max, Company.VerificationStatus.PENDING);
 
-                List<CompanyListDTO> companies = companyListProjection.stream()
+                return companyListProjection.stream()
                         .map(p -> CompanyListDTO.builder()
                                 .name(p.getName())
                                 .logo(p.getLogo())
@@ -175,8 +161,6 @@ public class CompanyServiceImpl implements CompanyService {
                                 .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
-
-                return ResponseFormat.createSuccessResponse(companies, "Company list retrieved successfully");
             }
 
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "please enter either ASC or DESC for orderBy");
@@ -186,7 +170,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public ResponseFormat companyUpdate(String companyGuid, CompanyUpdateRequest request, String email) {
+    public void companyUpdate(String companyGuid, CompanyUpdateRequest request, String email) {
         try {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -234,15 +218,13 @@ public class CompanyServiceImpl implements CompanyService {
             company.setUpdatedBy(admin.getId());
 
             companyRepository.save(company);
-
-            return ResponseFormat.createSuccessResponse(null, "Company updated successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat companyDelete(String companyGuid, String adminEmail) {
+    public void companyDelete(String companyGuid, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -255,8 +237,6 @@ public class CompanyServiceImpl implements CompanyService {
             company.setUpdatedBy(admin.getId());
 
             companyRepository.save(company);
-
-            return ResponseFormat.createSuccessResponse(null, "Company deleted successfully");
         } catch (Exception e) {
             throw e;
         }

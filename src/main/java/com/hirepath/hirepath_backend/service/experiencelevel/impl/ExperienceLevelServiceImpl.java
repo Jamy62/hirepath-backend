@@ -7,7 +7,6 @@ import com.hirepath.hirepath_backend.model.entity.experiencelevel.ExperienceLeve
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.experiencelevel.ExperienceLevelCreateRequest;
 import com.hirepath.hirepath_backend.model.request.experiencelevel.ExperienceLevelUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.experiencelevel.ExperienceLevelRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.experiencelevel.ExperienceLevelService;
@@ -31,7 +30,7 @@ public class ExperienceLevelServiceImpl implements ExperienceLevelService {
     private final UserRepository userRepository;
 
     @Override
-    public ResponseFormat experienceLevelCreate(ExperienceLevelCreateRequest request, String adminEmail) {
+    public void experienceLevelCreate(ExperienceLevelCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -46,20 +45,18 @@ public class ExperienceLevelServiceImpl implements ExperienceLevelService {
                     .build();
 
             experienceLevelRepository.save(experienceLevel);
-
-            return ResponseFormat.createSuccessResponse(null, "Experience level created successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat experienceLevelList(String searchName, String orderBy, int first, int max) {
+    public List<ExperienceLevelListDTO> experienceLevelList(String searchName, String orderBy, int first, int max) {
         try {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
                 List<ExperienceLevelListProjection> experienceLevelListProjections = experienceLevelRepository.findAllExperienceLevelsAdminPanel(searchName, orderBy, first, max);
 
-                List<ExperienceLevelListDTO> experienceLevels = experienceLevelListProjections.stream()
+                return experienceLevelListProjections.stream()
                         .map(p -> ExperienceLevelListDTO.builder()
                                 .name(p.getName())
                                 .description(p.getDescription())
@@ -68,8 +65,6 @@ public class ExperienceLevelServiceImpl implements ExperienceLevelService {
                                 .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
-
-                return ResponseFormat.createSuccessResponse(experienceLevels, "Experience level list retrieved successfully");
             }
 
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
@@ -79,7 +74,7 @@ public class ExperienceLevelServiceImpl implements ExperienceLevelService {
     }
 
     @Override
-    public ResponseFormat experienceLevelUpdate(String experienceLevelGuid, ExperienceLevelUpdateRequest request, String email) {
+    public void experienceLevelUpdate(String experienceLevelGuid, ExperienceLevelUpdateRequest request, String email) {
         try {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -98,15 +93,13 @@ public class ExperienceLevelServiceImpl implements ExperienceLevelService {
             experienceLevel.setUpdatedBy(admin.getId());
 
             experienceLevelRepository.save(experienceLevel);
-
-            return ResponseFormat.createSuccessResponse(null, "Experience level updated successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat experienceLevelDelete(String experienceLevelGuid, String adminEmail) {
+    public void experienceLevelDelete(String experienceLevelGuid, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -119,8 +112,6 @@ public class ExperienceLevelServiceImpl implements ExperienceLevelService {
             experienceLevel.setUpdatedBy(admin.getId());
 
             experienceLevelRepository.save(experienceLevel);
-
-            return ResponseFormat.createSuccessResponse(null, "Experience level deleted successfully");
         } catch (Exception e) {
             throw e;
         }

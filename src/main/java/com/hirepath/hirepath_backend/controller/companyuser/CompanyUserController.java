@@ -21,7 +21,7 @@ public class CompanyUserController {
     @PreAuthorize("hasAnyRole('COMPANY_OWNER', 'COMPANY_ADMIN')")
     public ResponseEntity<ResponseFormat> assignCompanyRole(@Valid @RequestBody AssignCompanyRoleRequest request,
                                                             Principal principal) {
-        ResponseFormat responseFormat = companyUserService.assignCompanyRole(request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        companyUserService.assignCompanyRole(request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Company role assigned successfully"));
     }
 }

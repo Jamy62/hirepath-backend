@@ -1,5 +1,7 @@
 package com.hirepath.hirepath_backend.controller.user;
 
+import com.hirepath.hirepath_backend.model.dto.user.UserDetailDTO;
+import com.hirepath.hirepath_backend.model.dto.user.UserListDTO;
 import com.hirepath.hirepath_backend.model.request.user.RegisterRequest;
 import com.hirepath.hirepath_backend.model.request.user.UserUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
@@ -11,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,14 +24,14 @@ public class UserController {
     @PostMapping("/register/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> adminRegister(@Valid @RequestBody RegisterRequest request) {
-        ResponseFormat responseFormat = userService.register(request, "admin");
-        return ResponseEntity.ok(responseFormat);
+        String response = userService.register(request, "admin");
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Admin registered successfully"));
     }
 
     @PostMapping("/register")
     public ResponseEntity<ResponseFormat> userRegister(@Valid @RequestBody RegisterRequest request) {
-        ResponseFormat responseFormat = userService.register(request, "user");
-        return ResponseEntity.ok(responseFormat);
+        String response = userService.register(request, "user");
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "User registered successfully"));
     }
 
     @GetMapping("/list/admin")
@@ -38,16 +41,16 @@ public class UserController {
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
             @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
-        ResponseFormat responseFormat = userService.userList(searchName, orderBy, first, max);
-        return ResponseEntity.ok(responseFormat);
+        List<UserListDTO> response = userService.userList(searchName, orderBy, first, max);
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "User list retrieved successfully"));
     }
 
     @PutMapping("/update/admin/{userGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> userUpdate(@PathVariable String userGuid,
                                                      @Valid @RequestBody UserUpdateRequest request, Principal principal) {
-        ResponseFormat responseFormat = userService.userUpdate(userGuid, request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        String response = userService.userUpdate(userGuid, request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "User updated successfully"));
     }
 
     @DeleteMapping("/delete/admin/{userGuid}")
@@ -55,7 +58,14 @@ public class UserController {
     public ResponseEntity<ResponseFormat> userDelete(
             @PathVariable(value = "userGuid") String userGuid,
             Principal principal) {
-        ResponseFormat responseFormat = userService.userDelete(userGuid, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        String response = userService.userDelete(userGuid, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "User deleted successfully"));
+    }
+
+    @GetMapping("/detail/{userGuid}")
+    public ResponseEntity<ResponseFormat> userDetail(
+            @PathVariable(value = "userGuid") String userGuid) {
+        UserDetailDTO response = userService.userDetail(userGuid);
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Successfully retrieved user detail"));
     }
 }

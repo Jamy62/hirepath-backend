@@ -1,15 +1,16 @@
 package com.hirepath.hirepath_backend.service.auth.impl;
 
+import com.hirepath.hirepath_backend.model.dto.user.UserDetailDTO;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.response.LoginResponse;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.company.CompanyRepository;
 import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.auth.AuthService;
+import com.hirepath.hirepath_backend.service.user.UserService;
 import com.hirepath.hirepath_backend.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,24 +27,24 @@ import java.util.Optional;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
+    private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final CompanyRepository companyRepository;
     private final CompanyUserRepository companyUserRepository;
 
-    public ResponseFormat login(String email, String password) {
+    public LoginResponse login(String email, String password) {
         try {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
 
             if (passwordEncoder.matches(password, user.getPassword())) {
                 String token = jwtUtil.generateSystemToken(user);
-                LoginResponse loginResponse = LoginResponse.builder()
+                UserDetailDTO userDetail = userService.userDetail(user.getGuid());
+                return LoginResponse.builder()
                         .token(token)
-                        .guid(user.getGuid())
+                        .user(userDetail)
                         .build();
-
-                return ResponseFormat.createSuccessResponse(loginResponse, "Login success");
             }
 
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid password");
@@ -64,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    public ResponseFormat companyAccess(String companyGuid, String email) {
+    public LoginResponse companyAccess(String companyGuid, String email) {
         try {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
@@ -79,11 +80,9 @@ public class AuthServiceImpl implements AuthService {
             String companyRole = companyUser.get().getRole().getName();
             String token = jwtUtil.generateCompanyToken(user, companyGuid, companyRole);
 
-            LoginResponse loginResponse = LoginResponse.builder()
+            return LoginResponse.builder()
                     .token(token)
                     .build();
-
-            return ResponseFormat.createSuccessResponse(loginResponse, "Successfully switched to company");
         } catch (Exception e) {
             throw e;
         }

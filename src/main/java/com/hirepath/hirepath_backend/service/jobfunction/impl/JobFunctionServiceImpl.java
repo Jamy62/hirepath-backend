@@ -7,7 +7,6 @@ import com.hirepath.hirepath_backend.model.entity.jobfunction.JobFunction;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.jobfunction.JobFunctionCreateRequest;
 import com.hirepath.hirepath_backend.model.request.jobfunction.JobFunctionUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.jobfunction.JobFunctionRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.jobfunction.JobFunctionService;
@@ -31,7 +30,7 @@ public class JobFunctionServiceImpl implements JobFunctionService {
     private final UserRepository userRepository;
 
     @Override
-    public ResponseFormat jobFunctionCreate(JobFunctionCreateRequest request, String adminEmail) {
+    public void jobFunctionCreate(JobFunctionCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -46,20 +45,18 @@ public class JobFunctionServiceImpl implements JobFunctionService {
                     .build();
 
             jobFunctionRepository.save(jobFunction);
-
-            return ResponseFormat.createSuccessResponse(null, "Job function created successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat jobFunctionList(String searchName, String orderBy, int first, int max) {
+    public List<JobFunctionListDTO> jobFunctionList(String searchName, String orderBy, int first, int max) {
         try {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
                 List<JobFunctionListProjection> jobFunctionListProjections = jobFunctionRepository.findAllJobFunctionsAdminPanel(searchName, orderBy, first, max);
 
-                List<JobFunctionListDTO> jobFunctions = jobFunctionListProjections.stream()
+                return jobFunctionListProjections.stream()
                         .map(p -> JobFunctionListDTO.builder()
                                 .name(p.getName())
                                 .description(p.getDescription())
@@ -68,8 +65,6 @@ public class JobFunctionServiceImpl implements JobFunctionService {
                                 .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
-
-                return ResponseFormat.createSuccessResponse(jobFunctions, "Job function list retrieved successfully");
             }
 
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
@@ -79,7 +74,7 @@ public class JobFunctionServiceImpl implements JobFunctionService {
     }
 
     @Override
-    public ResponseFormat jobFunctionUpdate(String jobFunctionGuid, JobFunctionUpdateRequest request, String email) {
+    public void jobFunctionUpdate(String jobFunctionGuid, JobFunctionUpdateRequest request, String email) {
         try {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -98,15 +93,13 @@ public class JobFunctionServiceImpl implements JobFunctionService {
             jobFunction.setUpdatedBy(admin.getId());
 
             jobFunctionRepository.save(jobFunction);
-
-            return ResponseFormat.createSuccessResponse(null, "Job function updated successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat jobFunctionDelete(String jobFunctionGuid, String adminEmail) {
+    public void jobFunctionDelete(String jobFunctionGuid, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -119,8 +112,6 @@ public class JobFunctionServiceImpl implements JobFunctionService {
             jobFunction.setUpdatedBy(admin.getId());
 
             jobFunctionRepository.save(jobFunction);
-
-            return ResponseFormat.createSuccessResponse(null, "Job function deleted successfully");
         } catch (Exception e) {
             throw e;
         }

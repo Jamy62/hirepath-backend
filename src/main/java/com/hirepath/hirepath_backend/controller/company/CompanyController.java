@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.controller.company;
 
+import com.hirepath.hirepath_backend.model.dto.company.CompanyListDTO;
 import com.hirepath.hirepath_backend.model.request.company.CompanyRegisterRequest;
 import com.hirepath.hirepath_backend.model.request.company.CompanyUpdateRequest;
 import com.hirepath.hirepath_backend.model.request.company.CompanyVerifyRequest;
@@ -15,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,8 +27,8 @@ public class CompanyController {
     @PostMapping("/register")
     public ResponseEntity<ResponseFormat> companyRegister(@Valid @RequestBody CompanyRegisterRequest request,
                                                           Principal principal) {
-        ResponseFormat responseFormat = companyService.companyRegister(request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        companyService.companyRegister(request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Company registered successfully"));
     }
 
     @PutMapping("/verify/{companyGuid}")
@@ -36,8 +38,8 @@ public class CompanyController {
                                                         Principal principal,
                                                         Authentication authentication) {
         AuthenticationUtil.isPageMember(authentication.getDetails(), companyGuid);
-        ResponseFormat responseFormat = companyService.companyVerify(companyGuid, request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        companyService.companyVerify(companyGuid, request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Company verification pending"));
     }
 
     @PutMapping("/verify/response/admin/{companyGuid}")
@@ -45,8 +47,11 @@ public class CompanyController {
     public ResponseEntity<ResponseFormat> verifyResponse(@PathVariable String companyGuid,
                                                          @Valid @RequestBody CompanyVerifyResponseRequest request,
                                                          Principal principal) {
-        ResponseFormat responseFormat = companyService.verifyResponse(companyGuid, request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        companyService.verifyResponse(companyGuid, request, principal.getName());
+        if (request.isResponse()) {
+            return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Company verified successfully"));
+        }
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Company declined successfully"));
     }
 
     @GetMapping("/list/admin")
@@ -56,8 +61,8 @@ public class CompanyController {
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
             @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
-        ResponseFormat responseFormat = companyService.companyList(searchName, orderBy, first, max);
-        return ResponseEntity.ok(responseFormat);
+        List<CompanyListDTO> response = companyService.companyList(searchName, orderBy, first, max);
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Company list retrieved successfully"));
     }
 
     @GetMapping("/verify-list/admin")
@@ -67,8 +72,8 @@ public class CompanyController {
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
             @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
-        ResponseFormat responseFormat = companyService.companyVerifyList(searchName, orderBy, first, max);
-        return ResponseEntity.ok(responseFormat);
+        List<CompanyListDTO> response = companyService.companyVerifyList(searchName, orderBy, first, max);
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Company list retrieved successfully"));
     }
 
     @PutMapping("/update/admin/{companyGuid}")
@@ -77,8 +82,8 @@ public class CompanyController {
                                                         Principal principal,
                                                         Authentication authentication) {
         AuthenticationUtil.isPageMember(authentication.getDetails(), companyGuid);
-        ResponseFormat responseFormat = companyService.companyUpdate(companyGuid, request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        companyService.companyUpdate(companyGuid, request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Company updated successfully"));
     }
 
     @DeleteMapping("/delete/admin/{companyGuid}")
@@ -86,7 +91,7 @@ public class CompanyController {
     public ResponseEntity<ResponseFormat> companyDelete(
             @PathVariable(value = "companyGuid") String companyGuid,
             Principal principal) {
-        ResponseFormat responseFormat = companyService.companyDelete(companyGuid, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        companyService.companyDelete(companyGuid, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Company deleted successfully"));
     }
 }

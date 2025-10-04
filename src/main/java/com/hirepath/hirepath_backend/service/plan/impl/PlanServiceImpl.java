@@ -7,7 +7,6 @@ import com.hirepath.hirepath_backend.model.entity.plan.Plan;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.plan.PlanCreateRequest;
 import com.hirepath.hirepath_backend.model.request.plan.PlanUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.repository.plan.PlanRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.plan.PlanService;
@@ -31,7 +30,7 @@ public class PlanServiceImpl implements PlanService {
     private final UserRepository userRepository;
 
     @Override
-    public ResponseFormat planCreate(PlanCreateRequest request, String adminEmail) {
+    public void planCreate(PlanCreateRequest request, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -50,20 +49,18 @@ public class PlanServiceImpl implements PlanService {
                     .build();
 
             planRepository.save(plan);
-
-            return ResponseFormat.createSuccessResponse(null, "Plan created successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat planList(String searchName, String orderBy, int first, int max) {
+    public List<PlanListDTO> planList(String searchName, String orderBy, int first, int max) {
         try {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
                 List<PlanListProjection> planListProjection = planRepository.findAllPlansAdminPanel(searchName, orderBy, first, max);
 
-                List<PlanListDTO> plans = planListProjection.stream()
+                return planListProjection.stream()
                         .map(p -> PlanListDTO.builder()
                                 .name(p.getName())
                                 .description(p.getDescription())
@@ -76,8 +73,6 @@ public class PlanServiceImpl implements PlanService {
                                 .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
-
-                return ResponseFormat.createSuccessResponse(plans, "Plan list retrieved successfully");
             }
 
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Please enter either ASC or DESC for orderBy");
@@ -87,7 +82,7 @@ public class PlanServiceImpl implements PlanService {
     }
 
     @Override
-    public ResponseFormat planUpdate(String planGuid, PlanUpdateRequest request, String email) {
+    public void planUpdate(String planGuid, PlanUpdateRequest request, String email) {
         try {
             User admin = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -118,15 +113,13 @@ public class PlanServiceImpl implements PlanService {
             plan.setUpdatedBy(admin.getId());
 
             planRepository.save(plan);
-
-            return ResponseFormat.createSuccessResponse(null, "Plan updated successfully");
         } catch (Exception e) {
             throw e;
         }
     }
 
     @Override
-    public ResponseFormat planDelete(String planGuid, String adminEmail) {
+    public void planDelete(String planGuid, String adminEmail) {
         try {
             User admin = userRepository.findByEmail(adminEmail)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
@@ -139,8 +132,6 @@ public class PlanServiceImpl implements PlanService {
             plan.setUpdatedBy(admin.getId());
 
             planRepository.save(plan);
-
-            return ResponseFormat.createSuccessResponse(null, "Plan deleted successfully");
         } catch (Exception e) {
             throw e;
         }

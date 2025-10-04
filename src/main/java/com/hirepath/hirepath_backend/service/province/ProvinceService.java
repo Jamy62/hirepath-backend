@@ -1,16 +1,18 @@
 package com.hirepath.hirepath_backend.service.province;
 
+import com.hirepath.hirepath_backend.model.dto.province.ProvinceListDTO;
 import com.hirepath.hirepath_backend.model.request.province.ProvinceCreateRequest;
 import com.hirepath.hirepath_backend.model.request.province.ProvinceUpdateRequest;
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
+
+import java.util.List;
 
 public interface ProvinceService {
 
-    ResponseFormat provinceCreate(ProvinceCreateRequest request, String adminEmail);
+    void provinceCreate(ProvinceCreateRequest request, String adminEmail);
 
-    ResponseFormat provinceList(String searchName, String orderBy, int first, int max);
+    List<ProvinceListDTO> provinceList(String searchName, String orderBy, int first, int max);
 
-    ResponseFormat provinceUpdate(String provinceGuid, ProvinceUpdateRequest request, String email);
+    void provinceUpdate(String provinceGuid, ProvinceUpdateRequest request, String email);
 
-    ResponseFormat provinceDelete(String provinceGuid, String adminEmail);
+    void provinceDelete(String provinceGuid, String adminEmail);
 }

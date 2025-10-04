@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.controller.township;
 
+import com.hirepath.hirepath_backend.model.dto.township.TownshipListDTO;
 import com.hirepath.hirepath_backend.model.request.township.TownshipCreateRequest;
 import com.hirepath.hirepath_backend.model.request.township.TownshipUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
@@ -11,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,8 +24,8 @@ public class TownshipController {
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> createTownship(@Valid @RequestBody TownshipCreateRequest request, Principal principal) {
-        ResponseFormat responseFormat = townshipService.townshipCreate(request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        townshipService.townshipCreate(request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Township created successfully"));
     }
 
     @GetMapping("/list/admin")
@@ -33,15 +35,15 @@ public class TownshipController {
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
             @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
-        ResponseFormat responseFormat = townshipService.townshipList(searchName, orderBy, first, max);
-        return ResponseEntity.ok(responseFormat);
+        List<TownshipListDTO> response = townshipService.townshipList(searchName, orderBy, first, max);
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Township list retrieved successfully"));
     }
 
     @PutMapping("/update/admin/{townshipGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> updateTownship(@PathVariable String townshipGuid, @Valid @RequestBody TownshipUpdateRequest request, Principal principal) {
-        ResponseFormat responseFormat = townshipService.townshipUpdate(townshipGuid, request, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        townshipService.townshipUpdate(townshipGuid, request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Township updated successfully"));
     }
 
     @DeleteMapping("/delete/admin/{townshipGuid}")
@@ -49,7 +51,7 @@ public class TownshipController {
     public ResponseEntity<ResponseFormat> deleteTownship(
             @PathVariable(value = "townshipGuid") String townshipGuid,
             Principal principal) {
-        ResponseFormat responseFormat = townshipService.townshipDelete(townshipGuid, principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        townshipService.townshipDelete(townshipGuid, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Township deleted successfully"));
     }
 }

@@ -12,7 +12,11 @@ public class AuthenticationUtil {
         String authCompanyGuid = ((Map<String, String>) authDetail).get("companyGuid");
 
         if (authCompanyGuid == null || !authCompanyGuid.equals(companyGuid)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not belong to this page.");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User does not belong to this company.");
         }
+    }
+
+    public static String getGuid(Object authDetail) {
+        return ((Map<String, String>) authDetail).get("companyGuid");
     }
 }

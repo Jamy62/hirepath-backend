@@ -9,9 +9,9 @@ import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.township.TownshipCreateRequest;
 import com.hirepath.hirepath_backend.model.request.township.TownshipUpdateRequest;
 import com.hirepath.hirepath_backend.repository.township.TownshipRepository;
-import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.province.ProvinceService;
 import com.hirepath.hirepath_backend.service.township.TownshipService;
+import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,7 +29,7 @@ import java.util.UUID;
 public class TownshipServiceImpl implements TownshipService {
 
     private final TownshipRepository townshipRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
     private final ProvinceService provinceService;
 
     @Override
@@ -45,8 +45,7 @@ public class TownshipServiceImpl implements TownshipService {
     @Override
     public void townshipCreate(TownshipCreateRequest request, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             Province province = provinceService.findByGuid(request.getProvinceGuid());
 
@@ -91,8 +90,7 @@ public class TownshipServiceImpl implements TownshipService {
     @Override
     public void townshipUpdate(String townshipGuid, TownshipUpdateRequest request, String email) {
         try {
-            User admin = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(email);
 
             Township township = findByGuid(townshipGuid);
 
@@ -116,8 +114,7 @@ public class TownshipServiceImpl implements TownshipService {
     @Override
     public void townshipDelete(String townshipGuid, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             Township township = findByGuid(townshipGuid);
 

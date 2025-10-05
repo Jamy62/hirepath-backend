@@ -7,7 +7,6 @@ import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.companyuser.AssignCompanyRoleRequest;
 import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
 import com.hirepath.hirepath_backend.repository.role.RoleRepository;
-import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.company.CompanyService;
 import com.hirepath.hirepath_backend.service.companyuser.CompanyUserService;
 import com.hirepath.hirepath_backend.service.user.UserService;
@@ -26,7 +25,6 @@ import java.util.UUID;
 public class CompanyUserServiceImpl implements CompanyUserService {
     private final CompanyService companyService;
     private final UserService userService;
-    private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final CompanyUserRepository companyUserRepository;
 
@@ -46,8 +44,7 @@ public class CompanyUserServiceImpl implements CompanyUserService {
             User user = userService.findByGuid(request.getUserGuid());
             Role role = roleRepository.findByGuid(request.getRoleGuid())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
-            User assigner = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Assigner not found"));
+            User assigner = userService.findByEmail(email);
 
             if (user.getRole().getName().equals("COMPANY_ADMIN") && role.getName().equals("COMPANY_OWNER")) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot assign Company Owner as an Admin");

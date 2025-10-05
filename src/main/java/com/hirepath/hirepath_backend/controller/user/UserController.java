@@ -2,6 +2,7 @@ package com.hirepath.hirepath_backend.controller.user;
 
 import com.hirepath.hirepath_backend.model.dto.user.UserDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserListDTO;
+import com.hirepath.hirepath_backend.model.dto.user.UserProfileDTO;
 import com.hirepath.hirepath_backend.model.request.user.RegisterRequest;
 import com.hirepath.hirepath_backend.model.request.user.UserUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
@@ -34,15 +35,26 @@ public class UserController {
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "User registered successfully"));
     }
 
-    @GetMapping("/list/admin")
+    @GetMapping("/userList/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> userList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
             @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
-        List<UserListDTO> response = userService.userList(searchName, orderBy, first, max);
+        List<UserListDTO> response = userService.userList(searchName, orderBy, "USER" , first, max);
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "User list retrieved successfully"));
+    }
+
+    @GetMapping("/adminList/admin")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<ResponseFormat> adminList(
+            @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
+            @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
+            @RequestParam(value = "first", required = false, defaultValue = "0") int first,
+            @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
+        List<UserListDTO> response = userService.userList(searchName, orderBy, "ADMIN", first, max);
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Admin list retrieved successfully"));
     }
 
     @PutMapping("/update/admin/{userGuid}")
@@ -67,5 +79,13 @@ public class UserController {
             @PathVariable(value = "userGuid") String userGuid) {
         UserDetailDTO response = userService.userDetail(userGuid);
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Successfully retrieved user detail"));
+    }
+
+    @GetMapping("/profile")
+    @PreAuthorize("hasAnyRole('SYSTEM')")
+    public ResponseEntity<ResponseFormat> userProfile(
+            Principal principal) {
+        UserProfileDTO response = userService.userProfile(principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Successfully retrieved user profile"));
     }
 }

@@ -32,6 +32,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
             FROM users u
             JOIN roles r on u.role_id = r.id
             WHERE (LOWER(u.name) LIKE LOWER(CONCAT('%', COALESCE(:searchName, ''), '%')) OR :searchName IS NULL)
+            AND r.name = :role
             AND u.is_deleted = 0
             ORDER BY
             CASE WHEN :orderBy = 'ASC' THEN u.created_at END ASC,
@@ -41,6 +42,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
     List<UserListProjection> findAllUsersAdminPanal(
             @Param("searchName") String searchName,
             @Param("orderBy") String orderBy,
+            @Param("role") String role,
             @Param("first") int first,
             @Param("max") int max);
 }

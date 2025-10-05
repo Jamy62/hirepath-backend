@@ -4,6 +4,9 @@ import com.hirepath.hirepath_backend.model.entity.preferredindustry.PreferredInd
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface PreferredIndustryRepository extends CrudRepository<PreferredIndustry, Long> {
+    Optional<PreferredIndustry> findByGuid(String guid);
 }

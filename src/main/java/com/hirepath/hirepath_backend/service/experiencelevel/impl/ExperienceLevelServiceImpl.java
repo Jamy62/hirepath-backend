@@ -8,8 +8,8 @@ import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.experiencelevel.ExperienceLevelCreateRequest;
 import com.hirepath.hirepath_backend.model.request.experiencelevel.ExperienceLevelUpdateRequest;
 import com.hirepath.hirepath_backend.repository.experiencelevel.ExperienceLevelRepository;
-import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.experiencelevel.ExperienceLevelService;
+import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ import java.util.UUID;
 public class ExperienceLevelServiceImpl implements ExperienceLevelService {
 
     private final ExperienceLevelRepository experienceLevelRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public ExperienceLevel findByGuid(String guid) {
@@ -42,8 +42,7 @@ public class ExperienceLevelServiceImpl implements ExperienceLevelService {
     @Override
     public void experienceLevelCreate(ExperienceLevelCreateRequest request, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             ExperienceLevel experienceLevel = ExperienceLevel.builder()
                     .name(request.getName())
@@ -86,8 +85,7 @@ public class ExperienceLevelServiceImpl implements ExperienceLevelService {
     @Override
     public void experienceLevelUpdate(String experienceLevelGuid, ExperienceLevelUpdateRequest request, String email) {
         try {
-            User admin = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(email);
 
             ExperienceLevel experienceLevel = findByGuid(experienceLevelGuid);
 
@@ -110,8 +108,7 @@ public class ExperienceLevelServiceImpl implements ExperienceLevelService {
     @Override
     public void experienceLevelDelete(String experienceLevelGuid, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             ExperienceLevel experienceLevel = findByGuid(experienceLevelGuid);
 

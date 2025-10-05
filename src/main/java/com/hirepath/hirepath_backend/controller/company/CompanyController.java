@@ -1,6 +1,9 @@
 package com.hirepath.hirepath_backend.controller.company;
 
+import com.hirepath.hirepath_backend.model.dto.company.CompanyDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.company.CompanyListDTO;
+import com.hirepath.hirepath_backend.model.dto.company.CompanyProfileDTO;
+import com.hirepath.hirepath_backend.model.dto.user.UserDetailDTO;
 import com.hirepath.hirepath_backend.model.request.company.CompanyRegisterRequest;
 import com.hirepath.hirepath_backend.model.request.company.CompanyUpdateRequest;
 import com.hirepath.hirepath_backend.model.request.company.CompanyVerifyRequest;
@@ -31,7 +34,7 @@ public class CompanyController {
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Company registered successfully"));
     }
 
-    @PutMapping("/verify/{companyGuid}")
+    @PutMapping("/verify/request/{companyGuid}")
     @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
     public ResponseEntity<ResponseFormat> companyVerify(@PathVariable String companyGuid,
                                                         @Valid @RequestBody CompanyVerifyRequest request,
@@ -93,5 +96,20 @@ public class CompanyController {
             Principal principal) {
         companyService.companyDelete(companyGuid, principal.getName());
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Company deleted successfully"));
+    }
+
+    @GetMapping("/detail/{companyGuid}")
+    public ResponseEntity<ResponseFormat> companyDetail(
+            @PathVariable(value = "companyGuid") String companyGuid) {
+        CompanyDetailDTO response = companyService.companyDetail(companyGuid);
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Successfully retrieved company detail"));
+    }
+
+    @GetMapping("/profile")
+    @PreAuthorize("hasAnyRole('COMPANY')")
+    public ResponseEntity<ResponseFormat> companyProfile(
+            Authentication authentication) {
+        CompanyProfileDTO response = companyService.companyProfile(AuthenticationUtil.getGuid(authentication.getDetails()));
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Successfully retrieved company profile"));
     }
 }

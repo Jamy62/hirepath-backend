@@ -4,6 +4,9 @@ import com.hirepath.hirepath_backend.model.entity.resume.Resume;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface ResumeRepository extends CrudRepository<Resume, Long> {
+    Optional<Resume> findByGuid(String guid);
 }

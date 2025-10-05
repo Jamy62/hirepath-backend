@@ -4,12 +4,14 @@ import com.hirepath.hirepath_backend.constant.VariableConstant;
 import com.hirepath.hirepath_backend.model.dto.user.UserDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserListDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserListProjection;
+import com.hirepath.hirepath_backend.model.dto.user.UserProfileDTO;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.user.RegisterRequest;
 import com.hirepath.hirepath_backend.model.request.user.UserUpdateRequest;
 import com.hirepath.hirepath_backend.repository.role.RoleRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
+import com.hirepath.hirepath_backend.service.role.RoleService;
 import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.Principal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -31,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
     public User findByGuid(String guid) {
         try {
@@ -49,6 +53,16 @@ public class UserServiceImpl implements UserService {
             throw e;
         }
     }
+
+//    public void isOwner(User user, String email) {
+//        try {
+//            if (!user.equals(findByEmail(email))) {
+//                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this account");
+//            }
+//        } catch (Exception e) {
+//            throw e;
+//        }
+//    }
 
     public String register(RegisterRequest request, String userType) {
         try {
@@ -80,14 +94,14 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public List<UserListDTO> userList(String searchName, String orderBy, int first, int max) {
+    public List<UserListDTO> userList(String searchName, String orderBy, String role, int first, int max) {
         try {
             if (searchName.isBlank()) {
                 searchName = null;
             }
 
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
-                List<UserListProjection> userListProjection = userRepository.findAllUsersAdminPanal(searchName, orderBy, first, max);
+                List<UserListProjection> userListProjection = userRepository.findAllUsersAdminPanal(searchName, orderBy, role, first, max);
 
                 return userListProjection.stream()
                         .map(p -> UserListDTO.builder()
@@ -117,10 +131,8 @@ public class UserServiceImpl implements UserService {
     public String userUpdate(String userGuid, UserUpdateRequest request, String email) {
         try {
             log.info("User update initiate");
-            User user = userRepository.findByGuid(userGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User to update not found"));
-            User updatedBy = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin user not found"));
+            User user = findByGuid(userGuid);
+            User updatedBy = findByEmail(email);
 
             if (request.getName() != null && !request.getName().isBlank()) {
                 user.setName(request.getName());
@@ -135,8 +147,7 @@ public class UserServiceImpl implements UserService {
                 user.setMobile(request.getMobile());
             }
             if (request.getRoleGuid() != null && !request.getRoleGuid().isBlank()) {
-                Role role = roleRepository.findByGuid(request.getRoleGuid())
-                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
+                Role role = roleService.findByGuid(request.getRoleGuid());
                 user.setRole(role);
             }
             if (request.getIsActive() instanceof Boolean) {
@@ -160,10 +171,8 @@ public class UserServiceImpl implements UserService {
 
     public String userDelete(String guid, String email) {
         try {
-            User user = userRepository.findByGuid(guid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User to update not found"));
-            User deletedBy = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Admin user not found"));
+            User user = findByGuid(guid);
+            User deletedBy = findByEmail(email);
 
             user.setIsDeleted(true);
             user.setUpdatedAt(ZonedDateTime.now());
@@ -182,6 +191,29 @@ public class UserServiceImpl implements UserService {
             User user = findByGuid(userGuid);
 
             return UserDetailDTO.builder()
+                    .name(user.getName())
+                    .fullName(user.getFullName())
+                    .email(user.getEmail())
+                    .mobile(user.getMobile())
+                    .profile(user.getProfile())
+                    .role(user.getRole())
+                    .isActive(user.getIsActive())
+                    .isBlocked(user.getIsBlocked())
+                    .guid(user.getGuid())
+                    .createdAt(user.getCreatedAt() != null ? user.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                    .lastLoginAt(user.getLastLoginAt() != null ? user.getLastLoginAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                    .build();
+        }
+        catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public UserProfileDTO userProfile(String email) {
+        try {
+            User user = findByEmail(email);
+
+            return UserProfileDTO.builder()
                     .name(user.getName())
                     .fullName(user.getFullName())
                     .email(user.getEmail())

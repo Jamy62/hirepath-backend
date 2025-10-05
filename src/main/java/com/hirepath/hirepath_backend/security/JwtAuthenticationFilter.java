@@ -54,8 +54,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         String systemRole = jwtUtil.extractSystemRole(jwt);
                         if (systemRole != null) {
                             authorities.add(new SimpleGrantedAuthority("ROLE_" + systemRole));
-                            if ("ADMIN".equals(systemRole)) {
-                                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                            if (List.of("ADMIN", "USER").contains(systemRole)) {
+                                authorities.add(new SimpleGrantedAuthority("ROLE_SYSTEM"));
                             }
                         }
                         auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
@@ -65,6 +65,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         String companyGuid = jwtUtil.extractCompanyGuid(jwt);
                         if (companyRole != null) {
                             authorities.add(new SimpleGrantedAuthority("ROLE_" + companyRole));
+                            if (List.of("COMPANY_OWNER", "COMPANY_ADMIN", "COMPANY_EMPLOYEE").contains(companyRole)) {
+                                authorities.add(new SimpleGrantedAuthority("ROLE_COMPANY"));
+                            }
                         }
                         auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
                         if (companyGuid != null) {

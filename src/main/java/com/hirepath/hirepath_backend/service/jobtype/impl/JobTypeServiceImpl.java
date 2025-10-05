@@ -8,8 +8,8 @@ import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.jobtype.JobTypeCreateRequest;
 import com.hirepath.hirepath_backend.model.request.jobtype.JobTypeUpdateRequest;
 import com.hirepath.hirepath_backend.repository.jobtype.JobTypeRepository;
-import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.jobtype.JobTypeService;
+import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ import java.util.UUID;
 public class JobTypeServiceImpl implements JobTypeService {
 
     private final JobTypeRepository jobTypeRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public JobType findByGuid(String guid) {
@@ -42,8 +42,7 @@ public class JobTypeServiceImpl implements JobTypeService {
     @Override
     public void jobTypeCreate(JobTypeCreateRequest request, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             JobType jobType = JobType.builder()
                     .name(request.getName())
@@ -86,8 +85,7 @@ public class JobTypeServiceImpl implements JobTypeService {
     @Override
     public void jobTypeUpdate(String jobTypeGuid, JobTypeUpdateRequest request, String email) {
         try {
-            User admin = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(email);
 
             JobType jobType = findByGuid(jobTypeGuid);
 
@@ -110,8 +108,7 @@ public class JobTypeServiceImpl implements JobTypeService {
     @Override
     public void jobTypeDelete(String jobTypeGuid, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             JobType jobType = findByGuid(jobTypeGuid);
 

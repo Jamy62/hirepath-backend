@@ -1,8 +1,10 @@
 package com.hirepath.hirepath_backend.service.company.impl;
 
 import com.hirepath.hirepath_backend.constant.VariableConstant;
+import com.hirepath.hirepath_backend.model.dto.company.CompanyDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.company.CompanyListDTO;
 import com.hirepath.hirepath_backend.model.dto.company.CompanyListProjection;
+import com.hirepath.hirepath_backend.model.dto.company.CompanyProfileDTO;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
@@ -14,8 +16,8 @@ import com.hirepath.hirepath_backend.model.request.company.CompanyVerifyResponse
 import com.hirepath.hirepath_backend.repository.company.CompanyRepository;
 import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
 import com.hirepath.hirepath_backend.repository.role.RoleRepository;
-import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.company.CompanyService;
+import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -34,8 +36,8 @@ public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
     private final CompanyUserRepository companyUserRepository;
-    private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final UserService userService;
 
     @Override
     public Company findByGuid(String guid) {
@@ -49,8 +51,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     public void companyRegister(CompanyRegisterRequest request, String email) {
         try {
-            User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User user = userService.findByEmail(email);
             Role role = roleRepository.findByName("COMPANY_OWNER")
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
 
@@ -85,8 +86,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     public void companyVerify(String companyGuid, CompanyVerifyRequest request, String email) {
         try {
-            Company company = companyRepository.findByGuid(companyGuid)
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Company not found"));
+            Company company = findByGuid(companyGuid);
 
             company.setVerificationStatus(Company.VerificationStatus.PENDING);
             company.setLegalBusinessName(request.getLegalBusinessName());
@@ -106,11 +106,9 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public void verifyResponse(String companyGuid, CompanyVerifyResponseRequest request, String email) {
         try {
-            User admin = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(email);
 
-            Company company = companyRepository.findByGuid(companyGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
+            Company company = findByGuid(companyGuid);
 
             if (request.isResponse()) {
                 company.setVerificationStatus(Company.VerificationStatus.TRUE);
@@ -182,11 +180,8 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public void companyUpdate(String companyGuid, CompanyUpdateRequest request, String email) {
         try {
-            User admin = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
-
-            Company company = companyRepository.findByGuid(companyGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
+            User admin = userService.findByEmail(email);
+            Company company = findByGuid(companyGuid);
 
             if (request.getName() != null && !request.getName().isBlank()) {
                 company.setName(request.getName());
@@ -236,17 +231,70 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public void companyDelete(String companyGuid, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
-
-            Company company = companyRepository.findByGuid(companyGuid)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Company not found"));
+            User admin = userService.findByEmail(adminEmail);
+            Company company = findByGuid(companyGuid);
 
             company.setIsDeleted(true);
             company.setUpdatedAt(ZonedDateTime.now());
             company.setUpdatedBy(admin.getId());
 
             companyRepository.save(company);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public CompanyDetailDTO companyDetail(String companyGuid) {
+        try {
+            Company company = findByGuid(companyGuid);
+
+            return CompanyDetailDTO.builder()
+                    .name(company.getName())
+                    .logo(company.getLogo())
+                    .email(company.getEmail())
+                    .phone(company.getPhone())
+                    .guid(company.getGuid())
+                    .createdAt(company.getCreatedAt() != null ? company.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                    .verificationStatus(company.getVerificationStatus())
+                    .legalBusinessName(company.getLegalBusinessName())
+                    .publicName(company.getPublicName())
+                    .website(company.getWebsite())
+                    .industry(company.getIndustry())
+                    .foundedDate(company.getFoundedDate())
+                    .companySize(company.getCompanySize())
+                    .businessType(company.getBusinessType())
+                    .verified_at(company.getVerified_at())
+                    .verifiedBy(company.getVerifiedBy())
+                    .build();
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public CompanyProfileDTO companyProfile(String companyGuid) {
+        try {
+            Company company = findByGuid(companyGuid);
+
+            return CompanyProfileDTO.builder()
+                    .name(company.getName())
+                    .logo(company.getLogo())
+                    .email(company.getEmail())
+                    .phone(company.getPhone())
+                    .guid(company.getGuid())
+                    .createdAt(company.getCreatedAt() != null ? company.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                    .verificationStatus(company.getVerificationStatus())
+                    .legalBusinessName(company.getLegalBusinessName())
+                    .publicName(company.getPublicName())
+                    .website(company.getWebsite())
+                    .industry(company.getIndustry())
+                    .foundedDate(company.getFoundedDate())
+                    .companySize(company.getCompanySize())
+                    .businessType(company.getBusinessType())
+                    .verified_at(company.getVerified_at())
+                    .verifiedBy(company.getVerifiedBy())
+                    .build();
         } catch (Exception e) {
             throw e;
         }

@@ -8,8 +8,8 @@ import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodCreateRequest;
 import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodUpdateRequest;
 import com.hirepath.hirepath_backend.repository.paymentmethod.PaymentMethodRepository;
-import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.paymentmethod.PaymentMethodService;
+import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ import java.util.UUID;
 public class PaymentMethodServiceImpl implements PaymentMethodService {
 
     private final PaymentMethodRepository paymentMethodRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public PaymentMethod findByGuid(String guid) {
@@ -42,8 +42,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     @Override
     public void paymentMethodCreate(PaymentMethodCreateRequest request, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             PaymentMethod paymentMethod = PaymentMethod.builder()
                     .name(request.getName())
@@ -86,8 +85,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     @Override
     public void paymentMethodUpdate(String paymentMethodGuid, PaymentMethodUpdateRequest request, String email) {
         try {
-            User admin = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(email);
 
             PaymentMethod paymentMethod = findByGuid(paymentMethodGuid);
 
@@ -110,8 +108,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     @Override
     public void paymentMethodDelete(String paymentMethodGuid, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             PaymentMethod paymentMethod = findByGuid(paymentMethodGuid);
 

@@ -8,8 +8,8 @@ import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.plan.PlanCreateRequest;
 import com.hirepath.hirepath_backend.model.request.plan.PlanUpdateRequest;
 import com.hirepath.hirepath_backend.repository.plan.PlanRepository;
-import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.plan.PlanService;
+import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ import java.util.UUID;
 public class PlanServiceImpl implements PlanService {
 
     private final PlanRepository planRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public Plan findByGuid(String guid) {
@@ -42,8 +42,7 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public void planCreate(PlanCreateRequest request, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             Plan plan = Plan.builder()
                     .name(request.getName())
@@ -94,8 +93,7 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public void planUpdate(String planGuid, PlanUpdateRequest request, String email) {
         try {
-            User admin = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(email);
 
             Plan plan = findByGuid(planGuid);
 
@@ -130,8 +128,7 @@ public class PlanServiceImpl implements PlanService {
     @Override
     public void planDelete(String planGuid, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             Plan plan = findByGuid(planGuid);
 

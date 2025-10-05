@@ -8,8 +8,8 @@ import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.jobfunction.JobFunctionCreateRequest;
 import com.hirepath.hirepath_backend.model.request.jobfunction.JobFunctionUpdateRequest;
 import com.hirepath.hirepath_backend.repository.jobfunction.JobFunctionRepository;
-import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.jobfunction.JobFunctionService;
+import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ import java.util.UUID;
 public class JobFunctionServiceImpl implements JobFunctionService {
 
     private final JobFunctionRepository jobFunctionRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public JobFunction findByGuid(String guid) {
@@ -42,8 +42,7 @@ public class JobFunctionServiceImpl implements JobFunctionService {
     @Override
     public void jobFunctionCreate(JobFunctionCreateRequest request, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             JobFunction jobFunction = JobFunction.builder()
                     .name(request.getName())
@@ -86,8 +85,7 @@ public class JobFunctionServiceImpl implements JobFunctionService {
     @Override
     public void jobFunctionUpdate(String jobFunctionGuid, JobFunctionUpdateRequest request, String email) {
         try {
-            User admin = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(email);
 
             JobFunction jobFunction = findByGuid(jobFunctionGuid);
 
@@ -110,8 +108,7 @@ public class JobFunctionServiceImpl implements JobFunctionService {
     @Override
     public void jobFunctionDelete(String jobFunctionGuid, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             JobFunction jobFunction = findByGuid(jobFunctionGuid);
 

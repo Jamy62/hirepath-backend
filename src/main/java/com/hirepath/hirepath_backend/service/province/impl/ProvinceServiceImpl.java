@@ -8,8 +8,8 @@ import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.province.ProvinceCreateRequest;
 import com.hirepath.hirepath_backend.model.request.province.ProvinceUpdateRequest;
 import com.hirepath.hirepath_backend.repository.province.ProvinceRepository;
-import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.province.ProvinceService;
+import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ import java.util.UUID;
 public class ProvinceServiceImpl implements ProvinceService {
 
     private final ProvinceRepository provinceRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public Province findByGuid(String guid) {
@@ -42,8 +42,7 @@ public class ProvinceServiceImpl implements ProvinceService {
     @Override
     public void provinceCreate(ProvinceCreateRequest request, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             Province province = Province.builder()
                     .name(request.getName())
@@ -84,8 +83,7 @@ public class ProvinceServiceImpl implements ProvinceService {
     @Override
     public void provinceUpdate(String provinceGuid, ProvinceUpdateRequest request, String email) {
         try {
-            User admin = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(email);
 
             Province province = findByGuid(provinceGuid);
 
@@ -105,8 +103,7 @@ public class ProvinceServiceImpl implements ProvinceService {
     @Override
     public void provinceDelete(String provinceGuid, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             Province province = findByGuid(provinceGuid);
 

@@ -8,8 +8,8 @@ import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.industry.IndustryCreateRequest;
 import com.hirepath.hirepath_backend.model.request.industry.IndustryUpdateRequest;
 import com.hirepath.hirepath_backend.repository.industry.IndustryRepository;
-import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.industry.IndustryService;
+import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,7 +27,7 @@ import java.util.UUID;
 public class IndustryServiceImpl implements IndustryService {
 
     private final IndustryRepository industryRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public Industry findByGuid(String guid) {
@@ -42,8 +42,7 @@ public class IndustryServiceImpl implements IndustryService {
     @Override
     public void industryCreate(IndustryCreateRequest request, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             Industry industry = Industry.builder()
                     .name(request.getName())
@@ -86,8 +85,7 @@ public class IndustryServiceImpl implements IndustryService {
     @Override
     public void industryUpdate(String industryGuid, IndustryUpdateRequest request, String email) {
         try {
-            User admin = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(email);
 
             Industry industry = findByGuid(industryGuid);
 
@@ -110,8 +108,7 @@ public class IndustryServiceImpl implements IndustryService {
     @Override
     public void industryDelete(String industryGuid, String adminEmail) {
         try {
-            User admin = userRepository.findByEmail(adminEmail)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Admin user not found"));
+            User admin = userService.findByEmail(adminEmail);
 
             Industry industry = findByGuid(industryGuid);
 

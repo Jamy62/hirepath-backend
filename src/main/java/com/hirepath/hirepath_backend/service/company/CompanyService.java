@@ -1,6 +1,8 @@
 package com.hirepath.hirepath_backend.service.company;
 
+import com.hirepath.hirepath_backend.model.dto.company.CompanyDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.company.CompanyListDTO;
+import com.hirepath.hirepath_backend.model.dto.company.CompanyProfileDTO;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.request.company.CompanyRegisterRequest;
 import com.hirepath.hirepath_backend.model.request.company.CompanyUpdateRequest;
@@ -26,4 +28,8 @@ public interface CompanyService {
     void companyUpdate(String companyGuid, CompanyUpdateRequest request, String adminEmail);
 
     void companyDelete(String companyGuid, String adminEmail);
+
+    CompanyDetailDTO companyDetail(String companyGuid);
+
+    CompanyProfileDTO companyProfile(String companyGuid);
 }

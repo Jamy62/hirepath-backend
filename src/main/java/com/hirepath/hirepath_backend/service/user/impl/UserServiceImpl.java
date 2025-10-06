@@ -5,10 +5,12 @@ import com.hirepath.hirepath_backend.model.dto.user.UserDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserListDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserListProjection;
 import com.hirepath.hirepath_backend.model.dto.user.UserProfileDTO;
+import com.hirepath.hirepath_backend.model.entity.preferredlanguage.PreferredLanguage;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.user.RegisterRequest;
 import com.hirepath.hirepath_backend.model.request.user.UserUpdateRequest;
+import com.hirepath.hirepath_backend.repository.preferredlanguage.PreferredLanguageRepository;
 import com.hirepath.hirepath_backend.repository.role.RoleRepository;
 import com.hirepath.hirepath_backend.repository.user.UserRepository;
 import com.hirepath.hirepath_backend.service.role.RoleService;
@@ -20,7 +22,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.security.Principal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
+    private final PreferredLanguageRepository preferredLanguageRepository;
 
     public User findByGuid(String guid) {
         try {
@@ -54,16 +56,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-//    public void isOwner(User user, String email) {
-//        try {
-//            if (!user.equals(findByEmail(email))) {
-//                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this account");
-//            }
-//        } catch (Exception e) {
-//            throw e;
-//        }
-//    }
-
     public String register(RegisterRequest request, String userType) {
         try {
             Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
@@ -73,11 +65,16 @@ public class UserServiceImpl implements UserService {
 
             Role role = roleRepository.findByName(userType.equals("admin") ? VariableConstant.ADMIN : VariableConstant.USER)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role not found"));
+            PreferredLanguage preferredLanguage = preferredLanguageRepository.findByName("English")
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Preferred language not found"));
             User user = User.builder()
                     .role(role)
                     .email(request.getEmail())
                     .password(passwordEncoder.encode(request.getPassword()))
                     .name(request.getName())
+                    .fullName(request.getFullName())
+                    .mobile(request.getMobile())
+                    .preferredLanguage(preferredLanguage)
                     .isActive(true)
                     .isDeleted(false)
                     .isBlocked(false)

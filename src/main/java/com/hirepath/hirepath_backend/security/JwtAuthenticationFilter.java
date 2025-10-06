@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -54,8 +55,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         String systemRole = jwtUtil.extractSystemRole(jwt);
                         if (systemRole != null) {
                             authorities.add(new SimpleGrantedAuthority("ROLE_" + systemRole));
-                            if (List.of("ADMIN", "USER").contains(systemRole)) {
-                                authorities.add(new SimpleGrantedAuthority("ROLE_SYSTEM"));
+                            if (Objects.equals("ADMIN", systemRole)) {
+                                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
                             }
                         }
                         auth = new UsernamePasswordAuthenticationToken(email, null, authorities);

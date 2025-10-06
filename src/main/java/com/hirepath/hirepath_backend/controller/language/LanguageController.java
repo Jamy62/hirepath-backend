@@ -28,8 +28,8 @@ public class LanguageController {
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Language created successfully"));
     }
 
-    @GetMapping("/list/admin")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/list")
+    @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<ResponseFormat> languageList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,

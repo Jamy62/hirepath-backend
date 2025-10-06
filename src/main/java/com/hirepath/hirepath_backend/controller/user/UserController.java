@@ -35,7 +35,7 @@ public class UserController {
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "User registered successfully"));
     }
 
-    @GetMapping("/userList/admin")
+    @GetMapping("/user-list/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> userList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
@@ -46,7 +46,7 @@ public class UserController {
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "User list retrieved successfully"));
     }
 
-    @GetMapping("/adminList/admin")
+    @GetMapping("/admin-list/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<ResponseFormat> adminList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,

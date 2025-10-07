@@ -7,6 +7,6 @@ import lombok.Data;
 @AutoNotBlank
 public class PaymentMethodCreateRequest {
     private String paymentTypeGuid;
-    private String cardCode;
-    private String cvvNumber;
+    private String code;
+    private String cvv;
 }

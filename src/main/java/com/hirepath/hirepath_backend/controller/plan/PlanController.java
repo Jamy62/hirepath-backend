@@ -28,8 +28,7 @@ public class PlanController {
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Plan created successfully"));
     }
 
-    @GetMapping("/list/admin")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/list")
     public ResponseEntity<ResponseFormat> planList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,

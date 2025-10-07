@@ -5,10 +5,13 @@ import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodCr
 import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodUpdateRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.paymentmethod.PaymentMethodService;
+import com.hirepath.hirepath_backend.util.AuthenticationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.parser.Authorization;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -23,26 +26,22 @@ public class PaymentMethodController {
 
     @PostMapping("/create")
     @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
-    public ResponseEntity<ResponseFormat> paymentMethodCreate(@Valid @RequestBody PaymentMethodCreateRequest request, Principal principal) {
-        paymentMethodService.paymentMethodCreate(request, principal.getName());
+    public ResponseEntity<ResponseFormat> paymentMethodCreate(@Valid @RequestBody PaymentMethodCreateRequest request, Authentication authentication) {
+        paymentMethodService.paymentMethodCreate(request, AuthenticationUtil.getGuid(authentication.getDetails()));
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Payment method created successfully"));
     }
 
     @GetMapping("/list")
     @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
-    public ResponseEntity<ResponseFormat> paymentMethodList(
-            @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
-            @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
-            @RequestParam(value = "first", required = false, defaultValue = "0") int first,
-            @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
-        List<PaymentMethodListDTO> response = paymentMethodService.paymentMethodList(searchName, orderBy, first, max);
+    public ResponseEntity<ResponseFormat> paymentMethodList(Authentication authentication) {
+        List<PaymentMethodListDTO> response = paymentMethodService.paymentMethodList(AuthenticationUtil.getGuid(authentication.getDetails()));
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Payment method list retrieved successfully"));
     }
 
     @PutMapping("/update/{paymentMethodGuid}")
     @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
-    public ResponseEntity<ResponseFormat> paymentMethodUpdate(@PathVariable String paymentMethodGuid, @Valid @RequestBody PaymentMethodUpdateRequest request, Principal principal) {
-        paymentMethodService.paymentMethodUpdate(paymentMethodGuid, request, principal.getName());
+    public ResponseEntity<ResponseFormat> paymentMethodUpdate(@PathVariable String paymentMethodGuid, @Valid @RequestBody PaymentMethodUpdateRequest request, Authentication authentication) {
+        paymentMethodService.paymentMethodUpdate(paymentMethodGuid, request, AuthenticationUtil.getGuid(authentication.getDetails()));
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Payment method updated successfully"));
     }
 
@@ -50,8 +49,8 @@ public class PaymentMethodController {
     @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
     public ResponseEntity<ResponseFormat> paymentMethodDelete(
             @PathVariable(value = "paymentMethodGuid") String paymentMethodGuid,
-            Principal principal) {
-        paymentMethodService.paymentMethodDelete(paymentMethodGuid, principal.getName());
+            Authentication authentication) {
+        paymentMethodService.paymentMethodDelete(paymentMethodGuid, AuthenticationUtil.getGuid(authentication.getName()));
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Payment method deleted successfully"));
     }
 }

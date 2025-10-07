@@ -1,6 +1,7 @@
 package com.hirepath.hirepath_backend.model.entity.paymentmethod;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.entity.paymenttype.PaymentType;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import jakarta.persistence.*;
@@ -24,18 +25,18 @@ public class PaymentMethod {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "company_id")
+    private Company company;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_type_id")
     private PaymentType paymentType;
 
-    @Column(name = "card_code")
-    private String cardCode;
+    @Column(name = "code")
+    private String code;
 
-    @Column(name = "cvv_number")
-    private String cvvNumber;
+    @Column(name = "cvv")
+    private String cvv;
 
     @Column(name = "guid")
     private String guid;

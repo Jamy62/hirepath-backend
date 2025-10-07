@@ -23,16 +23,8 @@ public interface PaymentMethodRepository extends CrudRepository<PaymentMethod, L
                 pm.updated_at AS updatedAt
             FROM payment_methods pm
             JOIN payment_types pt ON pm.payment_type_id = pt.id
-            WHERE (LOWER(pm.card_code) LIKE LOWER(CONCAT('%', COALESCE(:searchName, ''), '%')) OR :searchName IS NULL)
             AND pm.is_deleted = 0
-            ORDER BY
-            CASE WHEN :orderBy = 'ASC' THEN pm.created_at END ASC,
-            CASE WHEN :orderBy = 'DESC' THEN pm.created_at END DESC
-            LIMIT :max OFFSET :first
+            AND pm.company_id = companyId
             """, nativeQuery = true)
-    List<PaymentMethodListProjection> findAllPaymentMethodsAdminPanel(
-            @Param("searchName") String searchName,
-            @Param("orderBy") String orderBy,
-            @Param("first") int first,
-            @Param("max") int max);
+    List<PaymentMethodListProjection> findAllPaymentMethodsAdminPanel(@Param("companyId") Long companyId);
 }

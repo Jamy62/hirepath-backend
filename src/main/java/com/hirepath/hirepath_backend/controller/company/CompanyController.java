@@ -3,7 +3,6 @@ package com.hirepath.hirepath_backend.controller.company;
 import com.hirepath.hirepath_backend.model.dto.company.CompanyDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.company.CompanyListDTO;
 import com.hirepath.hirepath_backend.model.dto.company.CompanyProfileDTO;
-import com.hirepath.hirepath_backend.model.dto.user.UserDetailDTO;
 import com.hirepath.hirepath_backend.model.request.company.CompanyRegisterRequest;
 import com.hirepath.hirepath_backend.model.request.company.CompanyUpdateRequest;
 import com.hirepath.hirepath_backend.model.request.company.CompanyVerifyRequest;

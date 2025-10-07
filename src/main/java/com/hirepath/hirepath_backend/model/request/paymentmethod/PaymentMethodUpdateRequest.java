@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class PaymentMethodUpdateRequest {
-    private String name;
-    private String description;
+    private String paymentTypeGuid;
+    private String cardCode;
+    private String cvvNumber;
 }

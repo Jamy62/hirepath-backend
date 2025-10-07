@@ -1,41 +1,31 @@
-package com.hirepath.hirepath_backend.model.entity.paymentmethod;
+package com.hirepath.hirepath_backend.model.entity.paymenttype;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.hirepath.hirepath_backend.model.entity.paymenttype.PaymentType;
-import com.hirepath.hirepath_backend.model.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "payment_methods")
+@Table(name = "payment_types")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class PaymentMethod {
+public class PaymentType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "name")
+    private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_type_id")
-    private PaymentType paymentType;
-
-    @Column(name = "card_code")
-    private String cardCode;
-
-    @Column(name = "cvv_number")
-    private String cvvNumber;
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
 
     @Column(name = "guid")
     private String guid;

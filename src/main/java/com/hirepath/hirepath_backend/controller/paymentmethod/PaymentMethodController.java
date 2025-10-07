@@ -21,15 +21,15 @@ public class PaymentMethodController {
 
     private final PaymentMethodService paymentMethodService;
 
-    @PostMapping("/create/admin")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PostMapping("/create")
+    @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
     public ResponseEntity<ResponseFormat> paymentMethodCreate(@Valid @RequestBody PaymentMethodCreateRequest request, Principal principal) {
         paymentMethodService.paymentMethodCreate(request, principal.getName());
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Payment method created successfully"));
     }
 
-    @GetMapping("/list/admin")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/list")
+    @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
     public ResponseEntity<ResponseFormat> paymentMethodList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
@@ -39,15 +39,15 @@ public class PaymentMethodController {
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Payment method list retrieved successfully"));
     }
 
-    @PutMapping("/update/admin/{paymentMethodGuid}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PutMapping("/update/{paymentMethodGuid}")
+    @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
     public ResponseEntity<ResponseFormat> paymentMethodUpdate(@PathVariable String paymentMethodGuid, @Valid @RequestBody PaymentMethodUpdateRequest request, Principal principal) {
         paymentMethodService.paymentMethodUpdate(paymentMethodGuid, request, principal.getName());
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Payment method updated successfully"));
     }
 
     @DeleteMapping("/delete/admin/{paymentMethodGuid}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
     public ResponseEntity<ResponseFormat> paymentMethodDelete(
             @PathVariable(value = "paymentMethodGuid") String paymentMethodGuid,
             Principal principal) {

@@ -1,10 +1,16 @@
 package com.hirepath.hirepath_backend.model.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hirepath.hirepath_backend.model.dto.education.EducationListDTO;
+import com.hirepath.hirepath_backend.model.dto.preferredindustry.PreferredIndustryListDTO;
+import com.hirepath.hirepath_backend.model.dto.skill.SkillListDTO;
+import com.hirepath.hirepath_backend.model.dto.userlanguage.UserLanguageListDTO;
+import com.hirepath.hirepath_backend.model.dto.workexperience.WorkExperienceListDTO;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import lombok.*;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,4 +30,10 @@ public class UserDetailDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
     private ZonedDateTime createdAt;
     private ZonedDateTime lastLoginAt;
+
+    private List<EducationListDTO> educations;
+    private List<SkillListDTO> skills;
+    private List<WorkExperienceListDTO> workExperiences;
+    private List<PreferredIndustryListDTO> preferredIndustries;
+    private List<UserLanguageListDTO> userLanguages;
 }

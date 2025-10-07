@@ -16,14 +16,14 @@ public interface PaymentMethodRepository extends CrudRepository<PaymentMethod, L
 
     @Query(value = """
             SELECT
-                pm.name AS name,
-                pm.description AS description,
                 pm.guid AS guid,
-                pm.is_deleted AS isDeleted,
+                pm.card_code AS cardCode,
+                pt.name AS paymentTypeName,
                 pm.created_at AS createdAt,
                 pm.updated_at AS updatedAt
             FROM payment_methods pm
-            WHERE (LOWER(pm.name) LIKE LOWER(CONCAT('%', COALESCE(:searchName, ''), '%')) OR :searchName IS NULL)
+            JOIN payment_types pt ON pm.payment_type_id = pt.id
+            WHERE (LOWER(pm.card_code) LIKE LOWER(CONCAT('%', COALESCE(:searchName, ''), '%')) OR :searchName IS NULL)
             AND pm.is_deleted = 0
             ORDER BY
             CASE WHEN :orderBy = 'ASC' THEN pm.created_at END ASC,

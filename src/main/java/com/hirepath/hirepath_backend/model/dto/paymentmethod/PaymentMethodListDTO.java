@@ -8,9 +8,9 @@ import java.time.ZonedDateTime;
 @Data
 @Builder
 public class PaymentMethodListDTO {
-    private String name;
-    private String description;
     private String guid;
+    private String cardCode;
+    private String paymentTypeName;
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 }

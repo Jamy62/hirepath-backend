@@ -4,11 +4,13 @@ import com.hirepath.hirepath_backend.constant.VariableConstant;
 import com.hirepath.hirepath_backend.model.dto.paymentmethod.PaymentMethodListDTO;
 import com.hirepath.hirepath_backend.model.dto.paymentmethod.PaymentMethodListProjection;
 import com.hirepath.hirepath_backend.model.entity.paymentmethod.PaymentMethod;
+import com.hirepath.hirepath_backend.model.entity.paymenttype.PaymentType;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodCreateRequest;
 import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodUpdateRequest;
 import com.hirepath.hirepath_backend.repository.paymentmethod.PaymentMethodRepository;
 import com.hirepath.hirepath_backend.service.paymentmethod.PaymentMethodService;
+import com.hirepath.hirepath_backend.service.paymenttype.PaymentTypeService;
 import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
 
     private final PaymentMethodRepository paymentMethodRepository;
     private final UserService userService;
+    private final PaymentTypeService paymentTypeService;
 
     @Override
     public PaymentMethod findByGuid(String guid) {
@@ -40,17 +43,20 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     }
 
     @Override
-    public void paymentMethodCreate(PaymentMethodCreateRequest request, String adminEmail) {
+    public void paymentMethodCreate(PaymentMethodCreateRequest request, String email) {
         try {
-            User admin = userService.findByEmail(adminEmail);
+            User user = userService.findByEmail(email);
+            PaymentType paymentType = paymentTypeService.findByGuid(request.getPaymentTypeGuid());
 
             PaymentMethod paymentMethod = PaymentMethod.builder()
-                    .name(request.getName())
-                    .description(request.getDescription())
+                    .user(user)
+                    .paymentType(paymentType)
+                    .cardCode(request.getCardCode())
+                    .cvvNumber(request.getCvvNumber())
                     .guid(UUID.randomUUID().toString())
                     .isDeleted(false)
                     .createdAt(ZonedDateTime.now())
-                    .createdBy(admin.getId())
+                    .createdBy(user.getId())
                     .build();
 
             paymentMethodRepository.save(paymentMethod);
@@ -67,9 +73,9 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
 
                 return paymentMethodListProjections.stream()
                         .map(p -> PaymentMethodListDTO.builder()
-                                .name(p.getName())
-                                .description(p.getDescription())
                                 .guid(p.getGuid())
+                                .cardCode(p.getCardCode())
+                                .paymentTypeName(p.getPaymentTypeName())
                                 .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
@@ -85,19 +91,26 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     @Override
     public void paymentMethodUpdate(String paymentMethodGuid, PaymentMethodUpdateRequest request, String email) {
         try {
-            User admin = userService.findByEmail(email);
-
+            User user = userService.findByEmail(email);
             PaymentMethod paymentMethod = findByGuid(paymentMethodGuid);
 
-            if (request.getName() != null && !request.getName().isBlank()) {
-                paymentMethod.setName(request.getName());
+            if (!user.equals(paymentMethod.getUser())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this payment method");
             }
-            if (request.getDescription() != null && !request.getDescription().isBlank()) {
-                paymentMethod.setDescription(request.getDescription());
+
+            if (request.getPaymentTypeGuid() != null && !request.getPaymentTypeGuid().isBlank()) {
+                PaymentType paymentType = paymentTypeService.findByGuid(request.getPaymentTypeGuid());
+                paymentMethod.setPaymentType(paymentType);
+            }
+            if (request.getCardCode() != null && !request.getCardCode().isBlank()) {
+                paymentMethod.setCardCode(request.getCardCode());
+            }
+            if (request.getCvvNumber() != null && !request.getCvvNumber().isBlank()) {
+                paymentMethod.setCvvNumber(request.getCvvNumber());
             }
 
             paymentMethod.setUpdatedAt(ZonedDateTime.now());
-            paymentMethod.setUpdatedBy(admin.getId());
+            paymentMethod.setUpdatedBy(user.getId());
 
             paymentMethodRepository.save(paymentMethod);
         } catch (Exception e) {
@@ -106,15 +119,18 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     }
 
     @Override
-    public void paymentMethodDelete(String paymentMethodGuid, String adminEmail) {
+    public void paymentMethodDelete(String paymentMethodGuid, String email) {
         try {
-            User admin = userService.findByEmail(adminEmail);
-
+            User user = userService.findByEmail(email);
             PaymentMethod paymentMethod = findByGuid(paymentMethodGuid);
+
+            if (!user.equals(paymentMethod.getUser())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not own this payment method");
+            }
 
             paymentMethod.setIsDeleted(true);
             paymentMethod.setUpdatedAt(ZonedDateTime.now());
-            paymentMethod.setUpdatedBy(admin.getId());
+            paymentMethod.setUpdatedBy(user.getId());
 
             paymentMethodRepository.save(paymentMethod);
         } catch (Exception e) {

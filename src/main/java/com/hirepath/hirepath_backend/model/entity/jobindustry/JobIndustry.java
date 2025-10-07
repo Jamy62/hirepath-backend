@@ -1,8 +1,11 @@
 package com.hirepath.hirepath_backend.model.entity.jobindustry;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.hirepath.hirepath_backend.model.entity.industry.Industry;
+import com.hirepath.hirepath_backend.model.entity.job.Job;
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.ZonedDateTime;
 
 @Entity
@@ -20,11 +23,13 @@ public class JobIndustry {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
-    private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "job_id")
+    private Job job;
 
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "industry_id")
+    private Industry industry;
 
     @Column(name = "guid")
     private String guid;

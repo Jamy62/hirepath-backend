@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -94,5 +95,8 @@ public class Company {
 
     @Column(name = "updated_by")
     private Long updatedBy;
+
+    @Column(name = "amount")
+    private BigDecimal amount;
 
 }

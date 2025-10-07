@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.model.dto.paymenttype;
 
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 
 public interface PaymentTypeListProjection {
@@ -7,6 +8,6 @@ public interface PaymentTypeListProjection {
     String getDescription();
     String getGuid();
     Boolean getIsDeleted();
-    ZonedDateTime getCreatedAt();
-    ZonedDateTime getUpdatedAt();
+    Timestamp getCreatedAt();
+    Timestamp getUpdatedAt();
 }

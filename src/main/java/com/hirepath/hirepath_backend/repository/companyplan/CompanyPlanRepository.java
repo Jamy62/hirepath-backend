@@ -10,5 +10,7 @@ import java.util.Optional;
 @Repository
 public interface CompanyPlanRepository extends CrudRepository<CompanyPlan, Long> {
     Optional<CompanyPlan> findByGuid(String guid);
-    Optional<CompanyPlan> findByCompanyAndIsDeleted(Company company, Boolean isDeleted);
+    Optional<CompanyPlan> findByCompanyAndIsDeletedFalse(Company company);
+    Optional<CompanyPlan> findByCompanyAndIsDeletedTrue(Company company);
+    Optional<CompanyPlan> findByCompanyAndIsActiveTrue(Company company);
 }

@@ -67,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
         try {
             User user = userService.findByEmail(email);
             Company company = companyService.findByGuid(companyGuid);
-            Optional<CompanyUser> companyUser = companyUserRepository.findByUserAndCompanyAndIsDeleted(user, company, false);
+            Optional<CompanyUser> companyUser = companyUserRepository.findByUserAndCompanyAndIsDeletedFalse(user, company);
 
             if (companyUser.isEmpty() || companyUser.get().getRole().getType() != Role.RoleType.COMPANY) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You have no role in this company");

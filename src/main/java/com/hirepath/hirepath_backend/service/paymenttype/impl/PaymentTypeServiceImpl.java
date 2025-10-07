@@ -70,8 +70,8 @@ public class PaymentTypeServiceImpl implements PaymentTypeService {
                                 .name(p.getName())
                                 .description(p.getDescription())
                                 .guid(p.getGuid())
-                                .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().withZoneSameInstant(ZoneId.systemDefault()) : null)
-                                .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().withZoneSameInstant(ZoneId.systemDefault()) : null)
+                                .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                                .updatedAt(p.getUpdatedAt() != null ? p.getUpdatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .build())
                         .toList();
             }

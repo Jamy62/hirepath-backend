@@ -46,7 +46,7 @@ public class CompanyPlanServiceImpl implements CompanyPlanService {
             Company company = companyService.findByGuid(companyGuid);
             Plan plan = planService.findByGuid(request.getPlanGuid());
             PaymentMethod paymentMethod = paymentMethodService.findByGuid(request.getPaymentMethodGuid());
-            Optional<CompanyPlan> previousPlanOpt = companyPlanRepository.findByCompanyAndIsDeleted(company, false);
+            Optional<CompanyPlan> previousPlanOpt = companyPlanRepository.findByCompanyAndIsDeletedFalse(company);
             ZonedDateTime endDate = ZonedDateTime.now().plusDays(plan.getDurationDays());
 
             if (!company.equals(paymentMethod.getCompany())) {
@@ -83,7 +83,7 @@ public class CompanyPlanServiceImpl implements CompanyPlanService {
     @Override
     public ActivePlanDTO getActivePlan(String companyGuid) {
         Company company = companyService.findByGuid(companyGuid);
-        Optional<CompanyPlan> companyPlanOpt = companyPlanRepository.findByCompanyAndIsDeleted(company, false);
+        Optional<CompanyPlan> companyPlanOpt = companyPlanRepository.findByCompanyAndIsDeletedFalse(company);
 
         if (companyPlanOpt.isPresent()) {
             CompanyPlan companyPlan = companyPlanOpt.get();

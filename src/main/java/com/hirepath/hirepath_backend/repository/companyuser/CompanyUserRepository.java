@@ -6,12 +6,11 @@ import com.hirepath.hirepath_backend.model.entity.user.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CompanyUserRepository extends CrudRepository<CompanyUser, Long> {
     Optional<CompanyUser> findByGuid(String guid);
-    Optional<CompanyUser> findByUserAndCompanyAndIsDeleted(User user, Company company, boolean isDeleted);
-    Optional<List<CompanyUser>> findByUserAndIsDeleted(User user, boolean isDeleted);
+    Optional<CompanyUser> findByUserAndCompanyAndIsDeletedFalse(User user, Company company);
+    Optional<CompanyUser> findByUserAndCompanyAndIsDeletedTrue(User user, Company company);
 }

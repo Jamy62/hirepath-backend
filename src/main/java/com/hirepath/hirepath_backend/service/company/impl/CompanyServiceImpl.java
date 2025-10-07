@@ -66,6 +66,7 @@ public class CompanyServiceImpl implements CompanyService {
                     .guid(UUID.randomUUID().toString())
                     .isDeleted(false)
                     .createdAt(ZonedDateTime.now())
+                    .createdBy(user.getId())
                     .build();
             companyRepository.save(company);
 

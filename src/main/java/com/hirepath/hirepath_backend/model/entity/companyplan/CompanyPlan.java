@@ -2,6 +2,7 @@ package com.hirepath.hirepath_backend.model.entity.companyplan;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
+import com.hirepath.hirepath_backend.model.entity.paymentmethod.PaymentMethod;
 import com.hirepath.hirepath_backend.model.entity.plan.Plan;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,6 +31,10 @@ public class CompanyPlan {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id")
     private Plan plan;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_method_id")
+    private PaymentMethod paymentMethod;
 
     @Column(name = "start_date")
     private ZonedDateTime startDate;

@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.controller.companyplan;
 
+import com.hirepath.hirepath_backend.model.dto.companyplan.ActivePlanDTO;
 import com.hirepath.hirepath_backend.model.request.companyplan.PurchasePlanRequest;
 import com.hirepath.hirepath_backend.model.request.companyuser.AssignCompanyRoleRequest;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
@@ -7,13 +8,11 @@ import com.hirepath.hirepath_backend.service.companyplan.CompanyPlanService;
 import com.hirepath.hirepath_backend.util.AuthenticationUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 
@@ -29,5 +28,12 @@ public class CompanyPlanController {
                                                             Authentication authentication) {
         companyPlanService.purchasePlan(request, AuthenticationUtil.getGuid(authentication.getDetails()));
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Plan purchased successfully"));
+    }
+
+    @GetMapping("/active-plan")
+    @PreAuthorize("hasAnyRole('COMPANY')")
+    public ResponseEntity<ResponseFormat> getActivePlan(Authentication authentication) {
+        ActivePlanDTO response = companyPlanService.getActivePlan(AuthenticationUtil.getGuid(authentication.getDetails()));
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Successfully fetched active plan"));
     }
 }

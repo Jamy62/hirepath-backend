@@ -1,5 +1,7 @@
 package com.hirepath.hirepath_backend.service.job.impl;
 
+import com.hirepath.hirepath_backend.model.dto.job.JobListDTO;
+import com.hirepath.hirepath_backend.model.dto.job.JobListProjection;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.entity.companyplan.CompanyPlan;
 import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
@@ -15,13 +17,8 @@ import com.hirepath.hirepath_backend.model.request.job.JobCreateRequest;
 import com.hirepath.hirepath_backend.repository.company.CompanyRepository;
 import com.hirepath.hirepath_backend.repository.companyplan.CompanyPlanRepository;
 import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
-import com.hirepath.hirepath_backend.repository.experiencelevel.ExperienceLevelRepository;
-import com.hirepath.hirepath_backend.repository.industry.IndustryRepository;
 import com.hirepath.hirepath_backend.repository.job.JobRepository;
-import com.hirepath.hirepath_backend.repository.jobfunction.JobFunctionRepository;
 import com.hirepath.hirepath_backend.repository.jobindustry.JobIndustryRepository;
-import com.hirepath.hirepath_backend.repository.jobtype.JobTypeRepository;
-import com.hirepath.hirepath_backend.repository.township.TownshipRepository;
 import com.hirepath.hirepath_backend.service.company.CompanyService;
 import com.hirepath.hirepath_backend.service.experiencelevel.ExperienceLevelService;
 import com.hirepath.hirepath_backend.service.industry.IndustryService;
@@ -30,18 +27,19 @@ import com.hirepath.hirepath_backend.service.jobfunction.JobFunctionService;
 import com.hirepath.hirepath_backend.service.jobtype.JobTypeService;
 import com.hirepath.hirepath_backend.service.township.TownshipService;
 import com.hirepath.hirepath_backend.service.user.UserService;
-import com.hirepath.hirepath_backend.util.AuthenticationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -131,6 +129,43 @@ public class JobServiceImpl implements JobService {
                 
                 jobIndustryRepository.save(jobIndustry);
             }
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public List<JobListDTO> jobList(
+            String searchTitle,
+            String companyGuid,
+            String townshipGuid,
+            String jobTypeGuid,
+            String experienceLevelGuid,
+            String industryGuid,
+            Double minSalary,
+            Double maxSalary,
+            String orderBy,
+            int first,
+            int max) {
+        try {
+            List<JobListProjection> projections = jobRepository.findAllJobsForListView(
+                    searchTitle, companyGuid, townshipGuid, jobTypeGuid, experienceLevelGuid, industryGuid,
+                    minSalary, maxSalary, orderBy, first, max);
+
+            return projections.stream()
+                    .map(p -> JobListDTO.builder()
+                            .guid(p.getGuid())
+                            .title(p.getTitle())
+                            .salary(p.getSalary())
+                            .location(p.getLocation())
+                            .companyName(p.getCompanyName())
+                            .companyLogo(p.getCompanyLogo())
+                            .isCompanyVerified(p.getIsCompanyVerified())
+                            .jobType(p.getJobType())
+                            .experienceLevel(p.getExperienceLevel())
+                            .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                            .build())
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             throw e;
         }

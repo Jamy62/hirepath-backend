@@ -23,14 +23,14 @@ public class ProvinceController {
 
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> createProvince(@Valid @RequestBody ProvinceCreateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> provinceCreate(@Valid @RequestBody ProvinceCreateRequest request, Principal principal) {
         provinceService.provinceCreate(request, principal.getName());
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Province created successfully"));
     }
 
     @GetMapping("/list/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> listProvinces(
+    public ResponseEntity<ResponseFormat> provinceList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
@@ -41,14 +41,14 @@ public class ProvinceController {
 
     @PutMapping("/update/admin/{provinceGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> updateProvince(@PathVariable String provinceGuid, @Valid @RequestBody ProvinceUpdateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> provinceUpdate(@PathVariable String provinceGuid, @Valid @RequestBody ProvinceUpdateRequest request, Principal principal) {
         provinceService.provinceUpdate(provinceGuid, request, principal.getName());
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Province updated successfully"));
     }
 
     @DeleteMapping("/delete/admin/{provinceGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> deleteProvince(
+    public ResponseEntity<ResponseFormat> provinceDelete(
             @PathVariable(value = "provinceGuid") String provinceGuid,
             Principal principal) {
         provinceService.provinceDelete(provinceGuid, principal.getName());

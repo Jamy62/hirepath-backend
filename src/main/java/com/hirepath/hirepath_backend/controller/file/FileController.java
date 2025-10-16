@@ -30,7 +30,7 @@ public class FileController {
     private final Path resumeStorageLocation = Paths.get("files/resumes").toAbsolutePath().normalize();
 
     @PostMapping("/upload/{type}")
-    public ResponseEntity<ResponseFormat> uploadFile(@PathVariable String type,
+    public ResponseEntity<ResponseFormat> fileUpload(@PathVariable String type,
                                                      @RequestParam("file") MultipartFile file,
                                                      @RequestParam(required = false) String userGuid,
                                                      @RequestParam(required = false) String resumeGuid) {
@@ -55,7 +55,7 @@ public class FileController {
     }
 
     @GetMapping("/download/{type}/{filename:.+}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String type, @PathVariable String filename) {
+    public ResponseEntity<Resource> fileDownload(@PathVariable String type, @PathVariable String filename) {
         Path location;
         switch (type) {
             case "images":

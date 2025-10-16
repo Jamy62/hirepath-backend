@@ -23,14 +23,14 @@ public class TownshipController {
 
     @PostMapping("/create/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> createTownship(@Valid @RequestBody TownshipCreateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> townshipCreate(@Valid @RequestBody TownshipCreateRequest request, Principal principal) {
         townshipService.townshipCreate(request, principal.getName());
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Township created successfully"));
     }
 
     @GetMapping("/list/admin")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> listTownship(
+    public ResponseEntity<ResponseFormat> townshipList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
             @RequestParam(value = "first", required = false, defaultValue = "0") int first,
@@ -41,14 +41,14 @@ public class TownshipController {
 
     @PutMapping("/update/admin/{townshipGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> updateTownship(@PathVariable String townshipGuid, @Valid @RequestBody TownshipUpdateRequest request, Principal principal) {
+    public ResponseEntity<ResponseFormat> townshipUpdate(@PathVariable String townshipGuid, @Valid @RequestBody TownshipUpdateRequest request, Principal principal) {
         townshipService.townshipUpdate(townshipGuid, request, principal.getName());
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Township updated successfully"));
     }
 
     @DeleteMapping("/delete/admin/{townshipGuid}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<ResponseFormat> deleteTownship(
+    public ResponseEntity<ResponseFormat> townshipDelete(
             @PathVariable(value = "townshipGuid") String townshipGuid,
             Principal principal) {
         townshipService.townshipDelete(townshipGuid, principal.getName());

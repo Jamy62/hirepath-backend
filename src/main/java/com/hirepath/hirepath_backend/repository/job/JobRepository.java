@@ -33,6 +33,8 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             LEFT JOIN
                 townships t ON j.township_id = t.id
             LEFT JOIN
+                provinces p ON t.province_id = p.id
+            LEFT JOIN
                 job_types jt ON j.job_type_id = jt.id
             LEFT JOIN
                 experience_levels el ON j.experience_level_id = el.id
@@ -42,12 +44,12 @@ public interface JobRepository extends JpaRepository<Job, Long> {
                 j.is_deleted = 0 AND j.is_active = 1
                 AND (:searchTitle IS NULL OR LOWER(j.title) LIKE LOWER(CONCAT('%', :searchTitle, '%')))
                 AND (:companyGuid IS NULL OR c.guid = :companyGuid)
+                AND (:provinceGuid IS NULL OR p.guid = :provinceGuid)
                 AND (:townshipGuid IS NULL OR t.guid = :townshipGuid)
                 AND (:jobTypeGuid IS NULL OR jt.guid = :jobTypeGuid)
                 AND (:experienceLevelGuid IS NULL OR el.guid = :experienceLevelGuid)
                 AND (:industryGuid IS NULL OR ji.industry_id = (SELECT id FROM industries WHERE guid = :industryGuid))
-                AND (:minSalary IS NULL OR j.min_salary >= :minSalary)
-                AND (:maxSalary IS NULL OR j.max_salary <= :maxSalary)
+                AND (:salary IS NULL OR :salary BETWEEN j.min_salary AND j.max_salary)
             GROUP BY j.id
             ORDER BY
                 CASE WHEN :orderBy = 'ASC' THEN j.created_at END ASC,
@@ -57,12 +59,12 @@ public interface JobRepository extends JpaRepository<Job, Long> {
     List<JobListProjection> findAllJobsForListView(
             @Param("searchTitle") String searchTitle,
             @Param("companyGuid") String companyGuid,
+            @Param("provinceGuid") String provinceGuid,
             @Param("townshipGuid") String townshipGuid,
             @Param("jobTypeGuid") String jobTypeGuid,
             @Param("experienceLevelGuid") String experienceLevelGuid,
             @Param("industryGuid") String industryGuid,
-            @Param("minSalary") Double minSalary,
-            @Param("maxSalary") Double maxSalary,
+            @Param("salary") Double salary,
             @Param("orderBy") String orderBy,
             @Param("first") int first,
             @Param("max") int max);

@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.service.job.impl;
 
+import com.hirepath.hirepath_backend.model.dto.job.JobDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.job.JobListDTO;
 import com.hirepath.hirepath_backend.model.dto.job.JobListProjection;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
@@ -135,24 +136,13 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public List<JobListDTO> jobList(
-            String searchTitle,
-            String companyGuid,
-            String townshipGuid,
-            String jobTypeGuid,
-            String experienceLevelGuid,
-            String industryGuid,
-            Double minSalary,
-            Double maxSalary,
-            String orderBy,
-            int first,
-            int max) {
+    public List<JobListDTO> jobList(String searchTitle, String companyGuid, String provinceGuid, String townshipGuid,
+                                    String jobTypeGuid, String experienceLevelGuid, String industryGuid, Double salary, String orderBy, int first, int max) {
         try {
-            List<JobListProjection> projections = jobRepository.findAllJobsForListView(
-                    searchTitle, companyGuid, townshipGuid, jobTypeGuid, experienceLevelGuid, industryGuid,
-                    minSalary, maxSalary, orderBy, first, max);
+            List<JobListProjection> jobListProjections = jobRepository.findAllJobsForListView(searchTitle, companyGuid, provinceGuid, townshipGuid,
+                    jobTypeGuid, experienceLevelGuid, industryGuid, salary, orderBy, first, max);
 
-            return projections.stream()
+            return jobListProjections.stream()
                     .map(p -> JobListDTO.builder()
                             .guid(p.getGuid())
                             .title(p.getTitle())
@@ -166,6 +156,37 @@ public class JobServiceImpl implements JobService {
                             .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                             .build())
                     .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public JobDetailDTO jobDetail(String jobGuid) {
+        try {
+            Job job = findByGuid(jobGuid);
+            List<String> industries = jobIndustryRepository.findAllByJob(job).stream()
+                    .map(jobIndustry -> jobIndustry.getIndustry().getName())
+                    .collect(Collectors.toList());
+
+            return JobDetailDTO.builder()
+                    .guid(job.getGuid())
+                    .title(job.getTitle())
+                    .description(job.getDescription())
+                    .requirements(job.getRequirements())
+                    .benefits(job.getBenefits())
+                    .minSalary(job.getMinSalary())
+                    .maxSalary(job.getMaxSalary())
+                    .jobType(job.getJobType().getName())
+                    .experienceLevel(job.getExperienceLevel().getName())
+                    .location(job.getTownship().getName())
+                    .companyGuid(job.getCompany().getGuid())
+                    .companyName(job.getCompany().getName())
+                    .companyLogo(job.getCompany().getLogo())
+                    .industries(industries)
+                    .postedDate(job.getPostedDate())
+                    .expireDate(job.getExpireDate())
+                    .build();
         } catch (Exception e) {
             throw e;
         }

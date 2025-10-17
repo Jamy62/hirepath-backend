@@ -106,4 +106,25 @@ public class CompanyUserServiceImpl implements CompanyUserService {
             throw e;
         }
     }
+
+    @Override
+    public void employeeDelete(String companyUserGuid, String email, String companyGuid) {
+        try {
+            User user = userService.findByEmail(email);
+            Company company = companyService.findByGuid(companyGuid);
+            CompanyUser companyUser = findByGuid(companyUserGuid);
+
+            if (!companyUser.getCompany().equals(company)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to delete this user");
+            }
+
+            companyUser.setIsDeleted(true);
+            companyUser.setUpdatedAt(ZonedDateTime.now());
+            companyUser.setUpdatedBy(user.getId());
+
+            companyUserRepository.save(companyUser);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 }

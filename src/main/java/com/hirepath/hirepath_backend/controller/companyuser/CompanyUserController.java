@@ -34,4 +34,11 @@ public class CompanyUserController {
         List<CompanyUserListDTO> employees = companyUserService.employeeList(AuthenticationUtil.getGuid(authentication.getDetails()));
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(employees, "Company employees fetched successfully"));
     }
+
+    @PostMapping("/delete/{companyUserGuid}")
+    @PreAuthorize("hasAnyRole('COMPANY_OWNER', 'COMPANY_ADMIN')")
+    public ResponseEntity<ResponseFormat> employeeDelete(@PathVariable String companyUserGuid, Principal principal, Authentication authentication) {
+        companyUserService.employeeDelete(companyUserGuid, principal.getName(), AuthenticationUtil.getGuid(authentication.getDetails()));
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Company employee deleted successfully"));
+    }
 }

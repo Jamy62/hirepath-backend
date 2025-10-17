@@ -10,4 +10,5 @@ public interface CompanyUserService {
     CompanyUser findByGuid(String guid);
     void assignCompanyRole(AssignCompanyRoleRequest request, String email);
     List<CompanyUserListDTO> employeeList(String companyGuid);
+    void employeeDelete(String companyUserGuid, String email, String companyGuid);
 }

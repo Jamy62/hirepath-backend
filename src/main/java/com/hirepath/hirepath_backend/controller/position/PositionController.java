@@ -35,4 +35,11 @@ public class PositionController {
         List<PositionListDTO> positions = positionService.positionList(AuthenticationUtil.getGuid(authentication.getDetails()));
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(positions, "Positions fetched successfully"));
     }
+
+    @PostMapping("/delete/{positionGuid}")
+    @PreAuthorize("hasAnyRole('COMPANY_OWNER', 'COMPANY_ADMIN')")
+    public ResponseEntity<ResponseFormat> positionDelete(@PathVariable String positionGuid, Principal principal, Authentication authentication) {
+        positionService.positionDelete(positionGuid, principal.getName(), AuthenticationUtil.getGuid(authentication.getDetails()));
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Position deleted successfully"));
+    }
 }

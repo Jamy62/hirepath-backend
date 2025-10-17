@@ -10,4 +10,5 @@ public interface PositionService {
     Position findByGuid(String guid);
     void positionCreate(PositionCreateRequest request, String email, String companyGuid);
     List<PositionListDTO> positionList(String companyGuid);
+    void positionDelete(String positionGuid, String email, String companyGuid);
 }

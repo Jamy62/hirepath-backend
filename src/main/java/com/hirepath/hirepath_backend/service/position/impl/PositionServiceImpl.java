@@ -76,4 +76,25 @@ public class PositionServiceImpl implements PositionService {
             throw e;
         }
     }
+
+    @Override
+    public void positionDelete(String positionGuid, String email, String companyGuid) {
+        try {
+            User user = userService.findByEmail(email);
+            Company company = companyService.findByGuid(companyGuid);
+            Position position = findByGuid(positionGuid);
+
+            if (!position.getCompany().equals(company)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to delete this position");
+            }
+
+            position.setIsDeleted(true);
+            position.setUpdatedAt(ZonedDateTime.now());
+            position.setUpdatedBy(user.getId());
+
+            positionRepository.save(position);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 }

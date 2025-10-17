@@ -125,7 +125,7 @@ public class JobServiceImpl implements JobService {
                         .guid(UUID.randomUUID().toString())
                         .isDeleted(false)
                         .createdAt(ZonedDateTime.now())
-                        .createdBy(companyUser.getId())
+                        .createdBy(user.getId())
                         .build();
                 
                 jobIndustryRepository.save(jobIndustry);

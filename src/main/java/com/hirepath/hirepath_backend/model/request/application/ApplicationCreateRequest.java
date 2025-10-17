@@ -8,4 +8,5 @@ import lombok.Data;
 public class ApplicationCreateRequest {
     private String jobGuid;
     private String resumeGuid;
+    private String coverLetter;
 }

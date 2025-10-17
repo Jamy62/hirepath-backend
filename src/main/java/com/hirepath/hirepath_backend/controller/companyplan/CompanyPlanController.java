@@ -24,9 +24,9 @@ public class CompanyPlanController {
 
     @PostMapping("/purchase")
     @PreAuthorize("hasAnyRole('COMPANY_OWNER'")
-    public ResponseEntity<ResponseFormat> purchasePlan(@Valid @RequestBody PurchasePlanRequest request,
+    public ResponseEntity<ResponseFormat> purchasePlan(@Valid @RequestBody PurchasePlanRequest request, Principal principal,
                                                             Authentication authentication) {
-        companyPlanService.purchasePlan(request, AuthenticationUtil.getGuid(authentication.getDetails()));
+        companyPlanService.purchasePlan(request, principal.getName(), AuthenticationUtil.getGuid(authentication.getDetails()));
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Plan purchased successfully"));
     }
 

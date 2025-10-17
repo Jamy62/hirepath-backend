@@ -1,6 +1,5 @@
 package com.hirepath.hirepath_backend.util;
 
-import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 

@@ -5,12 +5,15 @@ import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.entity.companyplan.CompanyPlan;
 import com.hirepath.hirepath_backend.model.entity.paymentmethod.PaymentMethod;
 import com.hirepath.hirepath_backend.model.entity.plan.Plan;
+import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.companyplan.PurchasePlanRequest;
 import com.hirepath.hirepath_backend.repository.companyplan.CompanyPlanRepository;
 import com.hirepath.hirepath_backend.service.company.CompanyService;
 import com.hirepath.hirepath_backend.service.companyplan.CompanyPlanService;
+import com.hirepath.hirepath_backend.service.companyuser.CompanyUserService;
 import com.hirepath.hirepath_backend.service.paymentmethod.PaymentMethodService;
 import com.hirepath.hirepath_backend.service.plan.PlanService;
+import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
@@ -29,6 +32,8 @@ public class CompanyPlanServiceImpl implements CompanyPlanService {
     private final CompanyService companyService;
     private final PlanService planService;
     private final PaymentMethodService paymentMethodService;
+    private final UserService userService;
+    private final CompanyUserService companyUserService;
 
     @Override
     public CompanyPlan findByGuid(String guid) {
@@ -41,8 +46,9 @@ public class CompanyPlanServiceImpl implements CompanyPlanService {
     }
 
     @Override
-    public void purchasePlan(PurchasePlanRequest request, String companyGuid) {
+    public void purchasePlan(PurchasePlanRequest request, String email, String companyGuid) {
         try {
+            User user = userService.findByEmail(email);
             Company company = companyService.findByGuid(companyGuid);
             Plan plan = planService.findByGuid(request.getPlanGuid());
             PaymentMethod paymentMethod = paymentMethodService.findByGuid(request.getPaymentMethodGuid());
@@ -58,7 +64,7 @@ public class CompanyPlanServiceImpl implements CompanyPlanService {
                 previousPlan.setIsActive(false);
                 previousPlan.setIsDeleted(true);
                 previousPlan.setUpdatedAt(ZonedDateTime.now());
-                previousPlan.setUpdatedBy(company.getId());
+                previousPlan.setUpdatedBy(user.getId());
                 companyPlanRepository.save(previousPlan);
             }
 

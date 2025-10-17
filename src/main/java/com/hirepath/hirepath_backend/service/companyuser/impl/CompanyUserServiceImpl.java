@@ -1,11 +1,15 @@
 package com.hirepath.hirepath_backend.service.companyuser.impl;
 
+import com.hirepath.hirepath_backend.model.dto.companyuser.CompanyUserListDTO;
+import com.hirepath.hirepath_backend.model.dto.companyuser.CompanyUserPositionsDTO;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
+import com.hirepath.hirepath_backend.model.entity.companyuserposition.CompanyUserPosition;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.companyuser.AssignCompanyRoleRequest;
 import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
+import com.hirepath.hirepath_backend.repository.companyuserposition.CompanyUserPositionRepository;
 import com.hirepath.hirepath_backend.repository.role.RoleRepository;
 import com.hirepath.hirepath_backend.service.company.CompanyService;
 import com.hirepath.hirepath_backend.service.companyuser.CompanyUserService;
@@ -17,7 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,7 @@ public class CompanyUserServiceImpl implements CompanyUserService {
     private final UserService userService;
     private final RoleRepository roleRepository;
     private final CompanyUserRepository companyUserRepository;
+    private final CompanyUserPositionRepository companyUserPositionRepository;
 
     @Override
     public CompanyUser findByGuid(String guid) {
@@ -64,6 +71,37 @@ public class CompanyUserServiceImpl implements CompanyUserService {
                     .createdBy(assigner.getId())
                     .build();
             companyUserRepository.save(companyUser);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public List<CompanyUserListDTO> employeeList(String companyGuid) {
+        try {
+            Company company = companyService.findByGuid(companyGuid);
+            List<CompanyUser> companyUserList = companyUserRepository.findAllByCompanyAndIsDeletedFalse(company);
+
+            return companyUserList.stream()
+                    .map(companyUser -> {
+                        List<CompanyUserPosition> positionList = companyUserPositionRepository.findAllByCompanyUserAndIsDeletedFalse(companyUser);
+
+                        List<CompanyUserPositionsDTO> positionsDTOList = positionList.stream()
+                                .map(p -> CompanyUserPositionsDTO.builder()
+                                        .name(p.getPosition().getName())
+                                        .guid(p.getPosition().getGuid())
+                                        .build())
+                                .toList();
+
+                        return CompanyUserListDTO.builder()
+                                .name(companyUser.getUser().getName())
+                                .email(companyUser.getUser().getEmail())
+                                .guid(companyUser.getGuid())
+                                .userGuid(companyUser.getUser().getGuid())
+                                .positions(positionsDTOList)
+                                .build();
+                    })
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             throw e;
         }

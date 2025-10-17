@@ -1,16 +1,18 @@
 package com.hirepath.hirepath_backend.service.paymentmethod.impl;
 
-import com.hirepath.hirepath_backend.constant.VariableConstant;
 import com.hirepath.hirepath_backend.model.dto.paymentmethod.PaymentMethodListDTO;
 import com.hirepath.hirepath_backend.model.dto.paymentmethod.PaymentMethodListProjection;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
+import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
 import com.hirepath.hirepath_backend.model.entity.paymentmethod.PaymentMethod;
 import com.hirepath.hirepath_backend.model.entity.paymenttype.PaymentType;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodCreateRequest;
 import com.hirepath.hirepath_backend.model.request.paymentmethod.PaymentMethodUpdateRequest;
+import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
 import com.hirepath.hirepath_backend.repository.paymentmethod.PaymentMethodRepository;
 import com.hirepath.hirepath_backend.service.company.CompanyService;
+import com.hirepath.hirepath_backend.service.companyuser.CompanyUserService;
 import com.hirepath.hirepath_backend.service.paymentmethod.PaymentMethodService;
 import com.hirepath.hirepath_backend.service.paymenttype.PaymentTypeService;
 import com.hirepath.hirepath_backend.service.user.UserService;
@@ -33,6 +35,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     private final PaymentMethodRepository paymentMethodRepository;
     private final CompanyService companyService;
     private final PaymentTypeService paymentTypeService;
+    private final UserService userService;
 
     @Override
     public PaymentMethod findByGuid(String guid) {
@@ -45,8 +48,9 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     }
 
     @Override
-    public void paymentMethodCreate(PaymentMethodCreateRequest request, String companyGuid) {
+    public void paymentMethodCreate(PaymentMethodCreateRequest request, String email, String companyGuid) {
         try {
+            User user = userService.findByEmail(email);
             Company company = companyService.findByGuid(companyGuid);
             PaymentType paymentType = paymentTypeService.findByGuid(request.getPaymentTypeGuid());
 
@@ -58,7 +62,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
                     .guid(UUID.randomUUID().toString())
                     .isDeleted(false)
                     .createdAt(ZonedDateTime.now())
-                    .createdBy(company.getId())
+                    .createdBy(user.getId())
                     .build();
 
             paymentMethodRepository.save(paymentMethod);
@@ -88,8 +92,9 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     }
 
     @Override
-    public void paymentMethodUpdate(String paymentMethodGuid, PaymentMethodUpdateRequest request, String companyGuid) {
+    public void paymentMethodUpdate(String paymentMethodGuid, PaymentMethodUpdateRequest request, String email, String companyGuid) {
         try {
+            User user = userService.findByEmail(email);
             Company company = companyService.findByGuid(companyGuid);
             PaymentMethod paymentMethod = findByGuid(paymentMethodGuid);
 
@@ -109,7 +114,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
             }
 
             paymentMethod.setUpdatedAt(ZonedDateTime.now());
-            paymentMethod.setUpdatedBy(company.getId());
+            paymentMethod.setUpdatedBy(user.getId());
 
             paymentMethodRepository.save(paymentMethod);
         } catch (Exception e) {
@@ -118,8 +123,9 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     }
 
     @Override
-    public void paymentMethodDelete(String paymentMethodGuid, String companyGuid) {
+    public void paymentMethodDelete(String paymentMethodGuid, String email, String companyGuid) {
         try {
+            User user = userService.findByEmail(email);
             Company company = companyService.findByGuid(companyGuid);
             PaymentMethod paymentMethod = findByGuid(paymentMethodGuid);
 
@@ -129,7 +135,7 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
 
             paymentMethod.setIsDeleted(true);
             paymentMethod.setUpdatedAt(ZonedDateTime.now());
-            paymentMethod.setUpdatedBy(company.getId());
+            paymentMethod.setUpdatedBy(user.getId());
 
             paymentMethodRepository.save(paymentMethod);
         } catch (Exception e) {

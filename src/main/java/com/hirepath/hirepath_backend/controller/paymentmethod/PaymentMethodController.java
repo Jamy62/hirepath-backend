@@ -26,8 +26,8 @@ public class PaymentMethodController {
 
     @PostMapping("/create")
     @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
-    public ResponseEntity<ResponseFormat> paymentMethodCreate(@Valid @RequestBody PaymentMethodCreateRequest request, Authentication authentication) {
-        paymentMethodService.paymentMethodCreate(request, AuthenticationUtil.getGuid(authentication.getDetails()));
+    public ResponseEntity<ResponseFormat> paymentMethodCreate(@Valid @RequestBody PaymentMethodCreateRequest request, Principal principal, Authentication authentication) {
+        paymentMethodService.paymentMethodCreate(request, principal.getName(), AuthenticationUtil.getGuid(authentication.getDetails()));
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Payment method created successfully"));
     }
 
@@ -40,17 +40,15 @@ public class PaymentMethodController {
 
     @PutMapping("/update/{paymentMethodGuid}")
     @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
-    public ResponseEntity<ResponseFormat> paymentMethodUpdate(@PathVariable String paymentMethodGuid, @Valid @RequestBody PaymentMethodUpdateRequest request, Authentication authentication) {
-        paymentMethodService.paymentMethodUpdate(paymentMethodGuid, request, AuthenticationUtil.getGuid(authentication.getDetails()));
+    public ResponseEntity<ResponseFormat> paymentMethodUpdate(@PathVariable String paymentMethodGuid, @Valid @RequestBody PaymentMethodUpdateRequest request, Principal principal, Authentication authentication) {
+        paymentMethodService.paymentMethodUpdate(paymentMethodGuid, request, principal.getName(), AuthenticationUtil.getGuid(authentication.getDetails()));
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Payment method updated successfully"));
     }
 
     @DeleteMapping("/delete/admin/{paymentMethodGuid}")
     @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
-    public ResponseEntity<ResponseFormat> paymentMethodDelete(
-            @PathVariable(value = "paymentMethodGuid") String paymentMethodGuid,
-            Authentication authentication) {
-        paymentMethodService.paymentMethodDelete(paymentMethodGuid, AuthenticationUtil.getGuid(authentication.getName()));
+    public ResponseEntity<ResponseFormat> paymentMethodDelete(@PathVariable(value = "paymentMethodGuid") String paymentMethodGuid, Principal principal, Authentication authentication) {
+        paymentMethodService.paymentMethodDelete(paymentMethodGuid, principal.getName(), AuthenticationUtil.getGuid(authentication.getName()));
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Payment method deleted successfully"));
     }
 }

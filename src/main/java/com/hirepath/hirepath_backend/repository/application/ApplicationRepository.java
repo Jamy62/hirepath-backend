@@ -3,6 +3,11 @@ package com.hirepath.hirepath_backend.repository.application;
 import com.hirepath.hirepath_backend.model.dto.application.CompanyApplicationListProjection;
 import com.hirepath.hirepath_backend.model.dto.application.UserApplicationListProjection;
 import com.hirepath.hirepath_backend.model.entity.application.Application;
+import com.hirepath.hirepath_backend.model.entity.company.Company;
+import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
+import com.hirepath.hirepath_backend.model.entity.job.Job;
+import com.hirepath.hirepath_backend.model.entity.user.User;
+import org.hibernate.type.JavaObjectType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +19,8 @@ import java.util.Optional;
 @Repository
 public interface ApplicationRepository extends CrudRepository<Application, Long> {
     Optional<Application> findByGuid(String guid);
+    Optional<Application> findByUserAndJobAndStatusAndIsDeletedFalse(User user, Job job, String status);
+    Optional<Application> findByUserAndJobAndStatusAndIsDeletedTrue(User user, Job job, String status);
 
     @Query(value = """
             SELECT
@@ -29,7 +36,7 @@ public interface ApplicationRepository extends CrudRepository<Application, Long>
             AND a.is_deleted = 0
             ORDER BY a.application_date DESC
             """, nativeQuery = true)
-    List<UserApplicationListProjection> findAllForUser(@Param("userId") Long userId);
+    List<UserApplicationListProjection> findAllByUser(@Param("userId") Long userId);
 
     @Query(value = """
             SELECT
@@ -47,5 +54,5 @@ public interface ApplicationRepository extends CrudRepository<Application, Long>
             AND a.is_deleted = 0
             ORDER BY a.application_date DESC
             """, nativeQuery = true)
-    List<CompanyApplicationListProjection> findAllForCompany(@Param("companyId") Long companyId);
+    List<CompanyApplicationListProjection> findAllByCompany(@Param("companyId") Long companyId);
 }

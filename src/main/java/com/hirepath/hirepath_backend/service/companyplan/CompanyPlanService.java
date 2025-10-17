@@ -6,6 +6,6 @@ import com.hirepath.hirepath_backend.model.request.companyplan.PurchasePlanReque
 
 public interface CompanyPlanService {
     CompanyPlan findByGuid(String guid);
-    void purchasePlan(PurchasePlanRequest request, String companyGuid);
+    void purchasePlan(PurchasePlanRequest request, String email, String companyGuid);
     ActivePlanDTO getActivePlan(String ownerCompanyGuid);
 }

@@ -42,14 +42,14 @@ public class Application {
     @Column(name = "cover_letter")
     private String coverLetter;
 
-    @Column(name = "file_path")
-    private String filePath;
-
     @Column(name = "status")
     private String status;
 
     @Column(name = "guid")
     private String guid;
+
+    @Column(name = "is_active")
+    private Boolean isActive;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;

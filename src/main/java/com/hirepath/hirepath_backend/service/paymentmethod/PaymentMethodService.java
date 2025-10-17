@@ -11,11 +11,11 @@ public interface PaymentMethodService {
 
     PaymentMethod findByGuid(String guid);
 
-    void paymentMethodCreate(PaymentMethodCreateRequest request, String companyGuid);
+    void paymentMethodCreate(PaymentMethodCreateRequest request, String email, String companyGuid);
 
     List<PaymentMethodListDTO> paymentMethodList(String companyGuid);
 
-    void paymentMethodUpdate(String paymentMethodGuid, PaymentMethodUpdateRequest request, String companyGuid);
+    void paymentMethodUpdate(String paymentMethodGuid, PaymentMethodUpdateRequest request, String email, String companyGuid);
 
-    void paymentMethodDelete(String paymentMethodGuid, String companyGuid);
+    void paymentMethodDelete(String paymentMethodGuid, String email, String companyGuid);
 }

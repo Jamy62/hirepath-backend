@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import javax.swing.text.Position;
 import java.time.ZonedDateTime;
@@ -16,6 +17,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@SQLRestriction("is_deleted = false")
 public class Education {
 
     @Id

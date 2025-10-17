@@ -6,6 +6,7 @@ import com.hirepath.hirepath_backend.model.entity.paymentmethod.PaymentMethod;
 import com.hirepath.hirepath_backend.model.entity.plan.Plan;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.ZonedDateTime;
 
@@ -17,6 +18,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@SQLRestriction("is_deleted = false")
 public class CompanyPlan {
 
     @Id

@@ -6,6 +6,7 @@ import com.hirepath.hirepath_backend.model.entity.resume.Resume;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.ZonedDateTime;
 
@@ -17,6 +18,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@SQLRestriction("is_deleted = false")
 public class Application {
 
     @Id

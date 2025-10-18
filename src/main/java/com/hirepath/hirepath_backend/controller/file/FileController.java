@@ -16,6 +16,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -27,26 +28,50 @@ public class FileController {
 
     private final FileStorageService fileStorageService;
     private final Path imageStorageLocation = Paths.get("files/images").toAbsolutePath().normalize();
+    private final Path logoStorageLocation = Paths.get("files/logos").toAbsolutePath().normalize();
+    private final Path bannerStorageLocation = Paths.get("files/banners").toAbsolutePath().normalize();
+    private final Path locationStorageLocation = Paths.get("files/locations").toAbsolutePath().normalize();
     private final Path resumeStorageLocation = Paths.get("files/resumes").toAbsolutePath().normalize();
 
     @PostMapping("/upload/{type}")
     public ResponseEntity<ResponseFormat> fileUpload(@PathVariable String type,
                                                      @RequestParam("file") MultipartFile file,
                                                      @RequestParam(required = false) String userGuid,
-                                                     @RequestParam(required = false) String resumeGuid) {
+                                                     @RequestParam(required = false) String companyGuid,
+                                                     @RequestParam(required = false) String name,
+                                                     @RequestParam(required = false) String address,
+                                                     Principal principal) {
         String fileName;
         switch (type) {
             case "profile":
                 if (userGuid == null || userGuid.isBlank()) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "userGuid is required for profile image uploads.");
                 }
-                fileName = fileStorageService.storeProfile(file, userGuid);
+                fileName = fileStorageService.storeProfile(file, userGuid, principal.getName());
+                break;
+            case "logo":
+                if (companyGuid == null || companyGuid.isBlank()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "companyGuid is required for company logo uploads.");
+                }
+                fileName = fileStorageService.storeLogo(file, companyGuid, principal.getName());
+                break;
+            case "banner":
+                if (companyGuid == null || companyGuid.isBlank()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "companyGuid is required for company banner uploads.");
+                }
+                fileName = fileStorageService.storeBanner(file, companyGuid, principal.getName());
+                break;
+            case "location":
+                if (companyGuid == null || companyGuid.isBlank() || name == null || name.isBlank()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "companyGuid, name, and address is required for company location uploads.");
+                }
+                fileName = fileStorageService.storeLocation(file, companyGuid, name, address, principal.getName());
                 break;
             case "resume":
-                if (resumeGuid == null || resumeGuid.isBlank()) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "resumeGuid is required for resume uploads.");
+                if (userGuid == null || userGuid.isBlank() || name == null || name.isBlank() || address == null || address.isBlank()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "userGuid and name is required for resume uploads.");
                 }
-                fileName = fileStorageService.storeResume(file, resumeGuid);
+                fileName = fileStorageService.storeResume(file, userGuid, name, principal.getName());
                 break;
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type specified.");
@@ -61,9 +86,19 @@ public class FileController {
             case "images":
                 location = imageStorageLocation;
                 break;
+            case "logo":
+                location = logoStorageLocation;
+                break;
+            case "banner":
+                location = bannerStorageLocation;
+                break;
+            case "location":
+                location = locationStorageLocation;
+                break;
             case "resumes":
                 location = resumeStorageLocation;
                 break;
+
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type specified.");
         }

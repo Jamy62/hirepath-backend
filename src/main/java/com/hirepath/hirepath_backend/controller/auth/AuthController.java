@@ -41,4 +41,10 @@ public class AuthController {
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Successfully switched to company"));
     }
 
+    @PostMapping("/company-switch-back")
+    @PreAuthorize("hasAnyRole('COMPANY')")
+    public ResponseEntity<ResponseFormat> companySwitchBack(Principal principal) {
+        LoginResponse response = authService.companySwitchBack(principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Successfully switched back to user"));
+    }
 }

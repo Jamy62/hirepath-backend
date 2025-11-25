@@ -54,6 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     if ("SYSTEM".equals(tokenType)) {
                         String systemRole = jwtUtil.extractSystemRole(jwt);
                         if (systemRole != null) {
+                            authorities.add(new SimpleGrantedAuthority("ROLE_SYSTEM"));
                             authorities.add(new SimpleGrantedAuthority("ROLE_" + systemRole));
                             if (Objects.equals("ADMIN", systemRole)) {
                                 authorities.add(new SimpleGrantedAuthority("ROLE_USER"));

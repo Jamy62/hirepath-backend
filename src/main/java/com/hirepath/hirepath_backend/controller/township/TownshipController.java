@@ -28,8 +28,8 @@ public class TownshipController {
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Township created successfully"));
     }
 
-    @GetMapping("/list/admin")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/list")
+    @PreAuthorize("hasAnyRole('SYSTEM', 'COMPANY')")
     public ResponseEntity<ResponseFormat> townshipList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,

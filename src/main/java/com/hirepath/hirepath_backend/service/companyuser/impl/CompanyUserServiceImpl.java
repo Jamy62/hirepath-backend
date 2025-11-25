@@ -2,15 +2,18 @@ package com.hirepath.hirepath_backend.service.companyuser.impl;
 
 import com.hirepath.hirepath_backend.model.dto.companyuser.CompanyUserListDTO;
 import com.hirepath.hirepath_backend.model.dto.companyuser.CompanyUserPositionsDTO;
+import com.hirepath.hirepath_backend.model.entity.application.Application;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
 import com.hirepath.hirepath_backend.model.entity.companyuserposition.CompanyUserPosition;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.companyuser.AssignCompanyRoleRequest;
+import com.hirepath.hirepath_backend.repository.application.ApplicationRepository;
 import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
 import com.hirepath.hirepath_backend.repository.companyuserposition.CompanyUserPositionRepository;
 import com.hirepath.hirepath_backend.repository.role.RoleRepository;
+import com.hirepath.hirepath_backend.service.application.ApplicationService;
 import com.hirepath.hirepath_backend.service.company.CompanyService;
 import com.hirepath.hirepath_backend.service.companyuser.CompanyUserService;
 import com.hirepath.hirepath_backend.service.user.UserService;
@@ -34,6 +37,8 @@ public class CompanyUserServiceImpl implements CompanyUserService {
     private final RoleRepository roleRepository;
     private final CompanyUserRepository companyUserRepository;
     private final CompanyUserPositionRepository companyUserPositionRepository;
+    private final ApplicationService applicationService;
+    private final ApplicationRepository applicationRepository;
 
     @Override
     public CompanyUser findByGuid(String guid) {
@@ -98,6 +103,7 @@ public class CompanyUserServiceImpl implements CompanyUserService {
                                 .email(companyUser.getUser().getEmail())
                                 .guid(companyUser.getGuid())
                                 .userGuid(companyUser.getUser().getGuid())
+                                .role(companyUser.getRole().getName())
                                 .positions(positionsDTOList)
                                 .build();
                     })
@@ -116,6 +122,14 @@ public class CompanyUserServiceImpl implements CompanyUserService {
 
             if (!companyUser.getCompany().equals(company)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to delete this user");
+            }
+
+            List<Application> applications = applicationService.findAllByUserAndCompanyAndStatus(companyUser.getUser(), company, "ACCEPTED");
+            for (Application application : applications) {
+                application.setIsDeleted(true);
+                application.setUpdatedAt(ZonedDateTime.now());
+                application.setUpdatedBy(user.getId());
+                applicationRepository.save(application);
             }
 
             companyUser.setIsDeleted(true);

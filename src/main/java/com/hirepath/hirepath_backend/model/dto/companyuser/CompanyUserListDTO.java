@@ -12,5 +12,6 @@ public class CompanyUserListDTO {
     private String email;
     private String guid;
     private String userGuid;
+    private String role;
     private List<CompanyUserPositionsDTO> positions;
 }

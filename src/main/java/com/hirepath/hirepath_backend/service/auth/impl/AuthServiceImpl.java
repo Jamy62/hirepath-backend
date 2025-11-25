@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.service.auth.impl;
 
+import com.hirepath.hirepath_backend.model.dto.company.CompanyDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserDetailDTO;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
@@ -43,6 +44,7 @@ public class AuthServiceImpl implements AuthService {
                 return LoginResponse.builder()
                         .token(token)
                         .user(userDetail)
+                        .role("USER")
                         .build();
             }
 
@@ -75,9 +77,28 @@ public class AuthServiceImpl implements AuthService {
 
             String companyRole = companyUser.get().getRole().getName();
             String token = jwtUtil.generateCompanyToken(user, companyGuid, companyRole);
+            CompanyDetailDTO companyDetail = companyService.companyDetail(companyGuid);
 
             return LoginResponse.builder()
                     .token(token)
+                    .company(companyDetail)
+                    .role("COMPANY")
+                    .companyRole(companyRole)
+                    .build();
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public LoginResponse companySwitchBack(String email) {
+        try {
+            User user = userService.findByEmail(email);
+            String token = jwtUtil.generateSystemToken(user);
+            UserDetailDTO userDetail = userService.userDetail(user.getGuid());
+            return LoginResponse.builder()
+                    .token(token)
+                    .user(userDetail)
                     .build();
         } catch (Exception e) {
             throw e;

@@ -99,6 +99,7 @@ public class Company {
     private Long updatedBy;
 
     @Column(name = "amount")
-    private BigDecimal amount;
+    @Builder.Default
+    private BigDecimal amount = BigDecimal.ZERO;
 
 }

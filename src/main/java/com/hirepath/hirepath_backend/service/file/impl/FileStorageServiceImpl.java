@@ -157,6 +157,17 @@ public class FileStorageServiceImpl implements FileStorageService {
         }
     }
 
+    @Override
+    public void deleteResume(String resumeGuid, String email) {
+        User uploader = userService.findByEmail(email);
+        Resume resume = resumeService.findByGuid(resumeGuid);
+
+        resume.setIsDeleted(true);
+        resume.setUpdatedAt(ZonedDateTime.now());
+        resume.setUpdatedBy(uploader.getId());
+        resumeRepository.save(resume);
+    }
+
     private String store(MultipartFile file, Path location, String storeName) {
         try {
             Files.createDirectories(imageStorageLocation);

@@ -28,8 +28,8 @@ public class IndustryController {
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Industry created successfully"));
     }
 
-    @GetMapping("/list/admin")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/list")
+    @PreAuthorize("hasAnyRole('SYSTEM', 'COMPANY')")
     public ResponseEntity<ResponseFormat> industryList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,

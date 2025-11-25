@@ -12,6 +12,7 @@ import com.hirepath.hirepath_backend.model.entity.companyuserposition.CompanyUse
 import com.hirepath.hirepath_backend.model.entity.job.Job;
 import com.hirepath.hirepath_backend.model.entity.position.Position;
 import com.hirepath.hirepath_backend.model.entity.resume.Resume;
+import com.hirepath.hirepath_backend.model.entity.role.Role;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.application.ApplicationAcceptRequest;
 import com.hirepath.hirepath_backend.model.request.application.ApplicationCreateRequest;
@@ -23,6 +24,7 @@ import com.hirepath.hirepath_backend.service.company.CompanyService;
 import com.hirepath.hirepath_backend.service.job.JobService;
 import com.hirepath.hirepath_backend.service.position.PositionService;
 import com.hirepath.hirepath_backend.service.resume.ResumeService;
+import com.hirepath.hirepath_backend.service.role.RoleService;
 import com.hirepath.hirepath_backend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -48,12 +50,22 @@ public class ApplicationServiceImpl implements ApplicationService {
     private final CompanyUserRepository companyUserRepository;
     private final PositionService positionService;
     private final CompanyUserPositionRepository companyUserPositionRepository;
+    private final RoleService roleService;
 
     @Override
     public Application findByGuid(String guid) {
         try {
             return applicationRepository.findByGuid(guid)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Application not found"));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public List<Application> findAllByUserAndCompanyAndStatus(User user, Company company, String status) {
+        try {
+            return applicationRepository.findAllByUserAndCompanyAndStatusAndIsDeletedFalse(user, company, status);
         } catch (Exception e) {
             throw e;
         }
@@ -111,30 +123,44 @@ public class ApplicationServiceImpl implements ApplicationService {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to accept this application");
             }
 
-            CompanyUser companyUser = CompanyUser.builder()
-                    .user(applicant)
-                    .company(company)
-                    .guid(UUID.randomUUID().toString())
-                    .isDeleted(false)
-                    .createdAt(ZonedDateTime.now())
-                    .createdBy(accepter.getId())
-                    .build();
+            Role role = roleService.findByGuid(request.getRoleGuid());
 
-            companyUserRepository.save(companyUser);
+            CompanyUser companyUser = companyUserRepository.findByUserAndCompanyIncludingDeleted(applicant.getId(), company.getId())
+                    .map(existingUser -> {
+                        existingUser.setRole(role);
+                        existingUser.setIsDeleted(false);
+                        existingUser.setUpdatedAt(ZonedDateTime.now());
+                        existingUser.setUpdatedBy(accepter.getId());
+                        return companyUserRepository.save(existingUser);
+                    })
+                    .orElseGet(() -> {
+                        CompanyUser newCompanyUser = CompanyUser.builder()
+                                .user(applicant)
+                                .company(company)
+                                .role(role)
+                                .guid(UUID.randomUUID().toString())
+                                .isDeleted(false)
+                                .createdAt(ZonedDateTime.now())
+                                .createdBy(accepter.getId())
+                                .build();
+                        return companyUserRepository.save(newCompanyUser);
+                    });
 
-            for (String positionGuid : request.getPositionGuids()) {
-                Position position = positionService.findByGuid(positionGuid);
+            if (request.getPositionGuids() != null) {
+                for (String positionGuid : request.getPositionGuids()) {
+                    Position position = positionService.findByGuid(positionGuid);
 
-                CompanyUserPosition companyUserPosition = CompanyUserPosition.builder()
-                        .companyUser(companyUser)
-                        .position(position)
-                        .guid(UUID.randomUUID().toString())
-                        .isDeleted(false)
-                        .createdAt(ZonedDateTime.now())
-                        .createdBy(accepter.getId())
-                        .build();
+                    CompanyUserPosition companyUserPosition = CompanyUserPosition.builder()
+                            .companyUser(companyUser)
+                            .position(position)
+                            .guid(UUID.randomUUID().toString())
+                            .isDeleted(false)
+                            .createdAt(ZonedDateTime.now())
+                            .createdBy(accepter.getId())
+                            .build();
 
-                companyUserPositionRepository.save(companyUserPosition);
+                    companyUserPositionRepository.save(companyUserPosition);
+                }
             }
 
             application.setStatus("ACCEPTED");
@@ -142,6 +168,13 @@ public class ApplicationServiceImpl implements ApplicationService {
             application.setUpdatedBy(accepter.getId());
 
             applicationRepository.save(application);
+
+            List<Application> otherApplications = findAllByUserAndCompanyAndStatus(applicant, company, "PENDING");
+            for (Application otherApplication : otherApplications) {
+                if (!otherApplication.equals(application)) {
+                    rejectApplication(otherApplication.getGuid(), email, companyGuid);
+                }
+            }
         } catch (Exception e) {
             throw e;
         }

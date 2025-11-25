@@ -28,8 +28,7 @@ public class PaymentTypeController {
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Payment type created successfully"));
     }
 
-    @GetMapping("/list/admin")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/list")
     public ResponseEntity<ResponseFormat> paymentTypeList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,

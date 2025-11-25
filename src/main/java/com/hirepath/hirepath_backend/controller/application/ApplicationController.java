@@ -34,7 +34,7 @@ public class ApplicationController {
 
     @PostMapping("/accept/{applicationGuid}")
     @PreAuthorize("hasAnyRole('COMPANY_OWNER', 'COMPANY_ADMIN')")
-    public ResponseEntity<ResponseFormat> acceptApplication(@PathVariable String applicationGuid, ApplicationAcceptRequest request, Principal principal, Authentication authentication) {
+    public ResponseEntity<ResponseFormat> acceptApplication(@PathVariable String applicationGuid, @RequestBody ApplicationAcceptRequest request, Principal principal, Authentication authentication) {
         applicationService.acceptApplication(applicationGuid, request, principal.getName(), AuthenticationUtil.getGuid(authentication.getDetails()));
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Application accepted successfully"));
     }

@@ -38,5 +38,5 @@ public interface CompanyRepository extends CrudRepository<Company, Long> {
                                                            @Param("orderBy") String orderBy,
                                                            @Param("first") int first,
                                                            @Param("max") int max,
-                                                           @Param("verificationStatus") Company.VerificationStatus verificationStatus);
+                                                           @Param("verificationStatus") String verificationStatus);
 }

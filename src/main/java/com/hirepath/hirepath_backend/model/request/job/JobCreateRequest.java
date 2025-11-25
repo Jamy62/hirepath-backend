@@ -20,6 +20,4 @@ public class JobCreateRequest {
     private String benefits;
     private Double minSalary;
     private Double maxSalary;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-    private ZonedDateTime expireDate;
 }

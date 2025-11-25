@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -57,11 +58,10 @@ public class CompanyServiceImpl implements CompanyService {
 
             Company company = Company.builder()
                     .name(request.getName())
-                    .logo(request.getLogo())
-                    .banner(request.getBanner())
                     .description(request.getDescription())
                     .email(request.getEmail())
                     .phone(request.getPhone())
+                    .amount(BigDecimal.valueOf(0))
                     .verificationStatus(Company.VerificationStatus.FALSE)
                     .guid(UUID.randomUUID().toString())
                     .isDeleted(false)
@@ -130,7 +130,7 @@ public class CompanyServiceImpl implements CompanyService {
     public List<CompanyListDTO> companyList(String searchName, String orderBy, int first, int max) {
         try {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
-                List<CompanyListProjection> companyListProjection = companyRepository.findAllCompaniesAdminPanel(searchName, orderBy, first, max, Company.VerificationStatus.TRUE);
+                List<CompanyListProjection> companyListProjection = companyRepository.findAllCompaniesAdminPanel(searchName, orderBy, first, max, Company.VerificationStatus.TRUE.toString());
 
                 return companyListProjection.stream()
                         .map(p -> CompanyListDTO.builder()
@@ -156,7 +156,7 @@ public class CompanyServiceImpl implements CompanyService {
     public List<CompanyListDTO> companyVerifyList(String searchName, String orderBy, int first, int max) {
         try {
             if (orderBy.equals(VariableConstant.DESC) || orderBy.equals(VariableConstant.ASC)) {
-                List<CompanyListProjection> companyListProjection = companyRepository.findAllCompaniesAdminPanel(searchName, orderBy, first, max, Company.VerificationStatus.PENDING);
+                List<CompanyListProjection> companyListProjection = companyRepository.findAllCompaniesAdminPanel(searchName, orderBy, first, max, Company.VerificationStatus.PENDING.toString());
 
                 return companyListProjection.stream()
                         .map(p -> CompanyListDTO.builder()

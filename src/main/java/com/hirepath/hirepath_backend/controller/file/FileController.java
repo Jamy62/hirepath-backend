@@ -3,7 +3,6 @@ package com.hirepath.hirepath_backend.controller.file;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.file.FileStorageService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.*;
@@ -11,14 +10,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.net.MalformedURLException;
-import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -49,34 +45,59 @@ public class FileController {
                 }
                 fileName = fileStorageService.storeProfile(file, userGuid, principal.getName());
                 break;
+
             case "logo":
                 if (companyGuid == null || companyGuid.isBlank()) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "companyGuid is required for company logo uploads.");
                 }
                 fileName = fileStorageService.storeLogo(file, companyGuid, principal.getName());
                 break;
+
             case "banner":
                 if (companyGuid == null || companyGuid.isBlank()) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "companyGuid is required for company banner uploads.");
                 }
                 fileName = fileStorageService.storeBanner(file, companyGuid, principal.getName());
                 break;
+
             case "location":
                 if (companyGuid == null || companyGuid.isBlank() || name == null || name.isBlank()) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "companyGuid, name, and address is required for company location uploads.");
                 }
                 fileName = fileStorageService.storeLocation(file, companyGuid, name, address, principal.getName());
                 break;
+
             case "resume":
-                if (userGuid == null || userGuid.isBlank() || name == null || name.isBlank() || address == null || address.isBlank()) {
+                if (userGuid == null || userGuid.isBlank() || name == null || name.isBlank()) {
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "userGuid and name is required for resume uploads.");
                 }
                 fileName = fileStorageService.storeResume(file, userGuid, name, principal.getName());
                 break;
+
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type specified.");
         }
+
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(fileName, "File uploaded successfully."));
+    }
+
+    @DeleteMapping("/delete/{type}/{guid}")
+    public ResponseEntity<ResponseFormat> deleteFile(@PathVariable String type,
+                                                     @PathVariable String guid,
+                                                     Principal principal) {
+        switch (type) {
+            case "resume":
+                if (guid == null || guid.isBlank()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "guid is required for resume deletion.");
+                }
+                fileStorageService.deleteResume(guid, principal.getName());
+                break;
+
+            default:
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type specified for deletion.");
+        }
+
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "File deleted successfully."));
     }
 
     @GetMapping("/download/{type}/{filename:.+}")
@@ -103,17 +124,6 @@ public class FileController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type specified.");
         }
 
-//        try {
-//            Resource resource = new UrlResource(filePath.toUri());
-//            if (resource.exists()) {
-//                return ResponseEntity.ok()
-//                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-//                        .contentType(getMediaTypeForFileName(filename))
-//                        .body(resource);
-//            } else {
-//                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found " + filename);
-//            }
-
         try (Stream<Path> files = Files.list(location)) {
             Optional<Path> foundFile = files.filter(file -> file.getFileName().toString().startsWith(filename))
                     .findFirst();
@@ -135,6 +145,7 @@ public class FileController {
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND ,"File not found " + filename, e);
         }
+
         return null;
     }
 

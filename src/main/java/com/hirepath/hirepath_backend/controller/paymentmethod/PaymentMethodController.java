@@ -48,7 +48,7 @@ public class PaymentMethodController {
     @DeleteMapping("/delete/admin/{paymentMethodGuid}")
     @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
     public ResponseEntity<ResponseFormat> paymentMethodDelete(@PathVariable(value = "paymentMethodGuid") String paymentMethodGuid, Principal principal, Authentication authentication) {
-        paymentMethodService.paymentMethodDelete(paymentMethodGuid, principal.getName(), AuthenticationUtil.getGuid(authentication.getName()));
+        paymentMethodService.paymentMethodDelete(paymentMethodGuid, principal.getName(), AuthenticationUtil.getGuid(authentication.getDetails()));
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Payment method deleted successfully"));
     }
 }

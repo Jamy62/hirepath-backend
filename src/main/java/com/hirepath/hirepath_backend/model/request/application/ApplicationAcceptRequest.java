@@ -9,4 +9,5 @@ import java.util.List;
 @Data
 public class ApplicationAcceptRequest {
     private List<String> positionGuids;
+    private String roleGuid;
 }

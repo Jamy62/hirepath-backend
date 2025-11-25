@@ -1,6 +1,7 @@
 package com.hirepath.hirepath_backend.service.user.impl;
 
 import com.hirepath.hirepath_backend.constant.VariableConstant;
+import com.hirepath.hirepath_backend.model.dto.company.CompanyListDTO;
 import com.hirepath.hirepath_backend.model.dto.education.EducationListDTO;
 import com.hirepath.hirepath_backend.model.dto.preferredindustry.PreferredIndustryListDTO;
 import com.hirepath.hirepath_backend.model.dto.skill.SkillListDTO;
@@ -10,6 +11,7 @@ import com.hirepath.hirepath_backend.model.dto.user.UserListProjection;
 import com.hirepath.hirepath_backend.model.dto.user.UserProfileDTO;
 import com.hirepath.hirepath_backend.model.dto.userlanguage.UserLanguageListDTO;
 import com.hirepath.hirepath_backend.model.dto.workexperience.WorkExperienceListDTO;
+import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
 import com.hirepath.hirepath_backend.model.entity.education.Education;
 import com.hirepath.hirepath_backend.model.entity.preferredindustry.PreferredIndustry;
 import com.hirepath.hirepath_backend.model.entity.preferredlanguage.PreferredLanguage;
@@ -20,6 +22,7 @@ import com.hirepath.hirepath_backend.model.entity.userlanguage.UserLanguage;
 import com.hirepath.hirepath_backend.model.entity.workexperience.WorkExperience;
 import com.hirepath.hirepath_backend.model.request.user.RegisterRequest;
 import com.hirepath.hirepath_backend.model.request.user.UserUpdateRequest;
+import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
 import com.hirepath.hirepath_backend.repository.education.EducationRepository;
 import com.hirepath.hirepath_backend.repository.preferredindustry.PreferredIndustryRepository;
 import com.hirepath.hirepath_backend.repository.preferredlanguage.PreferredLanguageRepository;
@@ -58,6 +61,7 @@ public class UserServiceImpl implements UserService {
     private final WorkExperienceRepository workExperienceRepository;
     private final PreferredIndustryRepository preferredIndustryRepository;
     private final UserLanguageRepository userLanguageRepository;
+    private final CompanyUserRepository companyUserRepository;
 
     public User findByGuid(String guid) {
         try {
@@ -370,6 +374,27 @@ public class UserServiceImpl implements UserService {
                     .build();
         }
         catch (Exception e) {
+            throw e;
+        }
+    }
+
+    public List<CompanyListDTO> getUserCompanies(String email) {
+        try {
+            User user = findByEmail(email);
+            List<CompanyUser> companyUsers = companyUserRepository.findAllByUserAndIsDeletedFalse(user);
+            return companyUsers.stream()
+                    .map(cu -> {
+                        return CompanyListDTO.builder()
+                                .name(cu.getCompany().getName())
+                                .email(cu.getCompany().getEmail())
+                                .logo(cu.getCompany().getLogo())
+                                .guid(cu.getCompany().getGuid())
+                                .createdAt(cu.getCompany().getCreatedAt())
+                                .updatedAt(cu.getCompany().getUpdatedAt())
+                                .build();
+                    })
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
             throw e;
         }
     }

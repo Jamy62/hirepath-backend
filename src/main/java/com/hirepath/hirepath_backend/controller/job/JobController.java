@@ -41,16 +41,17 @@ public class JobController {
                                                   @RequestParam(value = "salary", required = false) Double salary,
                                                   @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
                                                   @RequestParam(value = "first", required = false, defaultValue = "0") int first,
-                                                  @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
+                                                  @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max,
+                                                  @RequestParam(value = "userGuid", required = false) String userGuid) {
 
-        List<JobListDTO> jobList = jobService.jobList(searchTitle, companyGuid, provinceGuid, townshipGuid, jobTypeGuid, experienceLevelGuid, industryGuid, salary, orderBy, first, max);
+        List<JobListDTO> jobList = jobService.jobList(searchTitle, companyGuid, provinceGuid, townshipGuid, jobTypeGuid, experienceLevelGuid, industryGuid, salary, userGuid, orderBy, first, max);
 
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(jobList, "Job list fetched successfully"));
     }
 
     @GetMapping("/detail/{jobGuid}")
-    public ResponseEntity<ResponseFormat> jobDetail(@PathVariable String jobGuid) {
-        JobDetailDTO jobDetail = jobService.jobDetail(jobGuid);
+    public ResponseEntity<ResponseFormat> jobDetail(@PathVariable String jobGuid, @RequestParam(value = "userGuid", required = false) String userGuid) {
+        JobDetailDTO jobDetail = jobService.jobDetail(jobGuid, userGuid);
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(jobDetail, "Job detail fetched successfully"));
     }
 }

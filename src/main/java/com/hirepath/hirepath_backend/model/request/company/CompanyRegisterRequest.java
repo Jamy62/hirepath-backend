@@ -8,8 +8,6 @@ import lombok.*;
 @Data
 public class CompanyRegisterRequest {
     private String name;
-    private String logo;
-    private String banner;
     private String description;
     private String phone;
     @Email(message = "Email must be a valid email address")

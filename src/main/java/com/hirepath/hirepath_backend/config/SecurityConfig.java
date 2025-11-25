@@ -42,6 +42,16 @@ public class SecurityConfig {
                         .requestMatchers("/v1/auth/**").permitAll()
                         .requestMatchers("/v1/user/register").permitAll()
                         .requestMatchers("/v1/user/register/admin").authenticated()
+
+                        .requestMatchers(HttpMethod.GET, "/v1/job/list").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/job/detail/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/industry/list/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/job-type/list/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/experience-level/list/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/province/list/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/township/list/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/v1/files/download/**").permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);

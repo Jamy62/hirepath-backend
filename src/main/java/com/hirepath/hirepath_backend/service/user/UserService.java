@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.service.user;
 
+import com.hirepath.hirepath_backend.model.dto.company.CompanyListDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserListDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserProfileDTO;
@@ -20,4 +21,5 @@ public interface UserService {
     String userDelete(String userGuid, String email);
     UserDetailDTO userDetail(String userGuid);
     UserProfileDTO userProfile(String email);
+    List<CompanyListDTO> getUserCompanies(String email);
 }

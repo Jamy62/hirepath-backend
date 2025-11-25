@@ -1,6 +1,7 @@
 package com.hirepath.hirepath_backend.service.job.impl;
 
 import com.hirepath.hirepath_backend.model.dto.job.JobDetailDTO;
+import com.hirepath.hirepath_backend.model.dto.job.JobDetailProjection;
 import com.hirepath.hirepath_backend.model.dto.job.JobListDTO;
 import com.hirepath.hirepath_backend.model.dto.job.JobListProjection;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
@@ -137,23 +138,30 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public List<JobListDTO> jobList(String searchTitle, String companyGuid, String provinceGuid, String townshipGuid,
-                                    String jobTypeGuid, String experienceLevelGuid, String industryGuid, Double salary, String orderBy, int first, int max) {
+                                    String jobTypeGuid, String experienceLevelGuid, String industryGuid, Double salary, String userGuid, String orderBy, int first, int max) {
         try {
+            Long userId = null;
+            if (userGuid != null && !userGuid.isBlank()) {
+                userId = userService.findByGuid(userGuid).getId();
+            }
+
             List<JobListProjection> jobListProjections = jobRepository.findAllJobsForListView(searchTitle, companyGuid, provinceGuid, townshipGuid,
-                    jobTypeGuid, experienceLevelGuid, industryGuid, salary, orderBy, first, max);
+                    jobTypeGuid, experienceLevelGuid, industryGuid, salary, userId, orderBy, first, max);
 
             return jobListProjections.stream()
                     .map(p -> JobListDTO.builder()
                             .guid(p.getGuid())
                             .title(p.getTitle())
-                            .salary(p.getSalary())
+                            .minSalary(p.getMinSalary())
+                            .maxSalary(p.getMaxSalary())
                             .location(p.getLocation())
                             .companyName(p.getCompanyName())
                             .companyLogo(p.getCompanyLogo())
-                            .isCompanyVerified(p.getIsCompanyVerified())
                             .jobType(p.getJobType())
                             .experienceLevel(p.getExperienceLevel())
                             .createdAt(p.getCreatedAt() != null ? p.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
+                            .isApplied(p.getIsApplied() == 1)
+                            .isEmployed(p.getIsEmployed() == 1)
                             .build())
                     .collect(Collectors.toList());
         } catch (Exception e) {
@@ -162,30 +170,40 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public JobDetailDTO jobDetail(String jobGuid) {
+    public JobDetailDTO jobDetail(String jobGuid, String userGuid) {
         try {
+            Long userId = null;
+            if (userGuid != null && !userGuid.isBlank()) {
+                userId = userService.findByGuid(userGuid).getId();
+            }
+
+            JobDetailProjection projection = jobRepository.findJobDetailByGuid(jobGuid, userId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found"));
+
             Job job = findByGuid(jobGuid);
             List<String> industries = jobIndustryRepository.findAllByJob(job).stream()
                     .map(jobIndustry -> jobIndustry.getIndustry().getName())
                     .collect(Collectors.toList());
 
             return JobDetailDTO.builder()
-                    .guid(job.getGuid())
-                    .title(job.getTitle())
-                    .description(job.getDescription())
-                    .requirements(job.getRequirements())
-                    .benefits(job.getBenefits())
-                    .minSalary(job.getMinSalary())
-                    .maxSalary(job.getMaxSalary())
-                    .jobType(job.getJobType().getName())
-                    .experienceLevel(job.getExperienceLevel().getName())
-                    .location(job.getTownship().getName())
-                    .companyGuid(job.getCompany().getGuid())
-                    .companyName(job.getCompany().getName())
-                    .companyLogo(job.getCompany().getLogo())
+                    .guid(projection.getGuid())
+                    .title(projection.getTitle())
+                    .description(projection.getDescription())
+                    .requirements(projection.getRequirements())
+                    .benefits(projection.getBenefits())
+                    .minSalary(projection.getMinSalary())
+                    .maxSalary(projection.getMaxSalary())
+                    .jobType(projection.getJobType())
+                    .experienceLevel(projection.getExperienceLevel())
+                    .location(projection.getLocation())
+                    .companyGuid(projection.getCompanyGuid())
+                    .companyName(projection.getCompanyName())
+                    .companyLogo(projection.getCompanyLogo())
                     .industries(industries)
-                    .postedDate(job.getPostedDate())
-                    .expireDate(job.getExpireDate())
+                    .postedDate(projection.getPostedDate() != null ? projection.getPostedDate().toInstant().atZone(ZoneId.systemDefault()) : null)
+                    .expireDate(projection.getExpireDate() != null ? projection.getExpireDate().toInstant().atZone(ZoneId.systemDefault()) : null)
+                    .isApplied(projection.getIsApplied() == 1)
+                    .isEmployed(projection.getIsEmployed() == 1)
                     .build();
         } catch (Exception e) {
             throw e;

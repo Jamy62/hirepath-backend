@@ -5,12 +5,14 @@ import java.sql.Timestamp;
 public interface JobListProjection {
     String getGuid();
     String getTitle();
-    String getSalary();
+    String getMinSalary();
+    String getMaxSalary();
     String getLocation();
     String getCompanyName();
     String getCompanyLogo();
-    Boolean getIsCompanyVerified();
     String getJobType();
     String getExperienceLevel();
     Timestamp getCreatedAt();
+    Integer getIsApplied();
+    Integer getIsEmployed();
 }

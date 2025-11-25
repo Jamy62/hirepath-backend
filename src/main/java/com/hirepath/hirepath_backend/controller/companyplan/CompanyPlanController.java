@@ -23,7 +23,7 @@ public class CompanyPlanController {
     private final CompanyPlanService companyPlanService;
 
     @PostMapping("/purchase")
-    @PreAuthorize("hasAnyRole('COMPANY_OWNER'")
+    @PreAuthorize("hasAnyRole('COMPANY_OWNER')")
     public ResponseEntity<ResponseFormat> purchasePlan(@Valid @RequestBody PurchasePlanRequest request, Principal principal,
                                                             Authentication authentication) {
         companyPlanService.purchasePlan(request, principal.getName(), AuthenticationUtil.getGuid(authentication.getDetails()));

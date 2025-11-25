@@ -28,8 +28,8 @@ public class JobTypeController {
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Job type created successfully"));
     }
 
-    @GetMapping("/list/admin")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @GetMapping("/list")
+    @PreAuthorize("hasAnyRole('SYSTEM', 'COMPANY')")
     public ResponseEntity<ResponseFormat> jobTypeList(
             @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
             @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,

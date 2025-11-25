@@ -1,5 +1,6 @@
 package com.hirepath.hirepath_backend.controller.user;
 
+import com.hirepath.hirepath_backend.model.dto.company.CompanyListDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserListDTO;
 import com.hirepath.hirepath_backend.model.dto.user.UserProfileDTO;
@@ -87,5 +88,12 @@ public class UserController {
             Principal principal) {
         UserProfileDTO response = userService.userProfile(principal.getName());
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Successfully retrieved user profile"));
+    }
+
+    @GetMapping("/companies")
+    @PreAuthorize("hasAnyRole('SYSTEM')")
+    public ResponseEntity<ResponseFormat> getUserCompanies(Principal principal) {
+        List<CompanyListDTO> response = userService.getUserCompanies(principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Successfully retrieved user companies"));
     }
 }

@@ -18,4 +18,3 @@ public class CompanyListDTO {
     private ZonedDateTime createdAt;
     private ZonedDateTime updatedAt;
 }
-

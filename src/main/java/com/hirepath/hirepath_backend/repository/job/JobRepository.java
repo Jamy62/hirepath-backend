@@ -1,6 +1,8 @@
 package com.hirepath.hirepath_backend.repository.job;
 
+import com.hirepath.hirepath_backend.model.dto.job.JobDetailProjection;
 import com.hirepath.hirepath_backend.model.dto.job.JobListProjection;
+import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.entity.job.Job;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,19 +15,39 @@ import java.util.Optional;
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long> {
     Optional<Job> findByGuid(String guid);
+    List<Job> findAllByCompany(Company company);
 
     @Query(value = """
             SELECT
                 j.guid AS guid,
                 j.title AS title,
-                j.salary AS salary,
+                j.min_salary AS minSalary,
+                j.max_salary AS maxSalary,
                 t.name AS location,
                 c.name AS companyName,
                 c.logo AS companyLogo,
-                (c.verification_status = 'TRUE') AS isCompanyVerified,
                 jt.name AS jobType,
                 el.name AS experienceLevel,
-                j.created_at AS createdAt
+                j.created_at AS createdAt,
+                (CASE
+                    WHEN :currentUserId IS NULL THEN 0
+                    ELSE EXISTS (
+                        SELECT 1 FROM applications a
+                        WHERE a.job_id = j.id
+                        AND a.user_id = :currentUserId
+                        AND a.status != 'REJECTED'
+                        AND a.is_deleted = 1
+                    )
+                END) AS isApplied,
+                (CASE
+                    WHEN :currentUserId IS NULL THEN 0
+                    ELSE EXISTS (
+                        SELECT 1 FROM company_user cu
+                        WHERE cu.company_id = j.company_id
+                        AND cu.user_id = :currentUserId
+                        AND cu.is_deleted = 0
+                    )
+                END) AS isEmployed
             FROM
                 jobs j
             JOIN
@@ -39,9 +61,10 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             LEFT JOIN
                 experience_levels el ON j.experience_level_id = el.id
             LEFT JOIN
-                job_industries ji ON j.id = ji.job_id
+                job_industry ji ON j.id = ji.job_id
             WHERE
-                j.is_deleted = 0 AND j.is_active = 1
+                j.is_deleted = 0
+                AND j.expire_date >= NOW()
                 AND (:searchTitle IS NULL OR LOWER(j.title) LIKE LOWER(CONCAT('%', :searchTitle, '%')))
                 AND (:companyGuid IS NULL OR c.guid = :companyGuid)
                 AND (:provinceGuid IS NULL OR p.guid = :provinceGuid)
@@ -65,7 +88,60 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             @Param("experienceLevelGuid") String experienceLevelGuid,
             @Param("industryGuid") String industryGuid,
             @Param("salary") Double salary,
+            @Param("currentUserId") Long currentUserId,
             @Param("orderBy") String orderBy,
             @Param("first") int first,
             @Param("max") int max);
+
+    @Query(value = """
+            SELECT
+                j.guid AS guid,
+                j.title AS title,
+                j.description AS description,
+                j.requirements AS requirements,
+                j.benefits AS benefits,
+                j.min_salary AS minSalary,
+                j.max_salary AS maxSalary,
+                jt.name AS jobType,
+                el.name AS experienceLevel,
+                t.name AS location,
+                c.guid AS companyGuid,
+                c.name AS companyName,
+                c.logo AS companyLogo,
+                j.posted_date AS postedDate,
+                j.expire_date AS expireDate,
+                (CASE
+                    WHEN :userId IS NULL THEN 0
+                    ELSE EXISTS (
+                        SELECT 1 FROM applications a
+                        WHERE a.job_id = j.id
+                        AND a.user_id = :userId
+                        AND a.status != 'REJECTED'
+                        AND a.is_deleted = 1
+                    )
+                END) AS isApplied,
+                (CASE
+                    WHEN :userId IS NULL THEN 0
+                    ELSE EXISTS (
+                        SELECT 1 FROM company_user cu
+                        WHERE cu.company_id = j.company_id
+                        AND cu.user_id = :userId
+                        AND cu.is_deleted = 0
+                    )
+                END) AS isEmployed
+            FROM jobs j
+            LEFT JOIN
+                job_types jt ON j.job_type_id = jt.id
+            LEFT JOIN
+                experience_levels el ON j.experience_level_id = el.id
+            LEFT JOIN
+                townships t ON j.township_id = t.id
+            LEFT JOIN
+                companies c ON j.company_id = c.id
+            WHERE
+                j.guid = :jobGuid
+            """, nativeQuery = true)
+    Optional<JobDetailProjection> findJobDetailByGuid(
+            @Param("jobGuid") String jobGuid,
+            @Param("userId") Long userId);
 }

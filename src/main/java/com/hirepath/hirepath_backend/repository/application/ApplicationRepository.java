@@ -4,10 +4,8 @@ import com.hirepath.hirepath_backend.model.dto.application.CompanyApplicationLis
 import com.hirepath.hirepath_backend.model.dto.application.UserApplicationListProjection;
 import com.hirepath.hirepath_backend.model.entity.application.Application;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
-import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
 import com.hirepath.hirepath_backend.model.entity.job.Job;
 import com.hirepath.hirepath_backend.model.entity.user.User;
-import org.hibernate.type.JavaObjectType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -20,7 +18,9 @@ import java.util.Optional;
 public interface ApplicationRepository extends CrudRepository<Application, Long> {
     Optional<Application> findByGuid(String guid);
     Optional<Application> findByUserAndJobAndStatusAndIsDeletedFalse(User user, Job job, String status);
-    Optional<Application> findByUserAndJobAndStatusAndIsDeletedTrue(User user, Job job, String status);
+
+    @Query("SELECT a FROM Application a WHERE a.user = :user AND a.job.company = :company AND a.status = :status AND a.isDeleted = false")
+    List<Application> findAllByUserAndCompanyAndStatusAndIsDeletedFalse(@Param("user") User user, @Param("company") Company company, @Param("status") String status);
 
     @Query(value = """
             SELECT
@@ -33,7 +33,6 @@ public interface ApplicationRepository extends CrudRepository<Application, Long>
             JOIN jobs j ON a.job_id = j.id
             JOIN companies c ON j.company_id = c.id
             WHERE a.user_id = :userId
-            AND a.is_deleted = 0
             ORDER BY a.application_date DESC
             """, nativeQuery = true)
     List<UserApplicationListProjection> findAllByUser(@Param("userId") Long userId);
@@ -51,7 +50,6 @@ public interface ApplicationRepository extends CrudRepository<Application, Long>
             JOIN users u ON a.user_id = u.id
             JOIN resumes r ON a.resume_id = r.id
             WHERE j.company_id = :companyId
-            AND a.is_deleted = 0
             ORDER BY a.application_date DESC
             """, nativeQuery = true)
     List<CompanyApplicationListProjection> findAllByCompany(@Param("companyId") Long companyId);

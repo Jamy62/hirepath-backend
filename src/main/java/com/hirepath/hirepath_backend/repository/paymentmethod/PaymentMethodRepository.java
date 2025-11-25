@@ -17,14 +17,14 @@ public interface PaymentMethodRepository extends CrudRepository<PaymentMethod, L
     @Query(value = """
             SELECT
                 pm.guid AS guid,
-                pm.card_code AS cardCode,
+                pm.code AS cardCode,
                 pt.name AS paymentTypeName,
                 pm.created_at AS createdAt,
                 pm.updated_at AS updatedAt
             FROM payment_methods pm
             JOIN payment_types pt ON pm.payment_type_id = pt.id
-            AND pm.is_deleted = 0
-            AND pm.company_id = companyId
+            WHERE pm.is_deleted = 0
+            AND pm.company_id = :companyId
             """, nativeQuery = true)
     List<PaymentMethodListProjection> findAllPaymentMethodsAdminPanel(@Param("companyId") Long companyId);
 }

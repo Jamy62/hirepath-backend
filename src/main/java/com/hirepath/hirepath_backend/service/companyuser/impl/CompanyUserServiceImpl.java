@@ -61,6 +61,25 @@ public class CompanyUserServiceImpl implements CompanyUserService {
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
             User assigner = userService.findByEmail(email);
 
+            boolean requesterIsCompanyOwner = companyUserRepository.findByUserAndCompanyAndIsDeletedFalse(assigner, company)
+                    .map(cu -> cu.getRole().getName().equals("COMPANY_OWNER"))
+                    .orElse(false);
+
+            if (newRole.getName().equals("COMPANY_OWNER") && !requesterIsCompanyOwner) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the current Company Owner can assign a new owner.");
+            }
+
+            if (newRole.getName().equals("COMPANY_OWNER") && requesterIsCompanyOwner) {
+                Role companyAdminRole = roleRepository.findByName("COMPANY_ADMIN")
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "COMPANY_ADMIN role not found"));
+                CompanyUser currentOwnerCompanyUser = companyUserRepository.findByUserAndCompanyAndIsDeletedFalse(assigner, company)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Requester's company user record not found."));
+                currentOwnerCompanyUser.setRole(companyAdminRole);
+                currentOwnerCompanyUser.setUpdatedAt(ZonedDateTime.now());
+                currentOwnerCompanyUser.setUpdatedBy(assigner.getId());
+                companyUserRepository.save(currentOwnerCompanyUser);
+            }
+
             Optional<CompanyUser> existingCompanyUserOpt = companyUserRepository.findByUserAndCompanyIncludingDeleted(user.getId(), company.getId());
 
             if (existingCompanyUserOpt.isPresent()) {
@@ -105,20 +124,17 @@ public class CompanyUserServiceImpl implements CompanyUserService {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Company user does not belong to this company");
             }
 
-            boolean requesterIsAdmin = requester.getRole().getName().equals("ADMIN");
             boolean requesterIsCompanyOwner = companyUserRepository.findByUserAndCompanyAndIsDeletedFalse(requester, company)
                     .map(cu -> cu.getRole().getName().equals("COMPANY_OWNER"))
                     .orElse(false);
 
-            if (requesterIsAdmin && newRole.getName().equals("COMPANY_OWNER")) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admins cannot assign the COMPANY_OWNER role.");
+            // Corrected Logic: Only an owner can assign a new owner.
+            if (newRole.getName().equals("COMPANY_OWNER") && !requesterIsCompanyOwner) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only the current Company Owner can assign a new owner.");
             }
 
-            if (targetCompanyUser.getRole().getName().equals("COMPANY_OWNER") && !requesterIsCompanyOwner) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only a COMPANY_OWNER can reassign another COMPANY_OWNER.");
-            }
-
-            if (targetCompanyUser.getRole().getName().equals("COMPANY_OWNER") && newRole.getName().equals("COMPANY_OWNER")) {
+            // Demotion logic for the assigner if they are assigning a new owner.
+            if (newRole.getName().equals("COMPANY_OWNER") && requesterIsCompanyOwner) {
                 Role companyAdminRole = roleRepository.findByName("COMPANY_ADMIN")
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "COMPANY_ADMIN role not found"));
                 CompanyUser currentOwnerCompanyUser = companyUserRepository.findByUserAndCompanyAndIsDeletedFalse(requester, company)

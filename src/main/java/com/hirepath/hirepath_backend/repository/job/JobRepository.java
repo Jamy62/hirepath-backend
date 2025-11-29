@@ -2,20 +2,20 @@ package com.hirepath.hirepath_backend.repository.job;
 
 import com.hirepath.hirepath_backend.model.dto.job.JobDetailProjection;
 import com.hirepath.hirepath_backend.model.dto.job.JobListProjection;
-import com.hirepath.hirepath_backend.model.entity.company.Company;
+import com.hirepath.hirepath_backend.model.dto.report.MostPopularJobProjection;
 import com.hirepath.hirepath_backend.model.entity.job.Job;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long> {
     Optional<Job> findByGuid(String guid);
-    List<Job> findAllByCompany(Company company);
 
     @Query(value = """
             SELECT
@@ -62,6 +62,8 @@ public interface JobRepository extends JpaRepository<Job, Long> {
                 experience_levels el ON j.experience_level_id = el.id
             LEFT JOIN
                 job_industry ji ON j.id = ji.job_id
+            LEFT JOIN
+                job_function jf ON j.job_function_id = jf.id
             WHERE
                 j.is_deleted = 0
                 AND j.expire_date >= NOW()
@@ -72,6 +74,7 @@ public interface JobRepository extends JpaRepository<Job, Long> {
                 AND (:jobTypeGuid IS NULL OR jt.guid = :jobTypeGuid)
                 AND (:experienceLevelGuid IS NULL OR el.guid = :experienceLevelGuid)
                 AND (:industryGuid IS NULL OR ji.industry_id = (SELECT id FROM industries WHERE guid = :industryGuid))
+                AND (:jobFunctionGuid IS NULL OR jf.guid = :jobFunctionGuid)
                 AND (:salary IS NULL OR :salary BETWEEN j.min_salary AND j.max_salary)
             GROUP BY j.id
             ORDER BY
@@ -87,6 +90,7 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             @Param("jobTypeGuid") String jobTypeGuid,
             @Param("experienceLevelGuid") String experienceLevelGuid,
             @Param("industryGuid") String industryGuid,
+            @Param("jobFunctionGuid") String jobFunctionGuid,
             @Param("salary") Double salary,
             @Param("currentUserId") Long currentUserId,
             @Param("orderBy") String orderBy,
@@ -141,7 +145,24 @@ public interface JobRepository extends JpaRepository<Job, Long> {
             WHERE
                 j.guid = :jobGuid
             """, nativeQuery = true)
-    Optional<JobDetailProjection> findJobDetailByGuid(
-            @Param("jobGuid") String jobGuid,
-            @Param("userId") Long userId);
+    Optional<JobDetailProjection> findJobDetailByGuid(@Param("jobGuid") String jobGuid, @Param("userId") Long userId);
+
+    @Query(value = """
+            SELECT
+                j.title AS jobTitle,
+                COUNT(a.id) AS applicationCount,
+                c.name AS companyName,
+                c.logo AS logo,
+                c.website AS website
+            FROM jobs j
+            JOIN applications a ON j.id = a.job_id
+            JOIN companies c ON j.company_id = c.id
+            WHERE a.application_date >= :startDate
+            AND j.is_deleted = 0
+            AND a.is_deleted = 0
+            AND c.is_deleted = 0
+            GROUP BY j.title, c.name, c.logo, c.website
+            ORDER BY applicationCount DESC
+            """, nativeQuery = true)
+    List<MostPopularJobProjection> findMostPopularJobs(@Param("startDate") ZonedDateTime startDate);
 }

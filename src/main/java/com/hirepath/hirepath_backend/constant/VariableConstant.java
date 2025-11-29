@@ -1,7 +1,6 @@
 package com.hirepath.hirepath_backend.constant;
 
 public class VariableConstant {
-    // roles
     public static final String USER = "USER";
     public static final String ADMIN = "ADMIN";
     public static final String COMPANY_ADMIN = "COMPANY_ADMIN";

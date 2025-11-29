@@ -12,6 +12,8 @@ public class CompanyApplicationListDTO {
     private String applicationGuid;
     private String jobTitle;
     private String applicantName;
+    private String userGuid;
+    private String profilePicture;
     private String resumeGuid;
     private String status;
 

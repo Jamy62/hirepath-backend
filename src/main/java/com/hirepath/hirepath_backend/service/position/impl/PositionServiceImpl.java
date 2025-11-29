@@ -2,13 +2,16 @@ package com.hirepath.hirepath_backend.service.position.impl;
 
 import com.hirepath.hirepath_backend.model.dto.position.PositionListDTO;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
+import com.hirepath.hirepath_backend.model.entity.companyuserposition.CompanyUserPosition;
 import com.hirepath.hirepath_backend.model.entity.position.Position;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.position.PositionCreateRequest;
+import com.hirepath.hirepath_backend.repository.companyuserposition.CompanyUserPositionRepository;
 import com.hirepath.hirepath_backend.repository.position.PositionRepository;
 import com.hirepath.hirepath_backend.service.company.CompanyService;
 import com.hirepath.hirepath_backend.service.position.PositionService;
 import com.hirepath.hirepath_backend.service.user.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,7 @@ public class PositionServiceImpl implements PositionService {
     private final PositionRepository positionRepository;
     private final CompanyService companyService;
     private final UserService userService;
+    private final CompanyUserPositionRepository companyUserPositionRepository;
 
     @Override
     public Position findByGuid(String guid) {
@@ -78,6 +82,7 @@ public class PositionServiceImpl implements PositionService {
     }
 
     @Override
+    @Transactional
     public void positionDelete(String positionGuid, String email, String companyGuid) {
         try {
             User user = userService.findByEmail(email);
@@ -86,6 +91,14 @@ public class PositionServiceImpl implements PositionService {
 
             if (!position.getCompany().equals(company)) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to delete this position");
+            }
+
+            List<CompanyUserPosition> companyUserPositions = companyUserPositionRepository.findAllByPositionAndIsDeletedFalse(position);
+            for (CompanyUserPosition cup : companyUserPositions) {
+                cup.setIsDeleted(true);
+                cup.setUpdatedAt(ZonedDateTime.now());
+                cup.setUpdatedBy(user.getId());
+                companyUserPositionRepository.save(cup);
             }
 
             position.setIsDeleted(true);

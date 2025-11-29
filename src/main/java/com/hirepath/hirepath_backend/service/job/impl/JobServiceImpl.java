@@ -4,6 +4,7 @@ import com.hirepath.hirepath_backend.model.dto.job.JobDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.job.JobDetailProjection;
 import com.hirepath.hirepath_backend.model.dto.job.JobListDTO;
 import com.hirepath.hirepath_backend.model.dto.job.JobListProjection;
+import com.hirepath.hirepath_backend.model.entity.application.Application;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.entity.companyplan.CompanyPlan;
 import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
@@ -16,6 +17,7 @@ import com.hirepath.hirepath_backend.model.entity.jobtype.JobType;
 import com.hirepath.hirepath_backend.model.entity.township.Township;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.job.JobCreateRequest;
+import com.hirepath.hirepath_backend.repository.application.ApplicationRepository;
 import com.hirepath.hirepath_backend.repository.company.CompanyRepository;
 import com.hirepath.hirepath_backend.repository.companyplan.CompanyPlanRepository;
 import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
@@ -60,6 +62,7 @@ public class JobServiceImpl implements JobService {
     private final UserService userService;
     private final JobIndustryRepository jobIndustryRepository;
     private final CompanyPlanRepository companyPlanRepository;
+    private final ApplicationRepository applicationRepository;
 
     @Override
     public Job findByGuid(String guid) {
@@ -137,8 +140,39 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    public void deleteJob(String jobGuid, String email, String companyGuid) {
+        try {
+            Job job = findByGuid(jobGuid);
+            User user = userService.findByEmail(email);
+            Company company = companyService.findByGuid(companyGuid);
+
+            if (!job.getCompany().equals(company)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to delete this job");
+            }
+
+            List<Application> applications = applicationRepository.findAllByJobAndIsDeletedFalse(job);
+            for (Application application : applications) {
+                if (!company.equals(application.getJob().getCompany())) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not authorized to reject this application");
+                }
+                application.setStatus("REJECTED");
+                application.setUpdatedAt(ZonedDateTime.now());
+                application.setUpdatedBy(user.getId());
+                applicationRepository.save(application);
+            }
+
+            job.setIsDeleted(true);
+            job.setUpdatedAt(ZonedDateTime.now());
+            job.setUpdatedBy(user.getId());
+            jobRepository.save(job);
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
     public List<JobListDTO> jobList(String searchTitle, String companyGuid, String provinceGuid, String townshipGuid,
-                                    String jobTypeGuid, String experienceLevelGuid, String industryGuid, Double salary, String userGuid, String orderBy, int first, int max) {
+                                    String jobTypeGuid, String experienceLevelGuid, String industryGuid, String jobFunctionGuid, Double salary, String userGuid, String orderBy, int first, int max) {
         try {
             Long userId = null;
             if (userGuid != null && !userGuid.isBlank()) {
@@ -146,7 +180,7 @@ public class JobServiceImpl implements JobService {
             }
 
             List<JobListProjection> jobListProjections = jobRepository.findAllJobsForListView(searchTitle, companyGuid, provinceGuid, townshipGuid,
-                    jobTypeGuid, experienceLevelGuid, industryGuid, salary, userId, orderBy, first, max);
+                    jobTypeGuid, experienceLevelGuid, industryGuid, jobFunctionGuid, salary, userId, orderBy, first, max);
 
             return jobListProjections.stream()
                     .map(p -> JobListDTO.builder()

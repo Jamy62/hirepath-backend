@@ -3,10 +3,12 @@ package com.hirepath.hirepath_backend.service.plan.impl;
 import com.hirepath.hirepath_backend.constant.VariableConstant;
 import com.hirepath.hirepath_backend.model.dto.plan.PlanListDTO;
 import com.hirepath.hirepath_backend.model.dto.plan.PlanListProjection;
+import com.hirepath.hirepath_backend.model.entity.companyplan.CompanyPlan;
 import com.hirepath.hirepath_backend.model.entity.plan.Plan;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.plan.PlanCreateRequest;
 import com.hirepath.hirepath_backend.model.request.plan.PlanUpdateRequest;
+import com.hirepath.hirepath_backend.repository.companyplan.CompanyPlanRepository;
 import com.hirepath.hirepath_backend.repository.plan.PlanRepository;
 import com.hirepath.hirepath_backend.service.plan.PlanService;
 import com.hirepath.hirepath_backend.service.user.UserService;
@@ -28,6 +30,7 @@ public class PlanServiceImpl implements PlanService {
 
     private final PlanRepository planRepository;
     private final UserService userService;
+    private final CompanyPlanRepository companyPlanRepository;
 
     @Override
     public Plan findByGuid(String guid) {
@@ -129,8 +132,15 @@ public class PlanServiceImpl implements PlanService {
     public void planDelete(String planGuid, String adminEmail) {
         try {
             User admin = userService.findByEmail(adminEmail);
-
             Plan plan = findByGuid(planGuid);
+
+            List<CompanyPlan> companyPlans = companyPlanRepository.findAllByPlanAndIsDeletedFalse(plan);
+            for (CompanyPlan companyPlan : companyPlans) {
+                companyPlan.setIsDeleted(true);
+                companyPlan.setUpdatedAt(ZonedDateTime.now());
+                companyPlan.setUpdatedBy(admin.getId());
+                companyPlanRepository.save(companyPlan);
+            }
 
             plan.setIsDeleted(true);
             plan.setUpdatedAt(ZonedDateTime.now());

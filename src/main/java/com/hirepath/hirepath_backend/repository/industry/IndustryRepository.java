@@ -1,6 +1,7 @@
 package com.hirepath.hirepath_backend.repository.industry;
 
 import com.hirepath.hirepath_backend.model.dto.industry.IndustryListProjection;
+import com.hirepath.hirepath_backend.model.dto.report.TrendingIndustryProjection;
 import com.hirepath.hirepath_backend.model.entity.industry.Industry;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -35,4 +36,17 @@ public interface IndustryRepository extends CrudRepository<Industry, Long> {
             @Param("orderBy") String orderBy,
             @Param("first") int first,
             @Param("max") int max);
+
+    @Query(value = """
+            SELECT
+                i.name AS industryName,
+                COUNT(a.id) AS applicationCount
+            FROM industries i
+            JOIN job_industry ji ON i.id = ji.industry_id
+            JOIN jobs j ON ji.job_id = j.id
+            JOIN applications a ON j.id = a.job_id
+            GROUP BY i.name
+            ORDER BY applicationCount DESC
+            """, nativeQuery = true)
+    List<TrendingIndustryProjection> findTrendingIndustries();
 }

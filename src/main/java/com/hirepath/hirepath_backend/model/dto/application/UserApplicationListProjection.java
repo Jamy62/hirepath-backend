@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 
 public interface UserApplicationListProjection {
     String getApplicationGuid();
+    String getJobGuid();
     String getJobTitle();
     String getCompanyName();
     String getStatus();

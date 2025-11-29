@@ -5,8 +5,10 @@ import com.hirepath.hirepath_backend.model.dto.company.CompanyDetailDTO;
 import com.hirepath.hirepath_backend.model.dto.company.CompanyListDTO;
 import com.hirepath.hirepath_backend.model.dto.company.CompanyListProjection;
 import com.hirepath.hirepath_backend.model.dto.company.CompanyProfileDTO;
+import com.hirepath.hirepath_backend.model.dto.location.LocationDTO;
 import com.hirepath.hirepath_backend.model.entity.company.Company;
 import com.hirepath.hirepath_backend.model.entity.companyuser.CompanyUser;
+import com.hirepath.hirepath_backend.model.entity.location.Location;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.company.CompanyRegisterRequest;
@@ -15,6 +17,7 @@ import com.hirepath.hirepath_backend.model.request.company.CompanyVerifyRequest;
 import com.hirepath.hirepath_backend.model.request.company.CompanyVerifyResponseRequest;
 import com.hirepath.hirepath_backend.repository.company.CompanyRepository;
 import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
+import com.hirepath.hirepath_backend.repository.location.LocationRepository;
 import com.hirepath.hirepath_backend.repository.role.RoleRepository;
 import com.hirepath.hirepath_backend.service.company.CompanyService;
 import com.hirepath.hirepath_backend.service.user.UserService;
@@ -29,6 +32,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +43,7 @@ public class CompanyServiceImpl implements CompanyService {
     private final CompanyUserRepository companyUserRepository;
     private final RoleRepository roleRepository;
     private final UserService userService;
+    private final LocationRepository locationRepository;
 
     @Override
     public Company findByGuid(String guid) {
@@ -61,6 +66,7 @@ public class CompanyServiceImpl implements CompanyService {
                     .description(request.getDescription())
                     .email(request.getEmail())
                     .phone(request.getPhone())
+                    .foundedDate(request.getFoundedDate())
                     .amount(BigDecimal.valueOf(0))
                     .verificationStatus(Company.VerificationStatus.FALSE)
                     .guid(UUID.randomUUID().toString())
@@ -220,6 +226,9 @@ public class CompanyServiceImpl implements CompanyService {
             if (request.getBusinessType() != null && !request.getBusinessType().isBlank()) {
                 company.setBusinessType(request.getBusinessType());
             }
+            if (request.getFoundedDate() != null) {
+                company.setFoundedDate(request.getFoundedDate());
+            }
             company.setUpdatedAt(ZonedDateTime.now());
             company.setUpdatedBy(admin.getId());
 
@@ -249,10 +258,21 @@ public class CompanyServiceImpl implements CompanyService {
     public CompanyDetailDTO companyDetail(String companyGuid) {
         try {
             Company company = findByGuid(companyGuid);
+            List<Location> locations = locationRepository.findAllByCompanyAndIsDeletedFalse(company);
+            List<LocationDTO> locationDTOs = locations.stream()
+                    .map(location -> LocationDTO.builder()
+                            .name(location.getName())
+                            .address(location.getAddress())
+                            .photo(location.getPhoto())
+                            .guid(location.getGuid())
+                            .build())
+                    .collect(Collectors.toList());
 
             return CompanyDetailDTO.builder()
                     .name(company.getName())
                     .logo(company.getLogo())
+                    .banner(company.getBanner())
+                    .description(company.getDescription())
                     .email(company.getEmail())
                     .phone(company.getPhone())
                     .guid(company.getGuid())
@@ -267,6 +287,7 @@ public class CompanyServiceImpl implements CompanyService {
                     .businessType(company.getBusinessType())
                     .verified_at(company.getVerified_at())
                     .verifiedBy(company.getVerifiedBy())
+                    .locations(locationDTOs)
                     .build();
         } catch (Exception e) {
             throw e;
@@ -277,10 +298,21 @@ public class CompanyServiceImpl implements CompanyService {
     public CompanyProfileDTO companyProfile(String companyGuid) {
         try {
             Company company = findByGuid(companyGuid);
+            List<Location> locations = locationRepository.findAllByCompanyAndIsDeletedFalse(company);
+            List<LocationDTO> locationDTOs = locations.stream()
+                    .map(location -> LocationDTO.builder()
+                            .name(location.getName())
+                            .address(location.getAddress())
+                            .photo(location.getPhoto())
+                            .guid(location.getGuid())
+                            .build())
+                    .collect(Collectors.toList());
 
             return CompanyProfileDTO.builder()
                     .name(company.getName())
                     .logo(company.getLogo())
+                    .banner(company.getBanner())
+                    .description(company.getDescription())
                     .email(company.getEmail())
                     .phone(company.getPhone())
                     .guid(company.getGuid())
@@ -295,6 +327,7 @@ public class CompanyServiceImpl implements CompanyService {
                     .businessType(company.getBusinessType())
                     .verified_at(company.getVerified_at())
                     .verifiedBy(company.getVerifiedBy())
+                    .locations(locationDTOs)
                     .build();
         } catch (Exception e) {
             throw e;

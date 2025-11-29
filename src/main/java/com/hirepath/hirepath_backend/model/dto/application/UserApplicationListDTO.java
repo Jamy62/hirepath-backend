@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 @Builder
 public class UserApplicationListDTO {
     private String applicationGuid;
+    private String jobGuid;
     private String jobTitle;
     private String companyName;
     private String status;

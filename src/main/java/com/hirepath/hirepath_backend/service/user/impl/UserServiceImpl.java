@@ -274,6 +274,7 @@ public class UserServiceImpl implements UserService {
                     .mobile(user.getMobile())
                     .profile(user.getProfile())
                     .role(user.getRole())
+                    .preferredLanguage(user.getPreferredLanguage())
                     .isActive(user.getIsActive())
                     .isBlocked(user.getIsBlocked())
                     .guid(user.getGuid())

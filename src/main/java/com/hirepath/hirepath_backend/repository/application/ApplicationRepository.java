@@ -18,6 +18,7 @@ import java.util.Optional;
 public interface ApplicationRepository extends CrudRepository<Application, Long> {
     Optional<Application> findByGuid(String guid);
     Optional<Application> findByUserAndJobAndStatusAndIsDeletedFalse(User user, Job job, String status);
+    List<Application> findAllByJobAndIsDeletedFalse(Job job);
 
     @Query("SELECT a FROM Application a WHERE a.user = :user AND a.job.company = :company AND a.status = :status AND a.isDeleted = false")
     List<Application> findAllByUserAndCompanyAndStatusAndIsDeletedFalse(@Param("user") User user, @Param("company") Company company, @Param("status") String status);
@@ -25,13 +26,14 @@ public interface ApplicationRepository extends CrudRepository<Application, Long>
     @Query(value = """
             SELECT
                 a.guid AS applicationGuid,
+                j.guid AS jobGuid,
                 j.title AS jobTitle,
                 c.name AS companyName,
                 a.status AS status,
                 a.application_date AS applicationDate
             FROM applications a
-            JOIN jobs j ON a.job_id = j.id
-            JOIN companies c ON j.company_id = c.id
+            LEFT JOIN jobs j ON a.job_id = j.id
+            LEFT JOIN companies c ON j.company_id = c.id
             WHERE a.user_id = :userId
             ORDER BY a.application_date DESC
             """, nativeQuery = true)
@@ -42,13 +44,15 @@ public interface ApplicationRepository extends CrudRepository<Application, Long>
                 a.guid AS applicationGuid,
                 j.title AS jobTitle,
                 u.name AS applicantName,
+                u.guid AS userGuid,
+                u.profile AS profilePicture,
                 r.guid AS resumeGuid,
                 a.status AS status,
                 a.application_date AS applicationDate
             FROM applications a
-            JOIN jobs j ON a.job_id = j.id
-            JOIN users u ON a.user_id = u.id
-            JOIN resumes r ON a.resume_id = r.id
+            LEFT JOIN jobs j ON a.job_id = j.id
+            LEFT JOIN users u ON a.user_id = u.id
+            LEFT JOIN resumes r ON a.resume_id = r.id
             WHERE j.company_id = :companyId
             ORDER BY a.application_date DESC
             """, nativeQuery = true)

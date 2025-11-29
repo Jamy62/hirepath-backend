@@ -6,6 +6,8 @@ public interface CompanyApplicationListProjection {
     String getApplicationGuid();
     String getJobTitle();
     String getApplicantName();
+    String getUserGuid();
+    String getProfilePicture();
     String getResumeGuid();
     String getStatus();
     Timestamp getApplicationDate();

@@ -59,7 +59,7 @@ public class UserController {
     }
 
     @PutMapping("/update/admin/{userGuid}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SYSTEM')")
     public ResponseEntity<ResponseFormat> userUpdate(@PathVariable String userGuid,
                                                      @Valid @RequestBody UserUpdateRequest request, Principal principal) {
         String response = userService.userUpdate(userGuid, request, principal.getName());

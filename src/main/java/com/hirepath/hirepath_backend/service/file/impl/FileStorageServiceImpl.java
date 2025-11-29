@@ -29,7 +29,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -166,6 +168,24 @@ public class FileStorageServiceImpl implements FileStorageService {
         resume.setUpdatedAt(ZonedDateTime.now());
         resume.setUpdatedBy(uploader.getId());
         resumeRepository.save(resume);
+    }
+
+    @Override
+    public void deleteLocation(String locationGuid, String email) {
+        User uploader = userService.findByEmail(email);
+        Location location = locationService.findByGuid(locationGuid);
+
+        location.setIsDeleted(true);
+        location.setUpdatedAt(ZonedDateTime.now());
+        location.setUpdatedBy(uploader.getId());
+        locationRepository.save(location);
+    }
+
+    @Override
+    public String getResumeFilenameByGuid(String resumeGuid) {
+        Resume resume = resumeRepository.findByGuid(resumeGuid)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resume not found"));
+        return resume.getFilePath();
     }
 
     private String store(MultipartFile file, Path location, String storeName) {

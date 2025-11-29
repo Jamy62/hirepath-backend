@@ -10,7 +10,8 @@ import java.util.List;
 public interface JobService {
     Job findByGuid(String guid);
     void jobCreate(JobCreateRequest request, String email, String companyGuid);
+    void deleteJob(String jobGuid, String email, String companyGuid);
     List<JobListDTO> jobList(String searchTitle, String companyGuid, String provinceGuid, String townshipGuid,
-                             String jobTypeGuid, String experienceLevelGuid, String industryGuid, Double salary, String userGuid, String orderBy, int first, int max);
+                             String jobTypeGuid, String experienceLevelGuid, String industryGuid, String jobFunctionGuid, Double salary, String userGuid, String orderBy, int first, int max);
     JobDetailDTO jobDetail(String jobGuid, String userGuid);
 }

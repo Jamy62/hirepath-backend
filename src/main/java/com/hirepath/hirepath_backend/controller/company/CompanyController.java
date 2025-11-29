@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -79,17 +80,19 @@ public class CompanyController {
     }
 
     @PutMapping("/update/admin/{companyGuid}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY')")
     public ResponseEntity<ResponseFormat> companyUpdate(@PathVariable String companyGuid, @Valid @RequestBody CompanyUpdateRequest request,
                                                         Principal principal,
                                                         Authentication authentication) {
-        AuthenticationUtil.isPageMember(authentication.getDetails(), companyGuid);
+        if (!authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+            AuthenticationUtil.isPageMember(authentication.getDetails(), companyGuid);
+        }
         companyService.companyUpdate(companyGuid, request, principal.getName());
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Company updated successfully"));
     }
 
     @DeleteMapping("/delete/admin/{companyGuid}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN' 'COMPANY')")
     public ResponseEntity<ResponseFormat> companyDelete(
             @PathVariable(value = "companyGuid") String companyGuid,
             Principal principal) {

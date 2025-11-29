@@ -11,11 +11,11 @@ import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/preferred-language")
+@RequestMapping("/v1/user/preferred-language")
 public class PreferredLanguageController {
     private final PreferredLanguageService preferredLanguageService;
 
-    @PostMapping("/update")
+    @PostMapping("/update/{preferredLanguageGuid}")
     @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<ResponseFormat> preferredLanguageUpdate(@PathVariable(value = "preferredLanguageGuid") String guid, Principal principal) {
         preferredLanguageService.preferredLanguageUpdate(guid, principal.getName());

@@ -30,6 +30,13 @@ public class JobController {
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Job created successfully"));
     }
 
+    @DeleteMapping("/{jobGuid}")
+    @PreAuthorize("hasAnyRole('COMPANY_OWNER', 'COMPANY_ADMIN')")
+    public ResponseEntity<ResponseFormat> deleteJob(@PathVariable String jobGuid, Principal principal, Authentication authentication) {
+        jobService.deleteJob(jobGuid, principal.getName(), AuthenticationUtil.getGuid(authentication.getDetails()));
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Job deleted successfully"));
+    }
+
     @GetMapping("/list")
     public ResponseEntity<ResponseFormat> jobList(@RequestParam(value = "searchTitle", required = false) String searchTitle,
                                                   @RequestParam(value = "companyGuid", required = false) String companyGuid,
@@ -38,13 +45,14 @@ public class JobController {
                                                   @RequestParam(value = "jobTypeGuid", required = false) String jobTypeGuid,
                                                   @RequestParam(value = "experienceLevelGuid", required = false) String experienceLevelGuid,
                                                   @RequestParam(value = "industryGuid", required = false) String industryGuid,
+                                                  @RequestParam(value = "jobFunctionGuid", required = false) String jobFunctionGuid,
                                                   @RequestParam(value = "salary", required = false) Double salary,
                                                   @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
                                                   @RequestParam(value = "first", required = false, defaultValue = "0") int first,
                                                   @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max,
                                                   @RequestParam(value = "userGuid", required = false) String userGuid) {
 
-        List<JobListDTO> jobList = jobService.jobList(searchTitle, companyGuid, provinceGuid, townshipGuid, jobTypeGuid, experienceLevelGuid, industryGuid, salary, userGuid, orderBy, first, max);
+        List<JobListDTO> jobList = jobService.jobList(searchTitle, companyGuid, provinceGuid, townshipGuid, jobTypeGuid, experienceLevelGuid, industryGuid, jobFunctionGuid, salary, userGuid, orderBy, first, max);
 
         return ResponseEntity.ok(ResponseFormat.createSuccessResponse(jobList, "Job list fetched successfully"));
     }

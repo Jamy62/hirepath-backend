@@ -9,6 +9,7 @@ import com.hirepath.hirepath_backend.model.entity.companyuserposition.CompanyUse
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import com.hirepath.hirepath_backend.model.request.companyuser.AssignCompanyRoleRequest;
+import com.hirepath.hirepath_backend.model.request.companyuser.ReassignCompanyRoleRequest;
 import com.hirepath.hirepath_backend.repository.application.ApplicationRepository;
 import com.hirepath.hirepath_backend.repository.companyuser.CompanyUserRepository;
 import com.hirepath.hirepath_backend.repository.companyuserposition.CompanyUserPositionRepository;
@@ -23,8 +24,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -54,28 +57,83 @@ public class CompanyUserServiceImpl implements CompanyUserService {
         try {
             Company company = companyService.findByGuid(request.getCompanyGuid());
             User user = userService.findByGuid(request.getUserGuid());
-            Role role = roleRepository.findByGuid(request.getRoleGuid())
+            Role newRole = roleRepository.findByGuid(request.getRoleGuid())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
             User assigner = userService.findByEmail(email);
 
-            if (user.getRole().getName().equals("COMPANY_ADMIN") && role.getName().equals("COMPANY_OWNER")) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You cannot assign Company Owner as an Admin");
+            Optional<CompanyUser> existingCompanyUserOpt = companyUserRepository.findByUserAndCompanyIncludingDeleted(user.getId(), company.getId());
+
+            if (existingCompanyUserOpt.isPresent()) {
+                CompanyUser existingCompanyUser = existingCompanyUserOpt.get();
+
+                if (!existingCompanyUser.getIsDeleted() && existingCompanyUser.getRole().equals(newRole)) {
+                    return;
+                }
+
+                existingCompanyUser.setRole(newRole);
+                existingCompanyUser.setIsDeleted(false);
+                existingCompanyUser.setUpdatedAt(ZonedDateTime.now());
+                existingCompanyUser.setUpdatedBy(assigner.getId());
+                companyUserRepository.save(existingCompanyUser);
+            } else {
+                CompanyUser companyUser = CompanyUser.builder()
+                        .company(company)
+                        .user(user)
+                        .role(newRole)
+                        .guid(UUID.randomUUID().toString())
+                        .isDeleted(false)
+                        .createdAt(ZonedDateTime.now())
+                        .createdBy(assigner.getId())
+                        .build();
+                companyUserRepository.save(companyUser);
             }
-            else if (role.getName().equals("COMPANY_OWNER")) {
-                assigner.setRole(roleRepository.findByName("COMPANY_ADMIN")
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found")));
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public void reassignCompanyRole(String companyUserGuid, ReassignCompanyRoleRequest request, String email, String companyGuid) {
+        try {
+            User requester = userService.findByEmail(email);
+            Company company = companyService.findByGuid(companyGuid);
+            CompanyUser targetCompanyUser = findByGuid(companyUserGuid);
+            Role newRole = roleRepository.findByGuid(request.getNewRoleGuid())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "New role not found"));
+
+            if (!targetCompanyUser.getCompany().equals(company)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Company user does not belong to this company");
             }
 
-            CompanyUser companyUser = CompanyUser.builder()
-                    .company(company)
-                    .user(user)
-                    .role(role)
-                    .guid(UUID.randomUUID().toString())
-                    .isDeleted(false)
-                    .createdAt(ZonedDateTime.now())
-                    .createdBy(assigner.getId())
-                    .build();
-            companyUserRepository.save(companyUser);
+            boolean requesterIsAdmin = requester.getRole().getName().equals("ADMIN");
+            boolean requesterIsCompanyOwner = companyUserRepository.findByUserAndCompanyAndIsDeletedFalse(requester, company)
+                    .map(cu -> cu.getRole().getName().equals("COMPANY_OWNER"))
+                    .orElse(false);
+
+            if (requesterIsAdmin && newRole.getName().equals("COMPANY_OWNER")) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Admins cannot assign the COMPANY_OWNER role.");
+            }
+
+            if (targetCompanyUser.getRole().getName().equals("COMPANY_OWNER") && !requesterIsCompanyOwner) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Only a COMPANY_OWNER can reassign another COMPANY_OWNER.");
+            }
+
+            if (targetCompanyUser.getRole().getName().equals("COMPANY_OWNER") && newRole.getName().equals("COMPANY_OWNER")) {
+                Role companyAdminRole = roleRepository.findByName("COMPANY_ADMIN")
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "COMPANY_ADMIN role not found"));
+                CompanyUser currentOwnerCompanyUser = companyUserRepository.findByUserAndCompanyAndIsDeletedFalse(requester, company)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Requester's company user record not found."));
+                currentOwnerCompanyUser.setRole(companyAdminRole);
+                currentOwnerCompanyUser.setUpdatedAt(ZonedDateTime.now());
+                currentOwnerCompanyUser.setUpdatedBy(requester.getId());
+                companyUserRepository.save(currentOwnerCompanyUser);
+            }
+
+            targetCompanyUser.setRole(newRole);
+            targetCompanyUser.setUpdatedAt(ZonedDateTime.now());
+            targetCompanyUser.setUpdatedBy(requester.getId());
+            companyUserRepository.save(targetCompanyUser);
+
         } catch (Exception e) {
             throw e;
         }
@@ -104,6 +162,8 @@ public class CompanyUserServiceImpl implements CompanyUserService {
                                 .guid(companyUser.getGuid())
                                 .userGuid(companyUser.getUser().getGuid())
                                 .role(companyUser.getRole().getName())
+                                .profilePicture(companyUser.getUser().getProfile())
+                                .joinedDate(companyUser.getCreatedAt() != null ? companyUser.getCreatedAt().toInstant().atZone(ZoneId.systemDefault()) : null)
                                 .positions(positionsDTOList)
                                 .build();
                     })
@@ -126,10 +186,18 @@ public class CompanyUserServiceImpl implements CompanyUserService {
 
             List<Application> applications = applicationService.findAllByUserAndCompanyAndStatus(companyUser.getUser(), company, "ACCEPTED");
             for (Application application : applications) {
-                application.setIsDeleted(true);
+                application.setStatus("REJECTED");
                 application.setUpdatedAt(ZonedDateTime.now());
                 application.setUpdatedBy(user.getId());
                 applicationRepository.save(application);
+            }
+
+            List<CompanyUserPosition> positions = companyUserPositionRepository.findAllByCompanyUserAndIsDeletedFalse(companyUser);
+            for (CompanyUserPosition position : positions) {
+                position.setIsDeleted(true);
+                position.setUpdatedAt(ZonedDateTime.now());
+                position.setUpdatedBy(user.getId());
+                companyUserPositionRepository.save(position);
             }
 
             companyUser.setIsDeleted(true);

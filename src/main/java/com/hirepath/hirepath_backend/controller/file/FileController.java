@@ -92,6 +92,12 @@ public class FileController {
                 }
                 fileStorageService.deleteResume(guid, principal.getName());
                 break;
+            case "location":
+                if (guid == null || guid.isBlank()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "guid is required for location deletion.");
+                }
+                fileStorageService.deleteLocation(guid, principal.getName());
+                break;
 
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type specified for deletion.");
@@ -103,6 +109,8 @@ public class FileController {
     @GetMapping("/download/{type}/{filename:.+}")
     public ResponseEntity<Resource> fileDownload(@PathVariable String type, @PathVariable String filename) {
         Path location;
+        String searchFilename = filename;
+
         switch (type) {
             case "images":
                 location = imageStorageLocation;
@@ -118,14 +126,20 @@ public class FileController {
                 break;
             case "resumes":
                 location = resumeStorageLocation;
+                searchFilename = fileStorageService.getResumeFilenameByGuid(filename);
                 break;
 
             default:
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file type specified.");
         }
 
+        if (!Files.exists(location)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
+        }
+
         try (Stream<Path> files = Files.list(location)) {
-            Optional<Path> foundFile = files.filter(file -> file.getFileName().toString().startsWith(filename))
+            String finalSearchFilename = searchFilename;
+            Optional<Path> foundFile = files.filter(file -> file.getFileName().toString().startsWith(finalSearchFilename))
                     .findFirst();
 
             if (foundFile.isPresent()) {
@@ -140,13 +154,13 @@ public class FileController {
                 } else {
                     throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found " + filename);
                 }
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found " + filename);
             }
 
         } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND ,"File not found " + filename, e);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR ,"Error downloading file " + filename, e);
         }
-
-        return null;
     }
 
     private MediaType getMediaTypeForFileName(String filename) {

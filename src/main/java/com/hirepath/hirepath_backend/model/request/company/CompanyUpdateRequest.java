@@ -3,6 +3,8 @@ package com.hirepath.hirepath_backend.model.request.company;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Data
 public class CompanyUpdateRequest {
     private String name;
@@ -18,4 +20,5 @@ public class CompanyUpdateRequest {
     private String industry;
     private String companySize;
     private String businessType;
+    private LocalDate foundedDate;
 }

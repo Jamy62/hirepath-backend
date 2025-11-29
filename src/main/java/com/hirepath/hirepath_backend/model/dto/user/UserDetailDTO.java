@@ -6,6 +6,7 @@ import com.hirepath.hirepath_backend.model.dto.preferredindustry.PreferredIndust
 import com.hirepath.hirepath_backend.model.dto.skill.SkillListDTO;
 import com.hirepath.hirepath_backend.model.dto.userlanguage.UserLanguageListDTO;
 import com.hirepath.hirepath_backend.model.dto.workexperience.WorkExperienceListDTO;
+import com.hirepath.hirepath_backend.model.entity.preferredlanguage.PreferredLanguage;
 import com.hirepath.hirepath_backend.model.entity.role.Role;
 import lombok.*;
 
@@ -24,6 +25,7 @@ public class UserDetailDTO {
     private String mobile;
     private String profile;
     private Role role;
+    private PreferredLanguage preferredLanguage;
     private Boolean isActive;
     private Boolean isBlocked;
     private String guid;

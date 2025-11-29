@@ -38,6 +38,10 @@ public class AuthServiceImpl implements AuthService {
         try {
             User user = userService.findByEmail(email);
 
+            if (user.getIsBlocked()) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You've been banned by HirePath");
+            }
+
             if (passwordEncoder.matches(password, user.getPassword())) {
                 String token = jwtUtil.generateSystemToken(user);
                 UserDetailDTO userDetail = userService.userDetail(user.getGuid());

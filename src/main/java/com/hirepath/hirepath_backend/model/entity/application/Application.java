@@ -6,6 +6,7 @@ import com.hirepath.hirepath_backend.model.entity.resume.Resume;
 import com.hirepath.hirepath_backend.model.entity.user.User;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.ZonedDateTime;
 
@@ -17,6 +18,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@SQLRestriction("is_deleted = false")
 public class Application {
 
     @Id
@@ -42,14 +44,14 @@ public class Application {
     @Column(name = "cover_letter")
     private String coverLetter;
 
-    @Column(name = "file_path")
-    private String filePath;
-
     @Column(name = "status")
     private String status;
 
     @Column(name = "guid")
     private String guid;
+
+    @Column(name = "is_active")
+    private Boolean isActive;
 
     @Column(name = "is_deleted")
     private Boolean isDeleted;

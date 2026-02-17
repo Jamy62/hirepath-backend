@@ -3,6 +3,7 @@ package com.hirepath.hirepath_backend.model.entity.plan;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -15,6 +16,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@SQLRestriction("is_deleted = false")
 public class Plan {
 
     @Id
@@ -28,7 +30,7 @@ public class Plan {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "price")
+    @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price;
 
     @Column(name = "duration")
@@ -37,7 +39,7 @@ public class Plan {
     @Column(name = "duration_days")
     private Integer durationDays;
 
-    @Column(name = "features")
+    @Column(name = "features", columnDefinition = "TEXT")
     private String features;
 
     @Column(name = "guid")
@@ -58,3 +60,4 @@ public class Plan {
     @Column(name = "updated_by")
     private Long updatedBy;
 }
+

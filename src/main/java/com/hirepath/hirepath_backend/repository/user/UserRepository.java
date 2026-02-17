@@ -1,9 +1,9 @@
 package com.hirepath.hirepath_backend.repository.user;
 
-import com.hirepath.hirepath_backend.model.dto.UserListDTO;
-import com.hirepath.hirepath_backend.model.dto.UserListProjection;
+import com.hirepath.hirepath_backend.model.dto.report.MostActiveUserProjection;
+import com.hirepath.hirepath_backend.model.dto.report.UserGrowthProjection;
+import com.hirepath.hirepath_backend.model.dto.user.UserListProjection;
 import com.hirepath.hirepath_backend.model.entity.user.User;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -34,6 +34,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
             FROM users u
             JOIN roles r on u.role_id = r.id
             WHERE (LOWER(u.name) LIKE LOWER(CONCAT('%', COALESCE(:searchName, ''), '%')) OR :searchName IS NULL)
+            AND r.name = :role
             AND u.is_deleted = 0
             ORDER BY
             CASE WHEN :orderBy = 'ASC' THEN u.created_at END ASC,
@@ -43,6 +44,32 @@ public interface UserRepository extends CrudRepository<User, Long> {
     List<UserListProjection> findAllUsersAdminPanal(
             @Param("searchName") String searchName,
             @Param("orderBy") String orderBy,
+            @Param("role") String role,
             @Param("first") int first,
             @Param("max") int max);
+
+    @Query(value = """
+            SELECT
+                u.name AS userName,
+                COUNT(a.id) AS applicationCount,
+                u.profile as profile
+            FROM users u
+            JOIN applications a ON u.id = a.user_id
+            WHERE u.is_deleted = 0
+            AND a.is_deleted = 0
+            GROUP BY u.name, u.profile
+            ORDER BY applicationCount DESC
+            """, nativeQuery = true)
+    List<MostActiveUserProjection> findMostActiveUsers();
+
+    @Query(value = """
+            SELECT
+                CAST(created_at AS DATE) AS date,
+                COUNT(id) AS userCount
+            FROM users
+            WHERE is_deleted = 0
+            GROUP BY CAST(created_at AS DATE)
+            ORDER BY date
+            """, nativeQuery = true)
+    List<UserGrowthProjection> findUserGrowth();
 }

@@ -1,0 +1,57 @@
+package com.hirepath.hirepath_backend.controller.township;
+
+import com.hirepath.hirepath_backend.model.dto.township.TownshipListDTO;
+import com.hirepath.hirepath_backend.model.request.township.TownshipCreateRequest;
+import com.hirepath.hirepath_backend.model.request.township.TownshipUpdateRequest;
+import com.hirepath.hirepath_backend.model.response.ResponseFormat;
+import com.hirepath.hirepath_backend.service.township.TownshipService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
+import java.util.List;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/v1/township")
+public class TownshipController {
+
+    private final TownshipService townshipService;
+
+    @PostMapping("/create/admin")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<ResponseFormat> townshipCreate(@Valid @RequestBody TownshipCreateRequest request, Principal principal) {
+        townshipService.townshipCreate(request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Township created successfully"));
+    }
+
+    @GetMapping("/list")
+    @PreAuthorize("hasAnyRole('SYSTEM', 'COMPANY')")
+    public ResponseEntity<ResponseFormat> townshipList(
+            @RequestParam(value = "searchName", required = false, defaultValue = "") String searchName,
+            @RequestParam(value = "orderBy", required = false, defaultValue = "DESC") String orderBy,
+            @RequestParam(value = "first", required = false, defaultValue = "0") int first,
+            @RequestParam(value = "max", required = false, defaultValue = "" + Integer.MAX_VALUE) int max) {
+        List<TownshipListDTO> response = townshipService.townshipList(searchName, orderBy, first, max);
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Township list retrieved successfully"));
+    }
+
+    @PutMapping("/update/admin/{townshipGuid}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<ResponseFormat> townshipUpdate(@PathVariable String townshipGuid, @Valid @RequestBody TownshipUpdateRequest request, Principal principal) {
+        townshipService.townshipUpdate(townshipGuid, request, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Township updated successfully"));
+    }
+
+    @DeleteMapping("/delete/admin/{townshipGuid}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<ResponseFormat> townshipDelete(
+            @PathVariable(value = "townshipGuid") String townshipGuid,
+            Principal principal) {
+        townshipService.townshipDelete(townshipGuid, principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(null, "Township deleted successfully"));
+    }
+}

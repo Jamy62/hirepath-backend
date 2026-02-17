@@ -1,7 +1,8 @@
 package com.hirepath.hirepath_backend.controller.auth;
 
-import com.hirepath.hirepath_backend.model.request.CompanySwitchRequest;
-import com.hirepath.hirepath_backend.model.request.LoginRequest;
+import com.hirepath.hirepath_backend.model.request.companyuser.CompanySwitchRequest;
+import com.hirepath.hirepath_backend.model.request.user.LoginRequest;
+import com.hirepath.hirepath_backend.model.response.LoginResponse;
 import com.hirepath.hirepath_backend.model.response.ResponseFormat;
 import com.hirepath.hirepath_backend.service.auth.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -22,22 +23,28 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<ResponseFormat> login(@RequestBody LoginRequest request) {
-        ResponseFormat responseFormat = authService.login(request.getEmail(), request.getPassword());
-        return ResponseEntity.ok(responseFormat);
+        LoginResponse response = authService.login(request.getEmail(), request.getPassword());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Login success"));
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(Principal principal ) {
+    public ResponseEntity<?> logout(Principal principal) {
         authService.logout(principal.getName());
         return ResponseEntity.ok("Logout successful");
     }
 
     @PostMapping("/company-access")
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('USER')")
     public ResponseEntity<ResponseFormat> companyAccess(@RequestBody CompanySwitchRequest request,
                                                         Principal principal) {
-        ResponseFormat responseFormat = authService.companyAccess(request.getCompanyGuid(), principal.getName());
-        return ResponseEntity.ok(responseFormat);
+        LoginResponse response = authService.companyAccess(request.getCompanyGuid(), principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Successfully switched to company"));
     }
 
+    @PostMapping("/company-switch-back")
+    @PreAuthorize("hasAnyRole('COMPANY')")
+    public ResponseEntity<ResponseFormat> companySwitchBack(Principal principal) {
+        LoginResponse response = authService.companySwitchBack(principal.getName());
+        return ResponseEntity.ok(ResponseFormat.createSuccessResponse(response, "Successfully switched back to user"));
+    }
 }

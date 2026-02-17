@@ -6,39 +6,40 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
-@Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-        throws ServletException, IOException {
+            throws ServletException, IOException {
+
+        if (request.getRequestURI().equals("/v1/auth/login") || request.getRequestURI().equals("/v1/user/register")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        final String header = request.getHeader("Authorization");
+        String email = null;
+        String jwt = null;
+
         try {
-            if (request.getRequestURI().equals("/v1/auth/login") || request.getRequestURI().equals("/v1/user/register")) {
-                chain.doFilter(request, response);
-                return;
-            }
-
-            String header = request.getHeader("Authorization");
-            String email = null;
-            String jwt = null;
-
             if (header != null && header.startsWith("Bearer ")) {
                 jwt = header.substring(7);
                 email = jwtUtil.extractEmail(jwt);
@@ -46,36 +47,47 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 if (jwtUtil.isTokenValid(jwt, email)) {
-                    String systemRole = jwtUtil.extractSystemRole(jwt);
-                    Map<String, String> companyRoles = jwtUtil.extractCompanyRoles(jwt);
+                    String tokenType = jwtUtil.extractTokenType(jwt);
                     List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+                    UsernamePasswordAuthenticationToken auth = null;
 
-                    if (systemRole != null) {
-                        authorities.add(new SimpleGrantedAuthority("ROLE_" + systemRole));
+                    if ("SYSTEM".equals(tokenType)) {
+                        String systemRole = jwtUtil.extractSystemRole(jwt);
+                        if (systemRole != null) {
+                            authorities.add(new SimpleGrantedAuthority("ROLE_SYSTEM"));
+                            authorities.add(new SimpleGrantedAuthority("ROLE_" + systemRole));
+                            if (Objects.equals("ADMIN", systemRole)) {
+                                authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+                            }
+                        }
+                        auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
                     }
-                    if (companyRoles != null) {
-                        companyRoles.values().forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
+                    else if ("COMPANY".equals(tokenType)) {
+                        String companyRole = jwtUtil.extractCompanyRole(jwt);
+                        String companyGuid = jwtUtil.extractCompanyGuid(jwt);
+                        if (companyRole != null) {
+                            authorities.add(new SimpleGrantedAuthority("ROLE_" + companyRole));
+                            if (List.of("COMPANY_OWNER", "COMPANY_ADMIN", "COMPANY_EMPLOYEE").contains(companyRole)) {
+                                authorities.add(new SimpleGrantedAuthority("ROLE_COMPANY"));
+                            }
+                        }
+                        auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
+                        if (companyGuid != null) {
+                            auth.setDetails(Map.of("companyGuid", companyGuid));
+                        }
                     }
 
-                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(email, null, authorities);
-                    if (companyRoles != null && !companyRoles.isEmpty()) {
-                        auth.setDetails(Map.of("companyRoles", companyRoles));
+                    if (auth != null) {
+                        SecurityContextHolder.getContext().setAuthentication(auth);
                     }
-                    SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
-        }
-        catch (JwtException e) {
-            log.error("JWT validation failed for request: {} - {}", request.getRequestURI(), e.getMessage(), e);
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            chain.doFilter(request, response);
+        } catch (ResponseStatusException e) {
+            log.error("JWT validation failed for request: {} - {}", request.getRequestURI(), e.getMessage());
+            response.setStatus(e.getStatusCode().value());
             response.setContentType("application/json");
-            response.getWriter().write("{\"success\": false, \"data\": null, \"message\": \"Invalid or expired token\"}");
-        } catch (Exception e) {
-            log.error("Unexpected error in JWT filter for request: {} - {}", request.getRequestURI(), e.getMessage(), e);
-            response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-            response.setContentType("application/json");
-            response.getWriter().write("{\"success\": false, \"data\": null, \"message\": \"An unexpected error occurred\"}");
+            response.getWriter().write(String.format("{\"success\": false, \"data\": null, \"message\": \"%s\"}", e.getReason()));
         }
-        chain.doFilter(request, response);
     }
 }

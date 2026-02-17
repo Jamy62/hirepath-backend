@@ -8,7 +8,7 @@ import java.lang.reflect.Field;
 public class AutoNotBlankValidator implements ConstraintValidator<AutoNotBlank, Object> {
     @Override
     public void initialize(AutoNotBlank constraintAnnotation) {
-        // No initialization needed
+
     }
 
     @Override

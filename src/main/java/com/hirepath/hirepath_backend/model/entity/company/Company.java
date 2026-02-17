@@ -3,7 +3,10 @@ package com.hirepath.hirepath_backend.model.entity.company;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
 @Entity
@@ -14,6 +17,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@SQLRestriction("is_deleted = false")
 public class Company {
 
     public enum VerificationStatus {
@@ -44,7 +48,7 @@ public class Company {
     private String phone;
 
 
-    // verification details
+
     @Enumerated(EnumType.STRING)
     @Column(name = "verification_status")
     private VerificationStatus verificationStatus;
@@ -62,7 +66,7 @@ public class Company {
     private String industry;
 
     @Column(name = "founded_date")
-    private ZonedDateTime foundedDate;
+    private LocalDate foundedDate;
 
     @Column(name = "company_size")
     private String companySize;
@@ -94,5 +98,9 @@ public class Company {
 
     @Column(name = "updated_by")
     private Long updatedBy;
+
+    @Column(name = "amount")
+    @Builder.Default
+    private BigDecimal amount = BigDecimal.ZERO;
 
 }

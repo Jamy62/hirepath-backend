@@ -92,7 +92,7 @@ public class CompanyController {
     }
 
     @DeleteMapping("/delete/admin/{companyGuid}")
-    @PreAuthorize("hasAnyRole('ADMIN' 'COMPANY')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY')")
     public ResponseEntity<ResponseFormat> companyDelete(
             @PathVariable(value = "companyGuid") String companyGuid,
             Principal principal) {
